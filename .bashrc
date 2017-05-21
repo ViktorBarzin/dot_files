@@ -1,7 +1,6 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
-
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -72,56 +71,6 @@ xterm*|rxvt*)
     ;;
 esac
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    # Ne znam kakvo e tova otdolu, no ne raboti ;\
-    # test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias utorrent='utserver -settingspath /opt/utorrent-servealpha-v3_3/'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-    alias pycharm='bash /usr/share/pycharm-community-2016.2.3/bin/pycharm.sh'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-	alias android-studio='bash /usr/share/android-studio/bin/studio.sh'
-	alias hackbg-python='cd /home/viktor/Documents/Software_Development/python/HackBulgaria-Python/'
-    alias violent-python='cd /home/viktor/Documents/Software_Development/python/violent-python'
-    alias django='cd /home/viktor/Documents/Software_Development/python/HackBulgaria-Django/'
-	alias py='python3.6'
-	alias bye='systemctl suspend'
-	alias whatisopen='netstat -pnlt'
-    alias calc='gcalccmd'
-    alias pmr='python manage.py runserver'
-    alias nopmr="netstat -pnlt | grep -E -o -e '[0-9]+/python' | cut -d '/' -f 1 | xargs kill"
-
-    # git aliases
-    alias gs='git status'
-    alias ga='git add .'
-    alias gc='git commit'
-    alias gp='git push origin master'
-
-    # MSR registers is responsible for lag after suspend
-    alias checkcpu='modprobe msr; rdmsr -a 0x19a'
-    alias fixcpu='wrmsr -a 0x19a 0x0'
-	alias daimi="egrep --color -n -i -R $1 --exclude='*.pyc'"
-    alias muzika="xdg-open /home/viktor/Documents/Music/njoy.m3u"
-    alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
-    alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
-    alias svali_papka=download_github_folder
-
-    function download_github_folder(){
-        svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
-    }
-
-
-fi
-
-
-# some more ls aliases
-#alias ll='ls -l'
-#alias la='ls -A'
-#alias l='ls -CF'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -146,9 +95,23 @@ fi
 export NVM_DIR="/root/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
-alias omg="service NetworkManager restart"
 
-VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.5
-export VIRTUALENVWRAPPER_PYTHON
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
+#VIRTUALENV_PYTHON=/usr/bin/python3.5
+#VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.5
+#export VIRTUALENV_PYTHON
+#export WORKON_HOME=$HOME/.virtualenvs
+#source /usr/local/bin/virtualenvwrapper.sh
+
+# PYTHONPATH=/usr/local/bin/python3.6
+# export PYTHONPATH
+
+# Below is the activation for powerline sometime in the future
+
+#if [ "$TERM" != "linux" ]; then
+#    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+#fi
+eval "$(jump shell)"
+# file share across lan - woof
+# lsb_release is not supported for python3, did some stuff there to fix ;/
+# livedown - npm module for live markdown
+# desktop files location - ~/.local/share/applications/
