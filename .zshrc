@@ -1,10 +1,12 @@
-VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3.5
+#[[ $TERM != "screen" ]] && exec tmux
+VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export WORKON_HOME=$HOME/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-  export ZSH=/root/.oh-my-zsh
+export ZSH=~/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -13,10 +15,16 @@ ZSH_THEME="bira"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
+#
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+HISTSIZE=9000
+HISTFILESIZE=9000
+#HISTFILE="~/.bash_history"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
@@ -44,7 +52,7 @@ COMPLETION_WAITING_DOTS="true"
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="dd.mm.yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -53,7 +61,7 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=()
 
 source $ZSH/oh-my-zsh.sh
 
@@ -65,11 +73,12 @@ source $ZSH/oh-my-zsh.sh
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  # export EDITOR='mvim'
+  export EDITOR='vim'
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -89,5 +98,27 @@ eval "$(jump shell)"
 
 # Load aliases
 . ~/.bash_aliases
-export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~  $(git_prompt_info)%{$reset_color%}
-╰─%B#%b ";
+#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~ %{$reset_color%}
+#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~  $(git_prompt_info)%{$reset_color%}
+#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~  $(git_super_status)%{$reset_color%}
+#╰─%B#%b ";
+#PROMPT='%B%m%~%b$(git_super_status) '
+
+j () {
+	local dir="$(jump cd $@)"
+	test -d "$dir" && cd "$dir"
+}
+
+# . ~/.bash_completion
+
+source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
+
+
+# Locale settings for perl
+#export LC_CTYPE=en_US.UTF-8
+
+#export LC_ALL=C
+#export LC_ALL=en_US.UTF-8
+#sudo usermod -aG docker viktor
+#newgrp docker
+

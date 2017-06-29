@@ -1,5 +1,5 @@
 " Source vimrc on vim startup
-autocmd! VimEnter * source ~/.vimrc
+" autocmd! VimEnter * source ~/.vimrc
 
 " Load rename plugin
 so ~/.vim/Rename.vim
@@ -16,7 +16,6 @@ nnoremap <Leader>f :call ToggleFold()<CR>
 " Set relative line number and number to see current line number
 " set rnu
 set number
-
 " Show commands as being written
 set showcmd
 
@@ -148,7 +147,7 @@ if has('win32') || has ('win64')
 " ``<C>`` stands for ``CTRL`` and therefore ``<C-n>`` stands for ``CTRL+n``
 noremap <C-n> :nohl<CR>
 vnoremap <C-n> :nohl<CR>
-inoremap <C-n> :nohl<CR>
+"inoremap <C-n> :nohl<CR>
 
 " Tab switching
 noremap<C-tab> :b#
@@ -210,6 +209,9 @@ au InsertLeave * match ExtraWhitespace /\s\+$/
 set t_Co=256
 color wombat256mod
 
+" Spelling
+" set spell
+" set complete+=kpspell
 
 " Enable syntax highlighting
 " You need to reload this file for the change to apply
@@ -222,6 +224,8 @@ syntax on
 " W391 - blank line at end of file
 let g:syntastic_python_flake8_args='--ignore=W391, E501'
 let g:syntastic_python_flake8_show_quickfix=0
+let g:pymode_lint_ignore="E501,W601,W391"
+let g:pymode_rope_lookup_project = 0
 
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
@@ -271,10 +275,10 @@ set smartcase
 " Backup files are great so lets keep them in 1 place
 " Make sure you have ~/vimtmp/ folder. In the future will
 " move /vimtmp/ in $VIMHOME
-set backupdir=~/vimtmp//,.
-set directory=~/vimtmp//,.
-set dir=~/vimtmp//,.
-set undodir=~/vimtmp/undo//
+set backupdir=~/.vim/tmp//,.
+set directory=~/.vim/tmp//,.
+set dir=~/.vim/tmp//,.
+set undodir=~/.vim/tmp/undo//
 
 
 " Setup Pathogen to manage your plugins
@@ -406,4 +410,23 @@ vmap co :call CommentLines()<CR>
 
 " Encryption algo (vim -x file)
 set cm=blowfish2
+
+" Improve perfomance with long lines
+set synmaxcol=200
+
+
+set autoread
+
+" Autosave
+" augroup autoSaveAndRead
+"     autocmd!
+"     autocmd TextChanged,InsertLeave,FocusLost * silent! wall
+"     autocmd CursorHold * silent! checktime
+" augroup END
+
+" Lion alignment operator config (see https://github.com/tommcdo/vim-lion)
+let b:lion_squeeze_spaces = 1
+
+set showmatch
+set matchtime=3
 
