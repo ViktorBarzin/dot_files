@@ -43,6 +43,11 @@ let g:xptemplate_minimal_prefix = 1
 let g:xptemplate_vars="$author=viktor.barzin"
 let g:xptemplate_vars="$email=viktor.barzin@samitor.com"
 
+" Rebind <Leader> key
+" I like to have it here becuase it is easier to reach than the default and
+" it is next to ``m`` and ``n`` which I use for navigating between tabs.
+let mapleader = ","
+
 " Swap lines
 nnoremap <Leader>k :-1,-1m+0<CR>k
 nnoremap <Leader>j :+0,+0m+1<CR>
@@ -98,6 +103,7 @@ set wildmenu
 set pastetoggle=<F2>
 set clipboard=unnamed
 
+
 " Mouse and backspace
 set mouse=a  " on OSX press ALT and click
 set bs=2     " make backspace behave like normal again
@@ -110,10 +116,6 @@ endif
 " Set comment string for commentary.vim for python
 set commentstring=#%s
 
-" Rebind <Leader> key
-" I like to have it here becuase it is easier to reach than the default and
-" it is next to ``m`` and ``n`` which I use for navigating between tabs.
-let mapleader = ","
 
 
 
@@ -145,8 +147,8 @@ if has('win32') || has ('win64')
 " Bind nohl
 " Removes highlight of your last search
 " ``<C>`` stands for ``CTRL`` and therefore ``<C-n>`` stands for ``CTRL+n``
-noremap <C-n> :nohl<CR>
-vnoremap <C-n> :nohl<CR>
+noremap <F3> :nohl<CR>
+vnoremap <F3> :nohl<CR>
 "inoremap <C-n> :nohl<CR>
 
 " Tab switching
@@ -418,11 +420,11 @@ set synmaxcol=200
 set autoread
 
 " Autosave
-" augroup autoSaveAndRead
-"     autocmd!
-"     autocmd TextChanged,InsertLeave,FocusLost * silent! wall
-"     autocmd CursorHold * silent! checktime
-" augroup END
+augroup autoSaveAndRead
+    autocmd!
+    autocmd TextChanged,InsertLeave,FocusLost * silent! wall
+    autocmd CursorHold * silent! checktime
+augroup END
 
 " Lion alignment operator config (see https://github.com/tommcdo/vim-lion)
 let b:lion_squeeze_spaces = 1
@@ -430,3 +432,7 @@ let b:lion_squeeze_spaces = 1
 set showmatch
 set matchtime=3
 
+" Recompute syntax highlighting
+nnoremap <silent> <F4> :syntax sync fromstart<CR>
+
+autocmd FileType markdown syntax sync fromstart
