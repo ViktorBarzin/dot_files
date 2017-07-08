@@ -1,0 +1,1 @@
+/home/viktor/.vim
