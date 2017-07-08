@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/etc/NetworkManager/system-connections'
+let g:netrw_dirhist_2='/etc/NetworkManager/system-connections/USRP'
+let g:netrw_dirhist_3='/etc/NetworkManager/system-connections'
+let g:netrw_dirhist_4='/etc/cron.hourly'
+let g:netrw_dirhist_5='/home/viktor/Documents/Software_Development/python/hackbulgaria-python/week-10'
+let g:netrw_dirhist_6='/home/viktor/Documents/Software_Development/python/hackbulgaria-python/week-10/decorators'
+let g:netrw_dirhist_7='/home/viktor/Documents/Software_Development/python/HackBulgaria-Django/week-03/blog'
