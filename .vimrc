@@ -430,3 +430,6 @@ let b:lion_squeeze_spaces = 1
 set showmatch
 set matchtime=3
 
+
+"asdasdasd"
+
