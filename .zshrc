@@ -126,3 +126,7 @@ source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
 send_key() {
   cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
 }
+
+#PYENV_ROOT="$HOME/.pyenv"
+#PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
