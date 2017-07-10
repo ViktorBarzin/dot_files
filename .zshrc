@@ -1,7 +1,4 @@
 #[[ $TERM != "screen" ]] && exec tmux
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3.6
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -39,7 +36,7 @@ HYPHEN_INSENSITIVE="true"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
@@ -127,6 +124,11 @@ send_key() {
   cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
 }
 
-#PYENV_ROOT="$HOME/.pyenv"
-#PATH="$PYENV_ROOT/bin:$PATH"
+PYENV_ROOT="$HOME/.pyenv"
+PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+
+export VIRTUALENVWRAPPER_PYTHON=python
+export WORKON_HOME=$HOME/.virtualenvs
+source /usr/local/bin/virtualenvwrapper.sh
