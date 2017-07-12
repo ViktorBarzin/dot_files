@@ -35,3 +35,4 @@ function download_github_folder() {
 }
 
 alias sizeof="du -sh $1"
+alias mkdir="mkdir -pv"
