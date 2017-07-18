@@ -130,10 +130,10 @@ set commentstring=#%s
 "autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
 
 " Sources $MYVIMRC on changes
-augroup reload_vimrc " {
-    autocmd!
-    autocmd BufWritePost $MYVIMRC source $MYVIMRC
-augroup END " }
+" augroup reload_vimrc " {
+"     autocmd!
+"     autocmd BufWritePost $MYVIMRC source $MYVIMRC
+" augroup END " }
 
 
 " Set VIMHOME
