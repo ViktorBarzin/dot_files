@@ -36,3 +36,8 @@ function download_github_folder() {
 
 alias sizeof="du -sh $1"
 alias mkdir="mkdir -pv"
+
+# Send ssh key to server
+send_key() {
+  cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
+}
