@@ -44,8 +44,16 @@ send_key() {
 
 function ls(){
     if [[ $2 == "-l" ]]; then
-        exa -bghHliS
+        if [[ $3 != "" ]]; then
+            exa -bghHliS $3
+        else
+            exa -bghHliS
+        fi
     else
-        /bin/ls --color=auto
+        if [[ $2 != "" ]]; then
+            /bin/ls --color=auto $2
+        else
+            /bin/ls --color=auto
+        fi
     fi
 }
