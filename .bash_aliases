@@ -57,3 +57,6 @@ function ls(){
         fi
     fi
 }
+
+alias upgrade="sudo apt upgrade"
+alias install="sudo apt install"
