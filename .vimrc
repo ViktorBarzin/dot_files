@@ -4,6 +4,11 @@
 " Load rename plugin
 so ~/.vim/Rename.vim
 
+
+" Rezise splits
+"nnoremap <C-Left> :vertical resize -20<CR>
+
+
 " Autoindent html
 " autocmd BufWritePre *.html :normal gg=G
 
@@ -51,12 +56,12 @@ let mapleader = ","
 " Swap lines
 nnoremap <Leader>k :-1,-1m+0<CR>k
 nnoremap <Leader>j :+0,+0m+1<CR>
+vnoremap <Leader>k :m '<-2<CR>gv=gv
+vnoremap <Leader>j :m '>+1<CR>gv=gv
 
 " Enable folding with spacebar
 nnoremap <space> za
 
-" Toggle NEDRTree plugin
-noremap <C-b> :NERDTreeToggle<CR>
 
 " Make surrounding with various characters easier
 nmap <Leader>' ysiW'
@@ -80,9 +85,6 @@ vnoremap <BS> d
 " Save with <Leader> s
 noremap <silent> <Leader>s :update<CR>
 
-" Open NERDTree by default
-"autocmd VimEnter * NERDTree
-"autocmd VimEnter * wincmd p
 
 " Writes to all buffers when switching to another buffer
 set autowrite
@@ -348,11 +350,21 @@ noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
 
-" Do splits with C-right and C-up
-nnoremap <silent> <C-Right> :vsp<CR>
-nnoremap <silent> <C-Up> :sp<CR>
+" Do splits with Leader-\ and Leader--
+" nnoremap <silent> <C-Right> :vsp<CR>
+" nnoremap <silent> <C-Up> :sp<CR>
+noremap <leader>\ :vsp<CR>
+noremap <leader>- :sp<CR>
 
+
+" NERDTree settings
+" Open NERDTree by default
+"autocmd VimEnter * NERDTree
+"autocmd VimEnter * wincmd p
+" Toggle NEDRTree plugin
+noremap <C-b> :NERDTreeToggle<CR>
 let NERDTreeIgnore = ['\.pyc$', '__pycache__']
+let NERDTreeShowHidden=1
 
 " Better navigating through omnicomplete option list
 " See
@@ -436,3 +448,4 @@ set matchtime=3
 nnoremap <silent> <F4> :syntax sync fromstart<CR>
 
 autocmd FileType markdown syntax sync fromstart
+
