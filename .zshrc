@@ -95,11 +95,6 @@ eval "$(jump shell)"
 
 # Load aliases
 . ~/.bash_aliases
-#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~ %{$reset_color%}
-#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~  $(git_prompt_info)%{$reset_color%}
-#export PS1="%{$terminfo[bold]$fg[red]%}%n@%m%{$reset_color%} $terminfo[bold]%2~  $(git_super_status)%{$reset_color%}
-#╰─%B#%b ";
-#PROMPT='%B%m%~%b$(git_super_status) '
 
 j () {
 	local dir="$(jump cd $@)"
@@ -108,7 +103,7 @@ j () {
 
 # . ~/.bash_completion
 
-source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
+# source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
 
 
 # Locale settings for perl

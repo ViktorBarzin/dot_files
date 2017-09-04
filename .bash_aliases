@@ -21,7 +21,8 @@ alias gp='git push origin master'
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
 alias fixcpu='wrmsr -a 0x19a 0x0'
 
-alias daimi="egrep --color -n -i -R $1 --exclude='*.pyc'"
+#alias daimi="egrep --color -n -i -R $1 --exclude='*.pyc'"
+alias daimi="grep -rnw $2 $1"
 alias muzika="xdg-open /home/viktor/Documents/Music/njoy.m3u"
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
@@ -42,21 +43,29 @@ send_key() {
   cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
 }
 
-function ls(){
-    if [[ $2 == "-l" ]]; then
-        if [[ $3 != "" ]]; then
-            exa -bghHliS $3
-        else
-            exa -bghHliS
-        fi
-    else
-        if [[ $2 != "" ]]; then
-            /bin/ls --color=auto $2
-        else
-            /bin/ls --color=auto
-        fi
-    fi
-}
+# function ls(){
+#     if [[ $2 == "-l" ]]; then
+#         if [[ $3 != "" ]]; then
+#             exa -bghHliS $3
+#         else
+#             exa -bghHliS
+#         fi
+#     else
+#         if [[ $2 != "" ]]; then
+#             /bin/ls --color=auto $2
+#         else
+#             /bin/ls --color=auto
+#         fi
+#     fi
+# }
 
 alias upgrade="sudo apt upgrade"
 alias install="sudo apt install"
+
+function secureme(){
+    workon ansible;
+    cd /home/viktor/ansible-play/
+    ansible-playbook -i ./hosts --extra-vars "ansible_sudo_pass=$ROOTPASS" --tags "vpn_startup" main.yml >> /dev/null
+    cd /home/viktor/;
+    sudo openvpn --config viktor.ovpn &
+}
