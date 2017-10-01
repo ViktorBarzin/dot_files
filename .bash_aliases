@@ -27,7 +27,7 @@ alias muzika="xdg-open /home/viktor/Documents/Music/njoy.m3u"
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
-alias omg="service NetworkManager restart"
+alias omg="sudo service NetworkManager restart"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias whatismyip="curl ifconfig.co"
 
