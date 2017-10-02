@@ -61,6 +61,7 @@ HIST_STAMPS="dd.mm.yyyy"
 plugins=()
 
 source $ZSH/oh-my-zsh.sh
+tmux source-file /home/viktor/.tmux.conf
 
 # User configuration
 
@@ -103,6 +104,7 @@ j () {
 
 # . ~/.bash_completion
 
+# Slows down shell.
 # source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
 
 
@@ -126,4 +128,4 @@ eval "$(pyenv init -)"
 
 export VIRTUALENVWRAPPER_PYTHON=python
 export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
+# source /usr/local/bin/virtualenvwrapper.sh

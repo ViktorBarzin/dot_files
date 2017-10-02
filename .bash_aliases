@@ -30,6 +30,7 @@ alias svali_papka=download_github_folder
 alias omg="sudo service NetworkManager restart"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias whatismyip="curl ifconfig.co"
+alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
 
 function download_github_folder() {
     svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
