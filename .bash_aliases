@@ -40,11 +40,6 @@ function download_github_folder() {
 alias sizeof="du -sh $1"
 alias mkdir="mkdir -pv"
 
-# Send ssh key to server
-send_key() {
-  cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
-}
-
 # function ls(){
 #     if [[ $2 == "-l" ]]; then
 #         if [[ $3 != "" ]]; then
@@ -107,4 +102,42 @@ function in(){
         docker start $container_name >> /dev/null
         docker exec -it $container_name /bin/bash
     fi
+}
+
+function stest(){
+  : snapshot_name="rootsnap"
+    mount_point="$2"
+
+    if [ $# -ne 2 ];then
+        echo "Usage:"
+        echo "$0 <snapshot size> <mount point> "
+        echo
+        return
+    fi
+
+    if [ ${mount_point:0:1} != '/' ]; then
+        echo "Mount point must be absolute path"
+        return
+    fi
+
+    if [[ $(sudo lvs | grep $snapshot_name) ]]; then
+        echo "$snapshot_name already exists!"
+        # read -e -p "Do you want to discard it and create a new one?(y/N)" -i n should_discard
+        echo "Do you want to discard it and create a new one?(y/N)"
+        read  should_discard
+        should_discard=${should_discard:-"n"}
+        # if [ ${(L)should_discard} = 'y' ]; then
+        if [ $(echo $should_discard | awk '{print tolower($0)}') = 'y' ]; then
+            sudo umount $mount_point
+            sudo lvremove /dev/kubuntu-vg/$snapshot_name -y
+        else
+            echo "Leaving old snapshot intact"
+            return
+        fi
+
+    fi
+
+    sudo lvcreate -s -n $snapshot_name /dev/kubuntu-vg/root -L $1
+    sudo mount /dev/kubuntu-vg/$snapshot_name $mount_point
+    sudo chroot $mount_point /bin/zsh
 }

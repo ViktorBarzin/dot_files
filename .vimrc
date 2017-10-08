@@ -468,6 +468,10 @@ let b:lion_squeeze_spaces = 1
 set showmatch
 set matchtime=3
 
+" Fold functions in bash
+let g:sh_fold_enabled=3
+
+
 " Recompute syntax highlighting
 nnoremap <silent> <F4> :syntax sync fromstart<CR>
 
