@@ -9,6 +9,7 @@ export ZSH=~/.oh-my-zsh
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="bira"
+# ZSH_THEME="adben"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -24,7 +25,7 @@ HISTFILESIZE=9000
 HYPHEN_INSENSITIVE="true"
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
@@ -44,7 +45,7 @@ COMPLETION_WAITING_DOTS="true"
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -61,7 +62,7 @@ HIST_STAMPS="dd.mm.yyyy"
 plugins=()
 
 source $ZSH/oh-my-zsh.sh
-tmux source-file /home/viktor/.tmux.conf
+# tmux source-file /home/viktor/.tmux.conf
 
 # User configuration
 
@@ -104,27 +105,14 @@ j () {
 
 # . ~/.bash_completion
 
-# Slows down shell.
-# source $ZSH/custom/plugins/zsh-git-prompt/zshrc.sh
-
-
 # Locale settings for perl
 #export LC_CTYPE=en_US.UTF-8
-
 #export LC_ALL=C
 #export LC_ALL=en_US.UTF-8
-#sudo usermod -aG docker viktor
-#newgrp docker
-
-# Send ssh key to server
-send_key() {
-  cat ~/.ssh/id_rsa.pub | ssh $1 "mkdir -p ~/.ssh && cat >>  ~/.ssh/authorized_keys"
-}
 
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-
 
 export VIRTUALENVWRAPPER_PYTHON=python
 export WORKON_HOME=$HOME/.virtualenvs

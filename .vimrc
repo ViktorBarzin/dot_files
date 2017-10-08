@@ -109,8 +109,16 @@ let g:airline#extensions#virtualenv#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+" let g:airline_left_sep='>'
+" let g:airline_right_sep='<'
+" let g:airline_detect_modified=1
+let g:airline_powerline_fonts=1
+" let g:airline_section_b = '%{strftime("%c")}'
+" let g:airline_section_y = 'BN: %{bufnr("%")} FT: %y'
+
 
 " Enable wildmenu which is an enhanced  command completion
+"
 set wildmenu
 " Better copy & paste
 " When you want to paste large blocks of code into vim, press F2 before you
@@ -226,6 +234,8 @@ au InsertLeave * match ExtraWhitespace /\s\+$/
 "  http://www.vim.org/scripts/download_script.php?src_id=13400
 set t_Co=256
 color wombat256mod
+" color mayansmoke
+" color github
 
 " Spelling
 " set spell

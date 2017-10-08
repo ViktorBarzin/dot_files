@@ -31,6 +31,7 @@ alias omg="sudo service NetworkManager restart"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias whatismyip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
+alias root="sudo su"
 
 function download_github_folder() {
     svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
@@ -69,4 +70,41 @@ function secureme(){
     ansible-playbook -i ./hosts --extra-vars "ansible_sudo_pass=$ROOTPASS" --tags "vpn_startup" main.yml >> /dev/null
     cd /home/viktor/;
     sudo openvpn --config viktor.ovpn &
+}
+
+function in(){
+    if [ $# -ne 1 ] && [ $# -ne 2 ];
+    then
+        echo "Usage:"
+        echo "To start existing container:"
+        echo "in <os you want>"
+        echo
+        echo "To start new container:"
+        echo "in new <os you want>"
+        return
+    fi
+
+    if [ $# -eq 1 ]
+    then
+        container_name="${1/:/_}"
+    else
+        container_name="${2/:/_}"
+    fi
+
+    if [ "$1" = "new" ] && [ $# -eq 2 ]
+    then
+        image_name=$2
+        if [[ $(docker container ls -a | grep "$container_name") ]]
+        then
+            if [[ $(docker ps | grep $container_name) ]]
+            then
+                docker stop $container_name >> /dev/null
+            fi
+            docker rm $container_name >> /dev/null
+        fi
+        docker run -it --name $container_name $image_name /bin/bash
+    else
+        docker start $container_name >> /dev/null
+        docker exec -it $container_name /bin/bash
+    fi
 }
