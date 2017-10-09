@@ -114,6 +114,4 @@ PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
-export VIRTUALENVWRAPPER_PYTHON=python
-export WORKON_HOME=$HOME/.virtualenvs
-# source /usr/local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
