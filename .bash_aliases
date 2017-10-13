@@ -141,3 +141,10 @@ function stest(){
     sudo mount /dev/kubuntu-vg/$snapshot_name $mount_point
     sudo chroot $mount_point /bin/zsh
 }
+
+alias ifl="ifconfig|less"
+# Docker aliases
+alias dsl="docker swarm leave --force"
+alias dsi="docker swarm init --advertise-addr=$(ifconfig wlp2s0 | grep inet | awk '/1/{print $2}')"
+alias dsjtm="docker swarm join-token manager"
+alias dsjtw="docker swarm join-token worker"
