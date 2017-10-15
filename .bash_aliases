@@ -97,7 +97,7 @@ function in(){
             fi
             docker rm $container_name >> /dev/null
         fi
-        docker run -it --name $container_name $image_name /bin/bash
+        docker run -it --name $container_name --publish-all=true $image_name /bin/bash
     else
         docker start $container_name >> /dev/null
         docker exec -it $container_name /bin/bash
