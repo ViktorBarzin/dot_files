@@ -2,5 +2,5 @@
 Dotfiles collection
 
 ## Usage
-Just run the setup script
+To setup vim just run the setup script
 
