@@ -29,7 +29,7 @@ alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 
 alias svali_papka=download_github_folder
 alias omg="sudo service NetworkManager restart"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
-alias whatismyip="curl ifconfig.co"
+alias myip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
 alias root="sudo su"
 
@@ -59,13 +59,13 @@ alias mkdir="mkdir -pv"
 alias upgrade="sudo apt upgrade"
 alias install="sudo apt install"
 
-function secureme(){
-    workon ansible;
-    cd /home/viktor/ansible-play/
-    ansible-playbook -i ./hosts --extra-vars "ansible_sudo_pass=$ROOTPASS" --tags "vpn_startup" main.yml >> /dev/null
-    cd /home/viktor/;
-    sudo openvpn --config viktor.ovpn &
-}
+# function secureme(){
+#     workon ansible;
+#     cd /home/viktor/ansible-play/
+#     ansible-playbook -i ./hosts --extra-vars "ansible_sudo_pass=$ROOTPASS" --tags "vpn_startup" main.yml >> /dev/null
+#     cd /home/viktor/;
+#     sudo openvpn --config viktor.ovpn &
+# }
 
 function in(){
     if [ $# -ne 1 ] && [ $# -ne 2 ];
