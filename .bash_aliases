@@ -31,7 +31,7 @@ alias omg="sudo service NetworkManager restart"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias myip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
-alias root="sudo su"
+alias root="sudo su -"
 
 function download_github_folder() {
     svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
@@ -148,3 +148,6 @@ alias dsl="docker swarm leave --force"
 alias dsi="docker swarm init --advertise-addr=$(ifconfig wlp2s0 | grep inet | awk '/1/{print $2}')"
 alias dsjtm="docker swarm join-token manager"
 alias dsjtw="docker swarm join-token worker"
+
+alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
+alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
