@@ -151,3 +151,4 @@ alias dsjtw="docker swarm join-token worker"
 
 alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
+alias dd="dd status=progress"
