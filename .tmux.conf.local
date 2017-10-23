@@ -287,3 +287,4 @@ bind l resize-pane -R 10
 bind h resize-pane -L 10
 
 run-shell /home/viktor/.tmux/resurrect/resurrect.tmux
+
