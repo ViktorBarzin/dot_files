@@ -6,18 +6,18 @@ so ~/.vim/Rename.vim
 
 " let g:EclimCompletionMethod = 'omnifunc'
 " Java Autocomplete
-let g:acp_behaviorJavaEclimLength=3
-function MeetsForJavaEclim(context)
-  return g:acp_behaviorJavaEclimLength >= 0 &&
-        \ a:context =~ '\k\.\k\{' . g:acp_behaviorJavaEclimLength . ',}$'
-endfunction
-let g:acp_behavior = {
-    \ 'java': [{
-      \ 'command': "\<c-x>\<c-u>",
-      \ 'completefunc' : 'eclim#java#complete#CodeComplete',
-      \ 'meets'        : 'MeetsForJavaEclim',
-    \ }]
-  \ }
+" let g:acp_behaviorJavaEclimLength=3
+" function MeetsForJavaEclim(context)
+"   return g:acp_behaviorJavaEclimLength >= 0 &&
+"         \ a:context =~ '\k\.\k\{' . g:acp_behaviorJavaEclimLength . ',}$'
+" endfunction
+" let g:acp_behavior = {
+"     \ 'java': [{
+"       \ 'command': "\<c-x>\<c-u>",
+"       \ 'completefunc' : 'eclim#java#complete#CodeComplete',
+"       \ 'meets'        : 'MeetsForJavaEclim',
+"     \ }]
+"   \ }
 
 " Rezise splits
 "nnoremap <C-Left> :vertical resize -20<CR>
