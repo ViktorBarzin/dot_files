@@ -154,3 +154,5 @@ alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 alias dd="dd status=progress"
 alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
 alias aliases="vim /home/viktor/.bash_aliases && source /home/viktor/.bash_aliases"
+
+# alias ghcirun="ghci --make $1; ./$1"
