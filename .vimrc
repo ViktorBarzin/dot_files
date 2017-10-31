@@ -456,11 +456,11 @@ set synmaxcol=200
 set autoread
 
 " Autosave
-augroup autoSaveAndRead
-    autocmd!
-    autocmd TextChanged,InsertLeave,FocusLost * silent! wall
-    autocmd CursorHold * silent! checktime
-augroup END
+" augroup autoSaveAndRead
+"     autocmd!
+"     autocmd TextChanged,InsertLeave,FocusLost * silent! wall
+"     autocmd CursorHold * silent! checktime
+" augroup END
 
 " Lion alignment operator config (see https://github.com/tommcdo/vim-lion)
 let b:lion_squeeze_spaces = 1
