@@ -476,3 +476,4 @@ let g:sh_fold_enabled=3
 nnoremap <silent> <F4> :syntax sync fromstart<CR>
 
 autocmd FileType markdown syntax sync fromstart
+

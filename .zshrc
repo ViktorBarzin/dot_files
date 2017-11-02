@@ -115,3 +115,4 @@ PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 source /usr/local/bin/virtualenvwrapper.sh
+# eval ssh-agent > /dev/null
