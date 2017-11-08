@@ -21,9 +21,8 @@ alias gp='git push origin master'
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
 alias fixcpu='wrmsr -a 0x19a 0x0'
 
-#alias daimi="egrep --color -n -i -R $1 --exclude='*.pyc'"
 alias daimi="grep -rnw $2 $1"
-alias muzika="xdg-open /home/viktor/Documents/Music/njoy.m3u"
+alias muzika='xdg-open /home/viktor/Documents/Music/njoy.m3u'
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
@@ -158,3 +157,32 @@ alias aliases="vim /home/viktor/.bash_aliases && source /home/viktor/.bash_alias
 
 # alias ghcirun="ghci --make $1; ./$1"
 alias lip="ifconfig $(route -n | head -n 3 | tail -n 1 | awk '{print $8}') | grep inet | awk '{print \$2}'"
+
+function netissue(){
+    # ping google.com
+    echo 'Testing DNS settings.'
+    timeout 1 ping google.com -W 1 -c 1 &>> /dev/null
+    if (( $? == 0 )); then
+        echo 'Internet is up.'
+        return 0
+    fi
+    # ping 8.8.8.8
+    echo 'Pinging 8.8.8.8'
+    ping 8.8.8.8 -W 1 -c 1 &>> /dev/null
+    if (( $? == 0 )); then
+        echo 'Issue spoted in DNS settings'
+        return 0
+    fi
+    # ping gateway
+    echo 'Pinging default gateway'
+    ping $(echo $(route -n | sed -n '3p' | awk '{print $2}')) -W 1 -c 2 &>> /dev/null
+    if (($? == 0 )); then
+        echo 'Gateway connectivity issues or being firewalled.'
+        return 0
+    else
+        echo 'Cant reach default gateway.'
+        return 0
+    fi
+    # deteemine issue
+}
+

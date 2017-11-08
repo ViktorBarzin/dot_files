@@ -252,8 +252,9 @@ syntax on
 " W391 - blank line at end of file
 let g:syntastic_python_flake8_args='--ignore=W391, E501'
 let g:syntastic_python_flake8_show_quickfix=0
-let g:pymode_lint_ignore="E501,W601,W391"
+let g:pymode_lint_ignore="E501,W601,W391,W0401"
 let g:pymode_rope_lookup_project = 0
+let g:pymode_lint_cwindow = 0
 
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
