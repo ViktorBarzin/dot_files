@@ -4,7 +4,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias py='python3.6'
 alias bye='systemctl suspend'
-alias whatisopen='netstat -pnlt'
+alias whatisopen='sudo netstat -pnlt'
 alias calc='gcalccmd'
 alias pmr='python manage.py runserver'
 alias nopmr="netstat -pnlt | grep -E -o -e '[0-9]+/python' | cut -d '/' -f 1 | xargs kill"
