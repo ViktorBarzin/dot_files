@@ -111,8 +111,8 @@ j () {
 #export LC_ALL=en_US.UTF-8
 
 PYENV_ROOT="$HOME/.pyenv"
-PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+# PATH="$PYENV_ROOT/bin:$PATH"
+#eval "$(pyenv init -)"
 
 source /usr/local/bin/virtualenvwrapper.sh
 # eval ssh-agent > /dev/null
