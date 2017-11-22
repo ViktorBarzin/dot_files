@@ -367,7 +367,7 @@ let g:jedi#force_py_version = 3
 map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
 
 " Map C-a to select entire file
-nnoremap <C-a> ggVG
+"nnoremap <C-a> ggVG
 
 " Real vimmers dont use those
 noremap <Up> <NOP>
