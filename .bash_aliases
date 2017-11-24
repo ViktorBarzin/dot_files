@@ -186,3 +186,4 @@ function netissue(){
     # deteemine issue
 }
 
+alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
