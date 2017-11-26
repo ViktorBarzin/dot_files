@@ -478,3 +478,6 @@ nnoremap <silent> <F4> :syntax sync fromstart<CR>
 
 autocmd FileType markdown syntax sync fromstart
 
+set cursorline
+set scrolloff=3
+set sidescrolloff=3
