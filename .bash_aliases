@@ -56,6 +56,7 @@ alias mkdir="mkdir -pv"
 #     fi
 # }
 
+alias update="sudo apt update"
 alias upgrade="sudo apt upgrade"
 alias install="sudo apt install"
 
@@ -186,4 +187,4 @@ function netissue(){
     # deteemine issue
 }
 
-alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
+#alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
