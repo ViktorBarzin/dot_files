@@ -16,6 +16,7 @@ alias gs='git status'
 alias ga='git add $1'
 alias gc='git commit'
 alias gp='git push origin master'
+alias gpull='git pull origin master'
 
 # MSR registers is responsible for lag after suspend
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
