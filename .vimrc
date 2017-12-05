@@ -234,6 +234,7 @@ au InsertLeave * match ExtraWhitespace /\s\+$/
 "  http://www.vim.org/scripts/download_script.php?src_id=13400
 set t_Co=256
 color wombat256mod
+" color ronakg
 " color mayansmoke
 " color github
 
@@ -255,6 +256,7 @@ let g:syntastic_python_flake8_show_quickfix=0
 let g:pymode_lint_ignore="E501,W601,W391,W0401"
 let g:pymode_rope_lookup_project = 0
 let g:pymode_lint_cwindow = 0
+let g:pymode_rope = 0
 
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
