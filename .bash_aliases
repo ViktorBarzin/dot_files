@@ -189,3 +189,4 @@ function netissue(){
 }
 
 #alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
+alias sl=ls
