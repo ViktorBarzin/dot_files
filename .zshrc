@@ -116,3 +116,4 @@ PYENV_ROOT="$HOME/.pyenv"
 
 source /usr/local/bin/virtualenvwrapper.sh
 # eval ssh-agent > /dev/null
+export VIRTUALENV_PYTHON=/home/viktor/.pyenv/shims/python
