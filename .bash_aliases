@@ -60,6 +60,7 @@ alias mkdir="mkdir -pv"
 alias update="sudo apt update"
 alias upgrade="sudo apt upgrade"
 alias install="sudo apt install"
+alias remove="sudo apt remove"
 
 # function secureme(){
 #     workon ansible;
@@ -190,3 +191,4 @@ function netissue(){
 
 #alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
 alias sl=ls
+alias vimrc="vim ~/.vimrc"
