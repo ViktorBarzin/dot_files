@@ -161,7 +161,7 @@ alias aliases="vim /home/viktor/.bash_aliases && source /home/viktor/.bash_alias
 # alias ghcirun="ghci --make $1; ./$1"
 alias lip="ifconfig $(route -n | head -n 3 | tail -n 1 | awk '{print $8}') | grep inet | awk '{print \$2}'"
 
-function netissue(){
+function netok(){
     # ping google.com
     echo 'Testing DNS settings.'
     timeout 1 ping google.com -W 1 -c 1 &>> /dev/null
@@ -177,8 +177,9 @@ function netissue(){
         return 0
     fi
     # ping gateway
-    echo 'Pinging default gateway'
-    ping $(echo $(route -n | sed -n '3p' | awk '{print $2}')) -W 1 -c 2 &>> /dev/null
+    gateway=$(echo $(route -n | sed -n '3p' | awk '{print $2}'))
+    echo 'Pinging ' $gateway
+    ping $gateway -W 1 -c 2 &>> /dev/null
     if (($? == 0 )); then
         echo 'Gateway connectivity issues or being firewalled.'
         return 0
