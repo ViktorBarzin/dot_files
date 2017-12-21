@@ -486,3 +486,8 @@ autocmd FileType markdown syntax sync fromstart
 set cursorline
 set scrolloff=3
 set sidescrolloff=3
+
+" Easier line joining
+if v:version > 703 || v:version == 703 && has('patch541')
+  set formatoptions+=j
+endif
