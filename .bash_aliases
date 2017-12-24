@@ -193,3 +193,4 @@ function netok(){
 #alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
 alias sl=ls
 alias vimrc="vim ~/.vimrc"
+alias f="free -h"
