@@ -195,3 +195,4 @@ alias sl=ls
 alias vimrc="vim ~/.vimrc"
 alias f="free -h"
 alias h="htop"
+alias e="exa -bghHliS"
