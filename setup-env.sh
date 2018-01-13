@@ -10,10 +10,10 @@ sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/to
 
 # Setup config files
 git clone https://github.com/ViktorBarzin/dot_files.git && \
-cp g.zshrc ~/.zshrc && \
-cp g.bash_aliases ~/.bash_aliases && \
-sudo cp gvirtualenvwrapper.sh /usr/local/bin/virtualenvwrapper.sh && \
-cp g.zshenv ~/.zshenv && \
+cp .zshrc ~/.zshrc && \
+cp .bash_aliases ~/.bash_aliases && \
+sudo cp virtualenvwrapper.sh /usr/local/bin/virtualenvwrapper.sh && \
+cp .zshenv ~/.zshenv && \
 
 # Configure j (jump)
 # Debian like
