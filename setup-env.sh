@@ -39,3 +39,4 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv && \
 sudo pip install --upgrade pip && \
 sudo pip install virtualenvwrapper
 
+source ~/.zshrc
