@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Install zsh
+sudo apt update
 sudo apt install zsh \
-    install python-pip && \
+    install python-pip
 # Setup oh-my-zsh
 sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
 # Password prompt
