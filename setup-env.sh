@@ -36,9 +36,9 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv && \
 
 # Install pip
 sudo pip install --upgrade pip && \
-sudo pip install virtualenvwrapper
+sudo pip install virtualenvwrapper && \
 
-source ~/.zshrc
+source ~/.zshrc && \
 echo '
 
 
@@ -48,5 +48,5 @@ echo '
  |___/\__,_|\___\___\___||___/___/
 
 
-'
+' && \
 echo 'Restart your shell to apply changes'
