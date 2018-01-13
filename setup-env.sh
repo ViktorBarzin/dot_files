@@ -1,22 +1,20 @@
 #!/bin/bash
 
-echo -n Enter root password:
-read -s password
 # Install zsh
 sudo apt update
 sudo apt upgrade --assume-yes
 sudo apt install zsh \
-                python-pip
+                python-pip --assume-yes
 # Setup oh-my-zsh
-echo $password | sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
-# Password prompt
+echo "#######################################"
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
 
+echo "DAAAAAAAAAAAA#######################################"
 # Setup config files
-git clone https://github.com/ViktorBarzin/dot_files.git && \
-cp -i .zshrc ~/ && \
-cp -i .bash_aliases ~/  && \
-sudo cp -i virtualenvwrapper.sh /usr/local/bin/  && \
-cp -i .zshenv ~/ && \
+cp .zshrc ~/ && \
+cp  .bash_aliases ~/  && \
+sudo cp  virtualenvwrapper.sh /usr/local/bin/  && \
+cp  .zshenv ~/ && \
 
 # Configure j (jump)
 # Debian like
