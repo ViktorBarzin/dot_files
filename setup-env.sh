@@ -8,10 +8,8 @@ sudo apt install zsh \
 echo "Enter root password:"
 read -s password
 # Setup oh-my-zsh
-echo "#######################################"
 wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh && chmod +x install.sh && echo "$password" | ./install.sh && \
 
-echo "DAAAAAAAAAAAA#######################################"
 # Setup config files
 cp .zshrc ~/ && \
 cp  .bash_aliases ~/  && \
@@ -40,3 +38,14 @@ sudo pip install --upgrade pip && \
 sudo pip install virtualenvwrapper
 
 source ~/.zshrc
+echo '
+
+
+  ___ _   _  ___ ___ ___  ___ ___
+ / __| | | |/ __/ __/ _ \/ __/ __|
+ \__ \ |_| | (_| (_|  __/\__ \__ \
+ |___/\__,_|\___\___\___||___/___/
+
+
+'
+echo 'Restart your shell to apply changes'
