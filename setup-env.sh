@@ -1,12 +1,14 @@
 #!/bin/bash
 
+echo -n Enter root password:
+read -s password
 # Install zsh
 sudo apt update
-sudo apt upgrade
+sudo apt upgrade --assume-yes
 sudo apt install zsh \
                 python-pip
 # Setup oh-my-zsh
-sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
+echo $password | sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
 # Password prompt
 
 # Setup config files
