@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Install zsh
-sudo apt install zsh && \
+sudo apt install zsh \
+    install python-pip && \
 # Setup oh-my-zsh
 sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
 # Password prompt
@@ -30,6 +31,6 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv && \
 # pyenv install 3.6.4 # throws some error? :/
 
 # Install pip
-sudo apt install python-pip && sudo pip install --upgrade pip && \
+sudo pip install --upgrade pip && \
 sudo install virtualenvwrapper
 
