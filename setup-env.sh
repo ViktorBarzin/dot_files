@@ -2,18 +2,19 @@
 
 # Install zsh
 sudo apt update
+sudo apt upgrade
 sudo apt install zsh \
-        python-pip && \
+                python-pip
 # Setup oh-my-zsh
 sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
 # Password prompt
 
 # Setup config files
 git clone https://github.com/ViktorBarzin/dot_files.git && \
-cp .zshrc ~/.zshrc && \
-cp .bash_aliases ~/.bash_aliases && \
-sudo cp virtualenvwrapper.sh /usr/local/bin/virtualenvwrapper.sh && \
-cp .zshenv ~/.zshenv && \
+cp -i .zshrc ~/ && \
+cp -i .bash_aliases ~/  && \
+sudo cp -i virtualenvwrapper.sh /usr/local/bin/  && \
+cp -i .zshenv ~/ && \
 
 # Configure j (jump)
 # Debian like
@@ -33,5 +34,5 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv && \
 
 # Install pip
 sudo pip install --upgrade pip && \
-sudo install virtualenvwrapper
+sudo pip install virtualenvwrapper
 
