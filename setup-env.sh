@@ -7,7 +7,7 @@ sudo apt install zsh \
                 python-pip --assume-yes
 # Setup oh-my-zsh
 echo "#######################################"
-sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" && \
+wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh && chmod +x install.sh && ./install.sh && \
 
 echo "DAAAAAAAAAAAA#######################################"
 # Setup config files
@@ -15,6 +15,7 @@ cp .zshrc ~/ && \
 cp  .bash_aliases ~/  && \
 sudo cp  virtualenvwrapper.sh /usr/local/bin/  && \
 cp  .zshenv ~/ && \
+cp bira.zsh-theme ~/.oh-my-zsh/themes/
 
 # Configure j (jump)
 # Debian like
