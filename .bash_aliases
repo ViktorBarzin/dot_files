@@ -89,6 +89,7 @@ function in(){
         container_name="${2/:/_}"
     fi
 
+    # Check if recreating a container or reuse existing
     if [ "$1" = "new" ] && [ $# -eq 2 ]
     then
         image_name=$2
@@ -101,9 +102,11 @@ function in(){
             docker rm $container_name >> /dev/null
         fi
         docker run -it --name $container_name --publish-all=true $image_name /bin/bash
+        docker attach $container_name
     else
         docker start $container_name >> /dev/null
-        docker exec -it $container_name /bin/bash
+        docker attach $container_name
+        # docker exec -it $container_name /bin/bash
     fi
 }
 
