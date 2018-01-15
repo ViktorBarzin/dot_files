@@ -39,6 +39,16 @@ sudo pip install --upgrade pip && \
 sudo pip install virtualenvwrapper && \
 
 source ~/.zshrc && \
+
+# Check whether to install vim
+read -p "Setup vim? (Y/n)?" CONT
+if [ "$CONT" = "n" ]; then
+    echo Skipping vim installation
+  else
+      # Run vim installation script
+      ./setup-vim.sh
+    fi
+
 echo '
 
 
@@ -50,3 +60,4 @@ echo '
 
 ' && \
 echo 'Restart your shell to apply changes'
+
