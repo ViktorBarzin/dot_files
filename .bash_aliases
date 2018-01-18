@@ -3,7 +3,6 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias py='python3.6'
-alias bye='systemctl suspend'
 alias whatisopen='sudo netstat -pnlt'
 alias calc='gcalccmd'
 alias pmr='python manage.py runserver'
@@ -36,6 +35,15 @@ alias root="sudo su -"
 
 function download_github_folder() {
     svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
+}
+
+function bye() {
+    if ps -p $(pidof rsync) > /dev/null
+    then
+        echo 'Rsync is running, not going to sleep.'
+    else
+        echo 'systemctl supend'
+    fi
 }
 
 alias sizeof="du -sh $1"
