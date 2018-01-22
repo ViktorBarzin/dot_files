@@ -38,11 +38,11 @@ function download_github_folder() {
 }
 
 function bye() {
-    if ps -p $(pidof rsync) > /dev/null
+    if ps -p $(pidof rsync) 2> /dev/null
     then
         echo 'Rsync is running, not going to sleep.'
     else
-        echo 'systemctl supend'
+        systemctl suspend
     fi
 }
 
