@@ -292,3 +292,5 @@ bind h resize-pane -L 10
 
 run-shell /home/viktor/.tmux/resurrect/resurrect.tmux
 
+
+# bind -T copy-mode-vi y send-keys -X copy-pipe 'xclip -in -selection clipboard'
