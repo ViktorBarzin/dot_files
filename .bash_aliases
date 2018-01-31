@@ -231,3 +231,4 @@ alias hosts="sudo vim /etc/hosts"
        -s $OUTRES -preset $QUALITY -tune film -acodec libmp3lame -threads $THREADS -strict normal \
        -bufsize $CBR "rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
  }
+alias gg="xset dpms force off"
