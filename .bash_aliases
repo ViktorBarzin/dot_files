@@ -21,7 +21,7 @@ alias gpull='git pull origin master'
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
 alias fixcpu='wrmsr -a 0x19a 0x0'
 
-alias daimi="grep -rnw $2 $1"
+alias daimi="grep -rnwi $2 $1"
 alias muzika='xdg-open /home/viktor/Documents/Music/njoy.m3u'
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
@@ -232,3 +232,9 @@ alias hosts="sudo vim /etc/hosts"
        -bufsize $CBR "rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
  }
 alias gg="xset dpms force off"
+
+function hib(){
+    # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
+    sudo systemctl hibernate
+    # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
+}
