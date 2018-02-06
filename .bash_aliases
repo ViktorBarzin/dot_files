@@ -212,6 +212,26 @@ alias hosts="sudo vim /etc/hosts"
 # Source:
 # https://wiki.archlinux.org/index.php/Streaming_to_twitch.tv
  streaming() {
+     youtube_key="k1ms-wpmc-v652-7rjr" # Hide me
+     twitch_key="live_56376159_CCAGv99vT0rr3QwiBiMuDAdoPcYB5N" # and me
+
+     if [ "$#" -ne 1 ]; then
+         echo "Choose yt/tw"
+         return 1
+     fi
+
+     if [ "$1"=="yt" ]; then
+         STREAM_KEY=$youtube_key
+         STREAM_URI="rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
+     elif [ "$1"=="tw" ]; then
+         STREAM_KEY=$twitch_key
+         SERVER="live-fra" # twitch server in frankfurt, see http://bashtech.net/twitch/ingest.php for list
+         STREAM_URI="rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
+     else
+         echo "Invalid media\nChoose yt/tw"
+         exit 1
+     fi
+
      # INRES="1920x1080" # input resolution
      # OUTRES="1920x1080" # output resolution
      INRES="$(xdpyinfo | awk '/dimensions/{print $2}')"
@@ -223,18 +243,22 @@ alias hosts="sudo vim /etc/hosts"
      CBR="1000k" # constant bitrate (should be between 1000k - 3000k)
      QUALITY="ultrafast"  # one of the many FFMPEG preset
      AUDIO_RATE="44100"
-     STREAM_KEY="$1" # use the terminal command Streaming streamkeyhere to stream your video to twitch or justin
-     SERVER="live-fra" # twitch server in frankfurt, see http://bashtech.net/twitch/ingest.php for list
+     # STREAM_KEY="$1" # use the terminal command Streaming streamkeyhere to stream your video to twitch or justin
 
      ffmpeg -f x11grab -s "$INRES" -r "$FPS" -i :0.0 -f alsa -i pulse -f flv -ac 2 -ar $AUDIO_RATE \
        -vcodec libx264 -g $GOP -keyint_min $GOPMIN -b:v $CBR -minrate $CBR -maxrate $CBR -pix_fmt yuv420p\
        -s $OUTRES -preset $QUALITY -tune film -acodec libmp3lame -threads $THREADS -strict normal \
-       -bufsize $CBR "rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
+       -bufsize $CBR $STREAM_URI
  }
 alias gg="xset dpms force off"
 
 function hib(){
     # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
-    sudo systemctl hibernate
+    # sudo systemctl hibernate
     # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
+    /bin/lock
+    sleep 2
+    sudo s2disk
 }
+
+alias tricks="vi ~/tricks/tricks.txt"
