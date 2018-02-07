@@ -241,7 +241,7 @@ alias hosts="sudo vim /etc/hosts"
      GOPMIN="15" # min i-frame interval, should be equal to fps,
      THREADS="2" # max 6
      CBR="1000k" # constant bitrate (should be between 1000k - 3000k)
-     QUALITY="ultrafast"  # one of the many FFMPEG preset
+     QUALITY="slow"  # one of the many FFMPEG preset
      AUDIO_RATE="44100"
      # STREAM_KEY="$1" # use the terminal command Streaming streamkeyhere to stream your video to twitch or justin
 
