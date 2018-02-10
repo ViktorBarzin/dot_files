@@ -110,13 +110,15 @@ j () {
 #export LC_ALL=C
 #export LC_ALL=en_US.UTF-8
 
-PYENV_ROOT="$HOME/.pyenv"
+# Defined in ~/.zshenv
+# PYENV_ROOT="$HOME/.pyenv"
 # PATH="$PYENV_ROOT/bin:$PATH"
 #eval "$(pyenv init -)"
 
-source /usr/local/bin/virtualenvwrapper.sh
+# source /usr/local/bin/virtualenvwrapper.sh
 # eval ssh-agent > /dev/null
-export VIRTUALENV_PYTHON=/home/viktor/.pyenv/shims/python
+# export VIRTUALENV_PYTHON=/home/viktor/.pyenv/shims/python
+source ~/.zshenv
 
 # Color man pages
 export LESS_TERMCAP_mb=$'\e[1;32m'

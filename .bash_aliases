@@ -256,6 +256,7 @@ function hib(){
     # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
     # sudo systemctl hibernate
     # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
+    sudo swapon -a
     /bin/lock
     sleep 2
     sudo s2disk
