@@ -263,3 +263,4 @@ function hib(){
 }
 
 alias tricks="vi ~/tricks/tricks.txt"
+alias xo="xdg-open"
