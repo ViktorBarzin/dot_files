@@ -264,3 +264,4 @@ function hib(){
 
 alias tricks="vi ~/tricks/tricks.txt"
 alias xo="xdg-open"
+alias time='"time"'  # Disable bash builit
