@@ -42,7 +42,7 @@ function bye() {
     then
         echo 'Rsync is running, not going to sleep.'
     else
-        systemctl suspend
+        sudo systemctl suspend
     fi
 }
 
