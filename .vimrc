@@ -2,7 +2,7 @@
 " autocmd! VimEnter * source ~/.vimrc
 
 " Load rename plugin
-so ~/.vim/Rename.vim
+" so ~/.vim/Rename.vim
 
 " let g:EclimCompletionMethod = 'omnifunc'
 " Java Autocomplete
@@ -182,16 +182,12 @@ vnoremap <C-tab> :b#
 
 
 " Quicksave command
-noremap <C-Z> :update<CR>
-vnoremap <C-Z> <C-C>:update<CR>
-inoremap <C-Z> <C-O>:update<CR>
+" noremap <C-Z> :update<CR>
+" vnoremap <C-Z> <C-C>:update<CR>
+" inoremap <C-Z> <C-O>:update<CR>
 
 " Execute current file with python
 noremap <Leader>e :!python %<CR>
-
-" Quick quit command
-noremap <Leader>E :qa!<CR>   " Quit all windows
-
 
 " bind Ctrl+<movement> keys to move around the windows, instead of using
 " Ctrl+w + <movement>
@@ -200,7 +196,6 @@ map <c-j> <c-w>j
 map <c-k> <c-w>k
 map <c-l> <c-w>l
 map <c-h> <c-w>h
-
 
 " easier moving between tabs
 map <Leader>m <esc>:bn<CR>
@@ -213,20 +208,16 @@ map <Leader>t <esc>:enew<CR>
 " map sort function to a key
 vnoremap <Leader>s :sort<CR>
 
-
 " easier moving of code blocks
 " Try to go into visual mode (v), thenselect several lines of code here and
 " then press ``>`` several times.
 vnoremap < <gv  " better indentation
 vnoremap > >gv  " better indentation
 
-
-
 " Show whitespace
 " MUST be inserted BEFORE the colorscheme command
 autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
 au InsertLeave * match ExtraWhitespace /\s\+$/
-
 
 " Color scheme
 " mkdir -p ~/.vim/colors && cd ~/.vim/colors
@@ -252,11 +243,11 @@ syntax on
 " E128 - visual continuation
 " W391 - blank line at end of file
 let g:syntastic_python_flake8_args='--ignore=W391, E501, E702'
-let g:syntastic_python_flake8_show_quickfix=0
+let g:syntastic_python_flake8_show_quickfix=1
 let g:pymode_lint_ignore="E501,W601,W391,W0401,E702"
 let g:pymode_rope_lookup_project = 0
-let g:pymode_lint_cwindow = 0
-let g:pymode_rope = 0
+let g:pymode_lint_cwindow = 1
+let g:pymode_rope = 1
 let g:pymode_python="python3"
 let g:pymode_lint_checkers = ['pep8']
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
@@ -274,16 +265,9 @@ set fo-=t   " don't automatically wrap text when typing
 set colorcolumn=120
 highlight ColorColumn ctermbg=233
 
-
-" easier formatting of paragraphs
-vmap Q gq
-nmap Q gqap
-
-
 " Useful settings
 set history=700
 set undolevels=700
-
 
 " Real programmers don't use TABs but spaces
 set tabstop=4
@@ -292,13 +276,11 @@ set shiftwidth=4
 set shiftround
 set expandtab
 
-
 " Make search case insensitive
 set hlsearch
 set incsearch
 set ignorecase
 set smartcase
-
 
 " Disable stupid backup and swap files - they trigger too many events
 " for file system watchers
@@ -364,12 +346,12 @@ let g:SuperTabDefaultCompletionType = "<c-p>"
 " Settings for jedi-vim
 " cd ~/.vim/bundle
 " git clone git://github.com/davidhalter/jedi-vim.git
-let g:jedi#usages_command = "<leader>z"
-let g:jedi#popup_on_dot = 0
-let g:jedi#popup_select_first = 0
-let g:jedi#force_py_version = 3
+" let g:jedi#usages_command = "<leader>z"
+" let g:jedi#popup_on_dot = 0
+" let g:jedi#popup_select_first = 0
+" let g:jedi#force_py_version = 3
 " let g:jedi#completions_command = '.'
-map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
+" map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
 
 " Map C-a to select entire file
 "nnoremap <C-a> ggVG
@@ -381,11 +363,12 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 
 " Do splits with Leader-\ and Leader--
+" Close splits with Leader-Shift-\ (leader-|)
 " nnoremap <silent> <C-Right> :vsp<CR>
 " nnoremap <silent> <C-Up> :sp<CR>
 noremap <leader>\ :vsp<CR>
 noremap <leader>- :sp<CR>
-
+noremap <leader>\| <c-w>q<CR>
 
 " NERDTree settings
 " Open NERDTree by default
@@ -451,13 +434,11 @@ endfunction
 " map visual mode keycombo 'co' to this function
 vmap co :call CommentLines()<CR>
 
-
 " Encryption algo (vim -x file)
 set cm=blowfish2
 
 " Improve perfomance with long lines
 set synmaxcol=200
-
 
 set autoread
 
