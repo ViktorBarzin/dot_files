@@ -40,13 +40,16 @@ set showcmd
 
 " Set syntastic settings
 set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
+if exists("SyntasticStatuslineFlag")
+    set statusline+=%{SyntasticStatuslineFlag()}
+endif
 set statusline+=%*
 
 " Disables syntastic popup window with messages
 " Set both to 1 to turn it on
 let g:syntastic_always_populate_loc_list = 0
 let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 0
 
 " Set xptemplate trigger key to tab
 let g:xptemplate_key = '<Tab>'
@@ -59,8 +62,8 @@ let g:xptemplate_key = '<Tab>'
 " Python main method snippet
 "let g:xptemplate_brace_complete = '([{<'
 let g:xptemplate_minimal_prefix = 1
-let g:xptemplate_vars="$author=viktor.barzin"
-let g:xptemplate_vars="$email=viktor.barzin@samitor.com"
+" let g:xptemplate_vars="$author=viktor.barzin"
+" let g:xptemplate_vars="$email=viktor.barzin@samitor.com"
 
 " Rebind <Leader> key
 " I like to have it here becuase it is easier to reach than the default and
@@ -251,6 +254,7 @@ let g:pymode_rope = 1
 let g:pymode_python="python3"
 let g:pymode_lint_checkers = ['pep8']
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
+let g:pymode_rope_completion = 1
 
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
@@ -302,6 +306,8 @@ set undodir=~/.vim/tmp/undo//
 " curl -so ~/.vim/autoload/pathogen.vim
 " https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
 " Now you can install any plugin into a .vim/bundle/plugin-name/ folder
+
+" let g:pathogen_disabled = ["syntastic"]
 call pathogen#infect()
 
 
@@ -363,12 +369,10 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 
 " Do splits with Leader-\ and Leader--
-" Close splits with Leader-Shift-\ (leader-|)
 " nnoremap <silent> <C-Right> :vsp<CR>
 " nnoremap <silent> <C-Up> :sp<CR>
 noremap <leader>\ :vsp<CR>
 noremap <leader>- :sp<CR>
-noremap <leader>\| <c-w>q<CR>
 
 " NERDTree settings
 " Open NERDTree by default

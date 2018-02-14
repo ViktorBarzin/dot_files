@@ -162,7 +162,7 @@ fun! s:f.python_find_func( default )
     endif
 
     return matchstr( getline( defIndent[0] ), '\Vdef\s\+\zs\w\+' )
-    
+
 endfunction
 
 " ================================= Snippets ===================================
