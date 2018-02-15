@@ -248,9 +248,9 @@ syntax on
 let g:syntastic_python_flake8_args='--ignore=W391, E501, E702'
 let g:syntastic_python_flake8_show_quickfix=1
 let g:pymode_lint_ignore="E501,W601,W391,W0401,E702"
-let g:pymode_rope_lookup_project = 0
 let g:pymode_lint_cwindow = 1
 let g:pymode_rope = 1
+let g:pymode_rope_lookup_project = 0
 let g:pymode_python="python3"
 let g:pymode_lint_checkers = ['pep8']
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
