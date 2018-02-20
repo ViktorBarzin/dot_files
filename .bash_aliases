@@ -205,7 +205,7 @@ function netok(){
 alias sl=ls
 alias vimrc="vim ~/.vimrc"
 alias f="free -h"
-alias h="htop"
+alias h="sudo htop"
 alias e="exa -bghHliS"
 alias hosts="sudo vim /etc/hosts"
 
