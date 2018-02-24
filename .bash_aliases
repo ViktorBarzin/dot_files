@@ -266,3 +266,4 @@ alias tricks="vi ~/tricks/tricks.txt"
 alias xo="xdg-open"
 alias time='"time"'  # Disable bash builit
 alias vix="vim -X"   # Fast vim startup wihtout x (no ystem clipboard)
+alias reso="xrandr --output HDMI-1 --scale-from 1920x1080"
