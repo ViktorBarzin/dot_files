@@ -177,6 +177,8 @@ if has('win32') || has ('win64')
 noremap <F3> :nohl<CR>
 vnoremap <F3> :nohl<CR>
 "inoremap <C-n> :nohl<CR>
+noremap <F5> :syntax sync fromstart<CR>
+vnoremap <F5> :syntax sync fromstart<CR>
 
 " Tab switching
 noremap<C-tab> :b#
