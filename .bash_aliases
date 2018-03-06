@@ -220,10 +220,10 @@ alias hosts="sudo vim /etc/hosts"
          return 1
      fi
 
-     if [ "$1"=="yt" ]; then
+     if [ "$1" = "yt" ]; then
          STREAM_KEY=$youtube_key
          STREAM_URI="rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
-     elif [ "$1"=="tw" ]; then
+     elif [ "$1" = "tw" ]; then
          STREAM_KEY=$twitch_key
          SERVER="live-fra" # twitch server in frankfurt, see http://bashtech.net/twitch/ingest.php for list
          STREAM_URI="rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
