@@ -50,7 +50,9 @@ set statusline+=%*
 let g:syntastic_always_populate_loc_list = 0
 let g:syntastic_auto_loc_list = 0
 let g:syntastic_check_on_open = 0
+let g:syntastic_python_checkers = ['flake8']
 
+nnoremap <F10> :SyntasticCheck mypy<CR>
 " Set xptemplate trigger key to tab
 let g:xptemplate_key = '<Tab>'
 
@@ -247,9 +249,9 @@ syntax on
 " Ignore flake8 E501 for lines longer than 80 characters
 " E128 - visual continuation
 " W391 - blank line at end of file
-let g:syntastic_python_flake8_args='--ignore=W391, E501, E702'
-let g:syntastic_python_flake8_show_quickfix=1
-let g:pymode_lint_ignore="E501,W601,W391,W0401,E702"
+" let g:syntastic_python_flake8_args='--ignore=W391, E501, E701, E702'
+" let g:syntastic_python_flake8_show_quickfix=1
+let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
 let g:pymode_lint_cwindow = 1
 let g:pymode_rope = 1
 let g:pymode_rope_lookup_project = 0
