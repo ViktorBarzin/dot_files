@@ -355,7 +355,7 @@ let g:SuperTabDefaultCompletionType = "<c-p>"
 " cd ~/.vim/bundle
 " git clone git://github.com/davidhalter/jedi-vim.git
 " let g:jedi#usages_command = "<leader>z"
-" let g:jedi#popup_on_dot = 0
+let g:jedi#popup_on_dot = 0
 " let g:jedi#popup_select_first = 0
 " let g:jedi#force_py_version = 3
 " let g:jedi#completions_command = '.'
