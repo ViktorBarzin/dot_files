@@ -103,6 +103,7 @@ vnoremap <BS> d
 
 " Save with <Leader> s
 noremap <silent> <Leader>s :update<CR>
+noremap <silent> <Leader>S :w !sudo tee % > /dev/null<CR>
 
 
 " Writes to all buffers when switching to another buffer
