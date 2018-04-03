@@ -101,8 +101,9 @@ nnoremap <Leader><Tab> :b#<CR>
 nnoremap <BS> h<DEL>
 vnoremap <BS> d
 
-" Save with <Leader> s
+" Save with <Leader>s
 noremap <silent> <Leader>s :update<CR>
+" Sudo save with <Leader>S
 noremap <silent> <Leader>S :w !sudo tee % > /dev/null<CR>
 
 
@@ -481,3 +482,7 @@ set sidescrolloff=3
 if v:version > 703 || v:version == 703 && has('patch541')
   set formatoptions+=j
 endif
+
+set relativenumber
+
+nnoremap <leader>Q :qa<CR>
