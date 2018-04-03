@@ -57,7 +57,7 @@ nnoremap <F10> :SyntasticCheck mypy<CR>
 let g:xptemplate_key = '<Tab>'
 
 " Autocomplete with Tab
-"inoremap <Tab> <C-x><C-o>
+" inoremap <Tab> <C-x><Space><CR>
 "inoremap <Caps> <space><space><space><space>
 
 
@@ -354,15 +354,16 @@ set wildignore+=*/coverage/*
 "" let g:pymode_syntax_builtin_objs = 0
 "" let g:pymode_syntax_builtin_funcs = 0
 "" map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
-let g:SuperTabDefaultCompletionType = "<c-p>"
+" let g:SuperTabDefaultCompletionType = "<c-p>"
 " Settings for jedi-vim
 " cd ~/.vim/bundle
 " git clone git://github.com/davidhalter/jedi-vim.git
 " let g:jedi#usages_command = "<leader>z"
-let g:jedi#popup_on_dot = 1
+" let g:jedi#popup_on_dot = 1
 " let g:jedi#popup_select_first = 0
 " let g:jedi#force_py_version = 3
-let g:jedi#completions_command = '.'
+" let g:jedi#completions_command = '.'
+" let g:jedi#show_call_signatures = 1
 " map <Leader>b Oimport ipdb; ipdb.set_trace() # BREAKPOINT<C-c>
 
 " Map C-a to select entire file
@@ -408,7 +409,7 @@ endfunction
 "inoremap <silent><C-k> <C-R>=OmniPopup('k')<CR>
 set omnifunc=jedi#completions
 :"py3 import sys; sys.path[2]='/root/.virtualenvs/django/bin/python'
-"set omnifunc=syntaxcomplete#Complete
+" set omnifunc=syntaxcomplete#Complete
 
 " Python folding
 " mkdir -p ~/.vim/ftplugin
