@@ -256,7 +256,8 @@ syntax on
 let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
 let g:pymode_lint_cwindow = 1
 let g:pymode_rope = 1
-let g:pymode_rope_lookup_project = 0
+" let g:pymode_rope_autoimport = 0
+let g:pymode_rope_regenerate_on_write = 0
 let g:pymode_python="python3"
 let g:pymode_lint_checkers = ['pep8']
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
