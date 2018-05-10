@@ -285,3 +285,5 @@ function psave() {
 function camelcase() {
     perl -pe 's#(_|^)(.)#\u$2#g'
 }
+
+alias md5="md5sum $1 | cut -d ' ' -f 1"
