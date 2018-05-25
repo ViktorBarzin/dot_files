@@ -12,7 +12,7 @@ alias pmmm='python manage.py makemigrations'
 
 # git aliases
 alias gs='git status'
-alias ga='git add $1'
+alias ga='git add'
 alias gc='git commit'
 alias gp='git push origin master'
 alias gpull='git pull origin master'
@@ -21,7 +21,6 @@ alias gpull='git pull origin master'
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
 alias fixcpu='wrmsr -a 0x19a 0x0'
 
-alias daimi="grep -rnwi $2 $1"
 alias muzika='xdg-open /home/viktor/Documents/Music/njoy.m3u'
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
@@ -33,11 +32,11 @@ alias myip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
 alias root="sudo su -"
 
-function download_github_folder() {
+ download_github_folder() {
     svn checkout $(echo $1 | sed "s/\/tree\/[a-zA-Z]\+/\/trunk/")
 }
 
-function bye() {
+ bye() {
     if ps -p $(pidof rsync) 2> /dev/null
     then
         echo 'Rsync is running, not going to sleep.'
@@ -46,10 +45,10 @@ function bye() {
     fi
 }
 
-alias sizeof="du -sh $1"
+alias sizeof='du -sh'
 alias mkdir="mkdir -pv"
 
-# function ls(){
+#  ls(){
 #     if [[ $2 == "-l" ]]; then
 #         if [[ $3 != "" ]]; then
 #             exa -bghHliS $3
@@ -70,7 +69,7 @@ alias upgrade="sudo apt upgrade"
 alias install="sudo apt install"
 alias remove="sudo apt remove"
 
-# function secureme(){
+#  secureme(){
 #     workon ansible;
 #     cd /home/viktor/ansible-play/
 #     ansible-playbook -i ./hosts --extra-vars "ansible_sudo_pass=$ROOTPASS" --tags "vpn_startup" main.yml >> /dev/null
@@ -78,7 +77,7 @@ alias remove="sudo apt remove"
 #     sudo openvpn --config viktor.ovpn &
 # }
 
-function in(){
+ in(){
     if [ $# -ne 1 ] && [ $# -ne 2 ];
     then
         echo "Usage:"
@@ -118,43 +117,43 @@ function in(){
     fi
 }
 
-function stest(){
-  : snapshot_name="rootsnap"
-    mount_point="$2"
+#  stest(){
+    # snapshot_name="rootsnap"
+    # mount_point="$2"
 
-    if [ $# -ne 2 ];then
-        echo "Usage:"
-        echo "$0 <snapshot size> <mount point> "
-        echo
-        return
-    fi
+    # if [ $# -ne 2 ];then
+    #     echo "Usage:"
+    #     echo "$0 <snapshot size> <mount point> "
+    #     echo
+    #     return
+    # fi
 
-    if [ ${mount_point:0:1} != '/' ]; then
-        echo "Mount point must be absolute path"
-        return
-    fi
+    # if [ ${mount_point:0:1} != '/' ]; then
+    #     echo "Mount point must be absolute path"
+    #     return
+    # fi
 
-    if [[ $(sudo lvs | grep $snapshot_name) ]]; then
-        echo "$snapshot_name already exists!"
-        # read -e -p "Do you want to discard it and create a new one?(y/N)" -i n should_discard
-        echo "Do you want to discard it and create a new one?(y/N)"
-        read  should_discard
-        should_discard=${should_discard:-"n"}
-        # if [ ${(L)should_discard} = 'y' ]; then
-        if [ $(echo $should_discard | awk '{print tolower($0)}') = 'y' ]; then
-            sudo umount $mount_point
-            sudo lvremove /dev/kubuntu-vg/$snapshot_name -y
-        else
-            echo "Leaving old snapshot intact"
-            return
-        fi
+    # if [[ $(sudo lvs | grep $snapshot_name) ]]; then
+    #     echo "$snapshot_name already exists!"
+    #     # read -e -p "Do you want to discard it and create a new one?(y/N)" -i n should_discard
+    #     echo "Do you want to discard it and create a new one?(y/N)"
+    #     read  should_discard
+    #     should_discard=${should_discard:-"n"}
+    #     # if [ ${(L)should_discard} = 'y' ]; then
+    #     if [ $(echo $should_discard | awk '{print tolower($0)}') = 'y' ]; then
+    #         sudo umount $mount_point
+    #         sudo lvremove /dev/kubuntu-vg/$snapshot_name -y
+    #     else
+    #         echo "Leaving old snapshot intact"
+    #         return
+    #     fi
 
-    fi
+    # fi
 
-    sudo lvcreate -s -n $snapshot_name /dev/kubuntu-vg/root -L $1
-    sudo mount /dev/kubuntu-vg/$snapshot_name $mount_point
-    sudo chroot $mount_point /bin/zsh
-}
+    # sudo lvcreate -s -n $snapshot_name /dev/kubuntu-vg/root -L $1
+    # sudo mount /dev/kubuntu-vg/$snapshot_name $mount_point
+    # sudo chroot $mount_point /bin/zsh
+# }
 
 alias ifl="ifconfig|less"
 # Docker aliases
@@ -165,13 +164,14 @@ alias dsjtw="docker swarm join-token worker"
 
 alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
+
 alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
 alias aliases="vim /home/viktor/.bash_aliases && source /home/viktor/.bash_aliases"
 
 # alias ghcirun="ghci --make $1; ./$1"
 alias lip="ifconfig $(route -n | head -n 3 | tail -n 1 | awk '{print $8}') | grep inet | awk '{print \$2}'"
 
-function netok(){
+ netok(){
     # ping google.com
     echo 'Testing DNS settings.'
     timeout 1 ping google.com -W 1 -c 1 &>> /dev/null
@@ -254,7 +254,7 @@ alias hosts="sudo vim /etc/hosts"
  }
 alias gg="xset dpms force off"
 
-function hib(){
+ hib(){
     # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
     # sudo systemctl hibernate
     # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
@@ -275,13 +275,17 @@ alias dk="docker"
 alias lk="sudo logkeys --start --output /home/viktor/tt"   # integrated keyboard
 alias lk1="sudo logkeys --start --output /home/viktor/tt --device /dev/input/event17"  # usb keyboard
 
-function psave() {
+ psave() {
     sudo service bluetooth stop
     sudo service vmware-workstation-server stop
     sudo service vmware stop
     sudo service ModemManager stop
 }
 
-function camelcase() {
+ camelcase() {
     perl -pe 's#(_|^)(.)#\u$2#g'
+}
+
+ rem_known() {
+    "ssh-keygen -f '/home/viktor/.ssh/known_hosts' -R $1"
 }
