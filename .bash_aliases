@@ -289,3 +289,6 @@ alias lk1="sudo logkeys --start --output /home/viktor/tt --device /dev/input/eve
  rem_known() {
     "ssh-keygen -f '/home/viktor/.ssh/known_hosts' -R $1"
 }
+
+alias homep="sudo ssh root@samitor.com -L 80:localhost:80"
+alias homes="sudo ssh home"
