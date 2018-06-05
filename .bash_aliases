@@ -292,4 +292,4 @@ alias lk1="sudo logkeys --start --output /home/viktor/tt --device /dev/input/eve
 
 alias homep="sudo ssh root@samitor.com -L 80:localhost:80"
 alias homes="sudo ssh home"
-alias emergency_shell="ssh root@samitor.com 'ssh wizard@localhost -p 6060'"
+alias emergency_shell="ssh -t root@samitor.com 'ssh wizard@localhost -p 6060'"
