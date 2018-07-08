@@ -314,6 +314,8 @@ set undodir=~/.vim/tmp/undo//
 " https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
 " Now you can install any plugin into a .vim/bundle/plugin-name/ folder
 
+" Pathogen does not work in combatability mode so disable
+set nocp
 " let g:pathogen_disabled = ["syntastic"]
 call pathogen#infect()
 
