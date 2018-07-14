@@ -272,7 +272,7 @@ alias reso="xrandr --output HDMI-1 --scale-from 1920x1080"
 alias zoomit="gromit-mpx"
 alias dk="docker"
 
-alias lk="sudo logkeys --start --output /home/viktor/tt"   # integrated keyboard
+alias lk="sudo logkeys -u --start --output /home/viktor/tt --device /dev/input/event4"   # integrated keyboard
 alias lk1="sudo logkeys --start --output /home/viktor/tt --device /dev/input/event17"  # usb keyboard
 
  psave() {
