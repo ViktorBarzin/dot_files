@@ -166,7 +166,7 @@ alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 
 alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
-alias aliases="vim /home/viktor/.bash_aliases && source /home/viktor/.bash_aliases"
+alias aliases="vim ~/.bash_aliases && source ~/.bash_aliases"
 
 # alias ghcirun="ghci --make $1; ./$1"
 alias lip="ifconfig $(route -n | head -n 3 | tail -n 1 | awk '{print $8}') | grep inet | awk '{print \$2}'"
