@@ -81,7 +81,6 @@ vnoremap <Leader>j :m '>+1<CR>gv=gv
 " Enable folding with spacebar
 nnoremap <space> za
 
-
 " Make surrounding with various characters easier
 nmap <Leader>' ysiW'
 nmap <Leader>" ysiW"
@@ -106,7 +105,6 @@ noremap <silent> <Leader>s :update<CR>
 " Sudo save with <Leader>S
 noremap <silent> <Leader>S :w !sudo tee % > /dev/null<CR>
 
-
 " Writes to all buffers when switching to another buffer
 set autowrite
 
@@ -123,7 +121,6 @@ let g:airline_powerline_fonts=1
 " let g:airline_section_b = '%{strftime("%c")}'
 " let g:airline_section_y = 'BN: %{bufnr("%")} FT: %y'
 
-
 " Enable wildmenu which is an enhanced  command completion
 "
 set wildmenu
@@ -133,7 +130,6 @@ set wildmenu
 
 set pastetoggle=<F2>
 set clipboard=unnamed
-
 
 " Mouse and backspace
 set mouse=a  " on OSX press ALT and click
@@ -146,9 +142,6 @@ endif
 
 " Set comment string for commentary.vim for python
 set commentstring=#%s
-
-
-
 
 " I no longer use that because emmet.vim does all I need
 ""Auto complete HTLM tags
@@ -254,7 +247,7 @@ syntax on
 " let g:syntastic_python_flake8_args='--ignore=W391, E501, E701, E702'
 " let g:syntastic_python_flake8_show_quickfix=1
 let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
-let g:pymode_lint_cwindow = 1
+let g:pymode_lint_settingscwindow = 1
 let g:pymode_rope = 1
 " let g:pymode_rope_autoimport = 0
 let g:pymode_rope_regenerate_on_write = 0
@@ -490,3 +483,7 @@ endif
 set relativenumber
 
 nnoremap <leader>Q :qa<CR>
+
+" Remap ; to be : - save 1 key press :P
+nnoremap ; :
+nnoremap : ;
