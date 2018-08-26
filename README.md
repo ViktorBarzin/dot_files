@@ -1,6 +1,7 @@
-# dot files
-Dotfiles collection
+# README
 
-## Usage
-To setup vim just run the setup script
+You can find my dotfiles collection in here. Feel free to use and share them. 
 
+# TODO
+
+Add documentation
