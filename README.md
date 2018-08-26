@@ -8,7 +8,8 @@ You can find my dotfiles collection in here. Feel free to use and share them.
 Use both.
 
 # Vim settings
-Vim uses the **wombat256mod.vim** colorscheme. You can download it from the offical report of from this repo.
+Vimrc uses the **wombat256mod.vim** colorscheme. You can download it from the offical report of from this repo.
+Some of my python editing settings are in the vimrc. The pylint settings are here - search for **g:pymode_lint_**.
 
 
 # TODO
