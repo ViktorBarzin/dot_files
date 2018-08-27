@@ -261,7 +261,7 @@ alias gg="xset dpms force off"
     sudo swapon -a
     /bin/lock
     sleep 2
-    sudo s2disk
+    sudo s2disk 2>1 > /dev/null
 }
 
 alias tricks="vi ~/tricks/tricks.txt"
