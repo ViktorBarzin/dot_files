@@ -294,4 +294,7 @@ alias homep="sudo ssh root@samitor.com -L 80:localhost:80"
 alias homes="sudo ssh home"
 alias emergency_shell="ssh -t root@samitor.com 'ssh wizard@localhost -p 6060'"
 alias s="ssh"
+ytplaylist(){
+        youtube-dl --get-id "$1" | awk '{print "https://www.youtube.com/watch?v=" $0;}' | /snap/bin/vlc -
+}
 
