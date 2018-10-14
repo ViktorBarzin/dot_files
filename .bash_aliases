@@ -26,7 +26,7 @@ alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || 
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
 alias omg="sudo service NetworkManager restart"
-alias omg1.1="sudo modprobe -r iwlwifi; sudo modprobe iwlwifi"
+alias omg1.1="sudo modprobe -rv iwldvm && sudo modprobe -r iwlwifi; sudo modprobe iwlwifi"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias myip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
