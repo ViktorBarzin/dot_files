@@ -200,8 +200,8 @@ map <c-l> <c-w>l
 map <c-h> <c-w>h
 
 " easier moving between tabs
-map <Leader>m <esc>:bn<CR>
-map <Leader>n <esc>:bp<CR>
+map <Leader>m <esc>;bn<CR>
+map <Leader>n <esc>;bp<CR>
 
 " Create empty buffer and open it
 map <Leader>t <esc>:enew<CR>
