@@ -246,7 +246,8 @@ syntax on
 " W391 - blank line at end of file
 " let g:syntastic_python_flake8_args='--ignore=W391, E501, E701, E702'
 " let g:syntastic_python_flake8_show_quickfix=1
-let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
+" let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
+let g:pymode_lint_ignore=["E501","W601","W391","W0401","E702","E701"]
 let g:pymode_lint_settingscwindow = 1
 let g:pymode_rope = 1
 " let g:pymode_rope_autoimport = 0
