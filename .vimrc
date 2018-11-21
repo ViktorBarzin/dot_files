@@ -257,6 +257,10 @@ let g:pymode_lint_checkers = ['pep8']
 let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
 let g:pymode_rope_completion = 1
 
+" Run Lint fixer on save
+nnoremap <leader>p :PymodeLintAuto<CR>
+nnoremap zz :folddoclosed if foldlevel('.') < foldlevel(line('.')+1) \| exe 'norm! zo' \| endif<CR>
+
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
 
