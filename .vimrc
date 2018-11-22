@@ -259,7 +259,7 @@ let g:pymode_rope_completion = 1
 
 " Run Lint fixer on save
 nnoremap <leader>p :PymodeLintAuto<CR>
-nnoremap zz :folddoclosed if foldlevel('.') < foldlevel(line('.')+1) \| exe 'norm! zo' \| endif<CR>
+" nnoremap zz :folddoclosed if foldlevel('.') < foldlevel(line('.')+1) \| exe 'norm! zo' \| endif<CR>
 
 " Make quickfix screen smaller
 let g:syntastic_loc_list_height=1
