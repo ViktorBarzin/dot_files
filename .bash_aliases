@@ -299,3 +299,8 @@ ytplaylist(){
         # youtube-dl --get-id "$1" | awk '{print "https://www.youtube.com/watch?v=" $0;}' | /snap/bin/vlc -
 }
 
+function certinfo {
+    # curl --insecure -v "$1" 2>&1;
+    curl --insecure -v https://"$1" 2>&1 | awk 'BEGIN { cert=0 } /^\* SSL connection/ { cert=1 } /^\*/ { if (cert) print }';
+}
+
