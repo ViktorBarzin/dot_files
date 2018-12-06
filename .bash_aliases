@@ -165,7 +165,8 @@ alias dsjtw="docker swarm join-token worker"
 alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
 
-alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
+# alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
+alias omg2="kwin --replace &"
 alias aliases="vim ~/.bash_aliases && source ~/.bash_aliases"
 
 # alias ghcirun="ghci --make $1; ./$1"
