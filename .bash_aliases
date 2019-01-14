@@ -2,7 +2,7 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias py='python3.6'
+alias py='python3'
 alias whatisopen='sudo netstat -pnlt'
 alias calc='gcalccmd'
 alias pmr='python manage.py runserver'
@@ -10,12 +10,18 @@ alias nopmr="netstat -pnlt | grep -E -o -e '[0-9]+/python' | cut -d '/' -f 1 | x
 alias pmm='python manage.py migrate'
 alias pmmm='python manage.py makemigrations'
 
+# Start vim with system clipboard
+# alias vim="vimx" # don't alias this - make symlink instead
+alias vi="vim"
+
 # git aliases
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit'
 alias gp='git push origin master'
 alias gpull='git pull origin master'
+
+alias gpp='git push production master' # push to production for personal website
 
 # MSR registers is responsible for lag after suspend
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
@@ -64,10 +70,25 @@ alias mkdir="mkdir -pv"
 #     fi
 # }
 
-alias update="sudo apt update"
-alias upgrade="sudo apt upgrade"
-alias install="sudo apt install"
-alias remove="sudo apt remove"
+# Get packet manager
+declare -A osInfo;
+osInfo[/etc/redhat-release]=dnf
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+osInfo[/etc/debian_version]=apt-get
+
+# for f in "${!osInfo[@]}" # bash version
+for f in "${(@k)osInfo}" # zsh version
+do
+    if [[ -f $f ]];then
+        pm=${osInfo[$f]}
+    fi
+done
+alias update="sudo $pm update"
+alias upgrade="sudo $pm upgrade"
+alias install="sudo $pm install"
+alias remove="sudo $pm remove"
 
 #  secureme(){
 #     workon ansible;
@@ -255,17 +276,20 @@ alias hosts="sudo vim /etc/hosts"
  }
 alias gg="xset dpms force off"
 
- hib(){
-    # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
-    # sudo systemctl hibernate
-    # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
-    sudo swapon -a
-    /bin/lock
-    sleep 2
-    sudo s2disk 2>1 > /dev/null
-}
+alias hib="sudo systemctl hibernate"
+# where systemctl doesn't work
+ # hib(){
+ #    # sudo swapon /dev/kubuntu-vg/swap_1 2&>/dev/null
+ #    # sudo systemctl hibernate
+ #    # sudo swapoff /dev/kubuntu-vg/swap_1 2&>/dev/null
+ #    sudo swapon -a
+ #    /bin/lock
+ #    sleep 2
+ #    sudo s2disk 2>1 > /dev/null
+# }
 
 alias tricks="vi ~/tricks/tricks.txt"
+alias ftricks="vi ~/tricks/fedora.txt"
 alias xo="xdg-open"
 alias time='"time"'  # Disable bash builit
 alias vix="vim -X"   # Fast vim startup wihtout x (no ystem clipboard)
@@ -306,3 +330,6 @@ function certinfo {
     curl --insecure -v https://"$1" 2>&1 | awk 'BEGIN { cert=0 } /^\* SSL connection/ { cert=1 } /^\*/ { if (cert) print }';
 }
 
+alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py |python -"
+alias backupnas="rsync -az --progress --delete /home nas:/volume1/Backup/Viki/laptop/yuhu-fedora; rsync -az --progress --delete /opt
+nas:/volume1/Backup/Viki/laptop/yuhu-fedora"
