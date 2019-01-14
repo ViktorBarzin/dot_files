@@ -4,6 +4,7 @@
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
+# unset LD_PRELOAD
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -93,7 +94,7 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-eval "$(jump shell)"
+#eval "$(jump shell)"
 
 # Load aliases
 . ~/.bash_aliases
@@ -131,3 +132,13 @@ export LESS_TERMCAP_us=$'\e[1;4;31m'
 
 # Enable extended glob
 setopt extendedglob
+
+# Enable Ctrl-x-e to edit command line
+autoload -U edit-command-line
+# Emacs style
+zle -N edit-command-line
+bindkey '^xe' edit-command-line
+bindkey '^x^e' edit-command-line
+# Vi style:
+# zle -N edit-command-line
+# bindkey -M vicmd v edit-command-line

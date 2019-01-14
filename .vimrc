@@ -268,7 +268,8 @@ let g:syntastic_loc_list_height=1
 vnoremap // y/<C-R>"<CR>
 
 " Showing line numbers and length
-set tw=79   " width of document (used by gd)
+" set tw=79   " width of document (used by gd)
+set tw=120   " width of document (used by gd)
 set nowrap  " don't automatically wrap on load
 set fo-=t   " don't automatically wrap text when typing
 set colorcolumn=120
