@@ -47,7 +47,7 @@ alias root="sudo su -"
     then
         echo 'Rsync is running, not going to sleep.'
     else
-        /bin/lock && sudo systemctl suspend
+        (/bin/lock &) && sudo systemctl suspend
     fi
 }
 
@@ -320,8 +320,9 @@ alias homes="sudo ssh home"
 alias emergency_shell="ssh -t root@samitor.com 'ssh wizard@localhost -p 6060'"
 alias s="ssh"
 ytplaylist(){
+        # if error try updating youtube-dl with: sudo youtube-dl -U
         # youtube-dl -o - $1 -f best | /snap/bin/vlc -
-        youtube-dl -o - $1 -f best | vlc -
+        youtube-dl -o - -f best $@ | vlc -
         # youtube-dl --get-id "$1" | awk '{print "https://www.youtube.com/watch?v=" $0;}' | /snap/bin/vlc -
 }
 
@@ -331,5 +332,22 @@ function certinfo {
 }
 
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py |python -"
-alias backupnas="rsync -az --progress --delete /home nas:/volume1/Backup/Viki/laptop/yuhu-fedora; rsync -az --progress --delete /opt
-nas:/volume1/Backup/Viki/laptop/yuhu-fedora"
+alias backupnas="rsync -az --progress --delete /home nas:/volume1/Backup/Viki/laptop/yuhu-fedora; rsync -az --progress --delete /opt nas:/volume1/Backup/Viki/laptop/yuhu-fedora"
+
+function c(){
+   # pass any arguments to gcc and afterwards run executable
+   gcc "$@" && ./a.out
+}
+
+function dang_gcc(){
+    gcc "$@" -fno-stack-protector -z execstack
+}
+
+function encrypt() {
+    tar -czvf $1.tar.gz $1
+    gpg --symmetric $1.tar.gz
+    echo "Deleting $1 and $1.tar.gz"
+    rm -rf $1 $1.tar.gz
+
+
+}
