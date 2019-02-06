@@ -47,10 +47,12 @@ set statusline+=%*
 
 " Disables syntastic popup window with messages
 " Set both to 1 to turn it on
-let g:syntastic_always_populate_loc_list = 0
-let g:syntastic_auto_loc_list = 0
-let g:syntastic_check_on_open = 0
-let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+" 3 errors is more than enough
+let g:syntastic_loc_list_height=3
 
 nnoremap <F10> :SyntasticCheck mypy<CR>
 " Set xptemplate trigger key to tab
@@ -93,6 +95,9 @@ inoremap jk <Esc>
 " Easier buffer closing
 nnoremap <Leader>q :bd<CR>
 
+" Close splits instead of buffers
+" nnoremap <Leader>q :<C-w>q<CR>
+
 " Swap to previous buffer
 nnoremap <Leader><Tab> :b#<CR>
 
@@ -100,16 +105,17 @@ nnoremap <Leader><Tab> :b#<CR>
 nnoremap <BS> h<DEL>
 vnoremap <BS> d
 
-" Save with <Leader>s
+" Save with <Leader>s in normal and insert mode
 noremap <silent> <Leader>s :update<CR>
+inoremap <silent> <Leader>s <ESC>:update<CR>
 " Sudo save with <Leader>S
 noremap <silent> <Leader>S :w !sudo tee % > /dev/null<CR>
+" map sort function to a key
+vnoremap <Leader>s :sort<CR>
 
 " Writes to all buffers when switching to another buffer
 set autowrite
 
-" Enable virtualenv
-let g:airline#extensions#virtualenv#enabled = 1
 " Enable tabs plugin
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
@@ -140,33 +146,12 @@ if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
-" Set comment string for commentary.vim for python
-set commentstring=#%s
-
-" I no longer use that because emmet.vim does all I need
-""Auto complete HTLM tags
-"function! s:CompleteTags()
-"  inoremap <buffer> > ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR>
-"  inoremap <buffer> ><Leader> >
-"  inoremap <buffer> ><CR> ></<C-x><C-o><Esc>:startinsert!<CR><C-O>?</<CR><CR><Tab><CR><Up><C-O>$
-"endfunction
-
-"autocmd BufRead,BufNewFile *.html,*.js,*.xml call s:CompleteTags()
-
-" Sources $MYVIMRC on changes
-" augroup reload_vimrc " {
-"     autocmd!
-"     autocmd BufWritePost $MYVIMRC source $MYVIMRC
-" augroup END " }
-
-
 " Set VIMHOME
 if has('win32') || has ('win64')
         let $VIMHOME = $VIM."/vimfiles"
     else
         let $VIMHOME = $HOME."/.vim"
     endif
-
 
 " Bind nohl
 " Removes highlight of your last search
@@ -182,18 +167,15 @@ noremap<C-tab> :b#
 vnoremap <C-tab> :b#
 "inoremap <C-n> :b#
 
-
 " Quicksave command
 " noremap <C-Z> :update<CR>
 " vnoremap <C-Z> <C-C>:update<CR>
 " inoremap <C-Z> <C-O>:update<CR>
 
-" Execute current file with python
-noremap <Leader>e :!python %<CR>
-
 " bind Ctrl+<movement> keys to move around the windows, instead of using
 " Ctrl+w + <movement>
 " Every unnecessary keystroke that can be saved is good for your health :)
+"nmap <c-j> :wincmd j
 map <c-j> <c-w>j
 map <c-k> <c-w>k
 map <c-l> <c-w>l
@@ -206,13 +188,9 @@ map <Leader>n <esc>;bp<CR>
 " Create empty buffer and open it
 map <Leader>t <esc>:enew<CR>
 
-
-" map sort function to a key
-vnoremap <Leader>s :sort<CR>
-
 " easier moving of code blocks
 " Try to go into visual mode (v), thenselect several lines of code here and
-" then press ``>`` several times.
+" then press `>` several times.
 vnoremap < <gv  " better indentation
 vnoremap > >gv  " better indentation
 
@@ -241,35 +219,12 @@ filetype off
 filetype plugin indent on
 syntax on
 
-" Ignore flake8 E501 for lines longer than 80 characters
-" E128 - visual continuation
-" W391 - blank line at end of file
-" let g:syntastic_python_flake8_args='--ignore=W391, E501, E701, E702'
-" let g:syntastic_python_flake8_show_quickfix=1
-" let g:pymode_lint_ignore="E501,W601,W391,W0401,E702,E701"
-let g:pymode_lint_ignore=["E501","W601","W391","W0401","E702","E701"]
-let g:pymode_lint_settingscwindow = 1
-let g:pymode_rope = 1
-" let g:pymode_rope_autoimport = 0
-let g:pymode_rope_regenerate_on_write = 0
-let g:pymode_python="python3"
-let g:pymode_lint_checkers = ['pep8']
-let g:pymode_breakpoint_cmd = 'import ipdb; ipdb.set_trace() # XXX BREAKPOINT'
-let g:pymode_rope_completion = 1
-
-" Run Lint fixer on save
-nnoremap <leader>p :PymodeLintAuto<CR>
-nnoremap zz :folddoclosed if foldlevel('.') < foldlevel(line('.')+1) \| exe 'norm! zo' \| endif<CR>
-
-" Make quickfix screen smaller
-let g:syntastic_loc_list_height=1
-
 " In visual mode searches for the selected word
 vnoremap // y/<C-R>"<CR>
 
 " Showing line numbers and length
 " set tw=79   " width of document (used by gd)
-set tw=120   " width of document (used by gd)
+" set tw=120   " width of document (used by gd)
 set nowrap  " don't automatically wrap on load
 set fo-=t   " don't automatically wrap text when typing
 set colorcolumn=120
@@ -306,7 +261,6 @@ set directory=~/.vim/tmp//,.
 set dir=~/.vim/tmp//,.
 set undodir=~/.vim/tmp/undo//
 
-
 " Setup Pathogen to manage your plugins
 " mkdir -p ~/.vim/autoload ~/.vim/bundle
 " curl -so ~/.vim/autoload/pathogen.vim
@@ -319,18 +273,10 @@ set nocp
 call pathogen#infect()
 
 
-"
-"============================================================================
-" Python IDE Setup
-"
-"============================================================================
-
-
 " Settings for vim-powerline
 " cd ~/.vim/bundle
 " git clone git://github.com/Lokaltog/vim-powerline.git
 set laststatus=2
-
 
 " Settings for ctrlp
 " cd ~/.vim/bundle
@@ -340,7 +286,6 @@ let g:ctrlp_working_path_mode = 'ar'
 set wildignore+=*.pyc
 set wildignore+=*_build/*
 set wildignore+=*/coverage/*
-
 
 " Settings for python-mode
 " Note: I'm no longer using this. Leave this commented out
@@ -407,20 +352,11 @@ function! OmniPopup(action)
     return a:action
 endfunction
 
-"inoremap <silent><C-j> <C-R>=OmniPopup('j')<CR>
-"inoremap <silent><C-k> <C-R>=OmniPopup('k')<CR>
-set omnifunc=jedi#completions
-:"py3 import sys; sys.path[2]='/root/.virtualenvs/django/bin/python'
-" set omnifunc=syntaxcomplete#Complete
-
 " Python folding
 " mkdir -p ~/.vim/ftplugin
 " wget -O ~/.vim/ftplugin/python_editing.vim
 "http://www.vim.org/scripts/download_script.php?src_id=5492
 set foldenable
-
-" Auto activate virtual enviorment
-let g:virtualenv_auto_activate = 1
 
 " Keep undo history even after closing file
 set undofile
@@ -439,13 +375,13 @@ endif
 " au! BufRead,BufNewFile *.sh,*.tcl,*.php,*.pl let Comment="#"
 " if the comment character for a given filetype happens to be @
 " then use let Comment="\@" to avoid problems...
-function! CommentLines()
-  "let Comment="#" " shell, tcl, php, perl
-  exe ":s@^@".g:Comment."@g"
-  exe ":s@$@".g:EndComment."@g"
-endfunction
-" map visual mode keycombo 'co' to this function
-vmap co :call CommentLines()<CR>
+" function! CommentLines()
+"   "let Comment="#" " shell, tcl, php, perl
+"   exe ":s@^@".g:Comment."@g"
+"   exe ":s@$@".g:EndComment."@g"
+" endfunction
+" " map visual mode keycombo 'co' to this function
+" vmap co :call CommentLines()<CR>
 
 " Encryption algo (vim -x file)
 set cm=blowfish2
@@ -471,13 +407,13 @@ set matchtime=3
 " Fold functions in bash
 let g:sh_fold_enabled=3
 
-
 " Recompute syntax highlighting
 nnoremap <silent> <F4> :syntax sync fromstart<CR>
 
 autocmd FileType markdown syntax sync fromstart
 
 set cursorline
+" Minimal number of lines before scrolling
 set scrolloff=3
 set sidescrolloff=3
 
@@ -488,8 +424,16 @@ endif
 
 set relativenumber
 
-nnoremap <leader>Q :qa<CR>
+" nnoremap <leader>Q :qa<CR>
 
 " Remap ; to be : - save 1 key press :P
 nnoremap ; :
 nnoremap : ;
+
+" Gundo docs https://sjl.bitbucket.io/gundo.vim/
+nnoremap <F6> :GundoToggle<CR>
+
+" Auto encrypt files related to courseworks at uni
+augroup encrypted
+    autocmd BufNewFile */soton/*/coursework* :X
+augroup END
