@@ -63,12 +63,6 @@ let g:xptemplate_key = '<Tab>'
 "inoremap <Caps> <space><space><space><space>
 
 
-" Python main method snippet
-"let g:xptemplate_brace_complete = '([{<'
-let g:xptemplate_minimal_prefix = 1
-" let g:xptemplate_vars="$author=viktor.barzin"
-" let g:xptemplate_vars="$email=viktor.barzin@samitor.com"
-
 " Rebind <Leader> key
 " I like to have it here becuase it is easier to reach than the default and
 " it is next to ``m`` and ``n`` which I use for navigating between tabs.
@@ -126,6 +120,7 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_powerline_fonts=1
 " let g:airline_section_b = '%{strftime("%c")}'
 " let g:airline_section_y = 'BN: %{bufnr("%")} FT: %y'
+let g:airline#extensions#ale#enabled = 1
 
 " Enable wildmenu which is an enhanced  command completion
 "
@@ -223,7 +218,7 @@ syntax on
 vnoremap // y/<C-R>"<CR>
 
 " Showing line numbers and length
-" set tw=79   " width of document (used by gd)
+set tw=79   " width of document (used by gd)
 " set tw=120   " width of document (used by gd)
 set nowrap  " don't automatically wrap on load
 set fo-=t   " don't automatically wrap text when typing
@@ -437,3 +432,22 @@ nnoremap <F6> :GundoToggle<CR>
 augroup encrypted
     autocmd BufNewFile */soton/*/coursework* :X
 augroup END
+
+" SEttings for Go
+let g:neocomplete#enable_at_startup = 1 " DO NOT MOVE in another file
+let g:xptemplate_key = '<Space><Space>'
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['eslint'],
+\}
+
+
+" Put these lines at the very end of your vimrc file.
+
+" Load all plugins now.
+" Plugins need to be added to runtimepath before helptags can be generated.
+packloadall
+" Load all of the helptags now, after plugins have been loaded.
+" All messages and errors will be ignored.
+silent! helptags ALL

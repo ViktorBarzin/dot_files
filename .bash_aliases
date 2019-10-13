@@ -3,6 +3,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias py='python3'
+alias ipy='ipython3'
 alias whatisopen='sudo netstat -pnlt'
 alias calc='gcalccmd'
 alias pmr='python manage.py runserver'
@@ -11,7 +12,7 @@ alias pmm='python manage.py migrate'
 alias pmmm='python manage.py makemigrations'
 
 # Start vim with system clipboard
-# alias vim="vimx" # don't alias this - make symlink instead
+alias vim="vimx" # don't alias this - make symlink instead
 alias vi="vim"
 
 # git aliases
@@ -32,7 +33,7 @@ alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || 
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
 alias omg="sudo service NetworkManager restart"
-alias omg1.1="sudo modprobe -rv iwldvm && sudo modprobe -r iwlwifi; sudo modprobe iwlwifi"
+alias omg1.1="sudo rmmod iwlmvm && sudo rmmod iwlwifi; sudo modprobe iwlwifi"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias myip="curl ifconfig.co"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
@@ -47,7 +48,8 @@ alias root="sudo su -"
     then
         echo 'Rsync is running, not going to sleep.'
     else
-        (/bin/lock &) && sudo systemctl suspend
+        # (/bin/lock &) && sudo systemctl suspend
+        sudo systemctl suspend
     fi
 }
 
@@ -89,6 +91,7 @@ alias update="sudo $pm update"
 alias upgrade="sudo $pm upgrade"
 alias install="sudo $pm install"
 alias remove="sudo $pm remove"
+alias reinstall="sudo $pm reinstall"
 
 #  secureme(){
 #     workon ansible;
@@ -175,16 +178,17 @@ alias remove="sudo $pm remove"
     # sudo mount /dev/kubuntu-vg/$snapshot_name $mount_point
     # sudo chroot $mount_point /bin/zsh
 # }
+wifi_int_name="$(cat /proc/net/wireless | perl -ne '/(\w+):/ && print $1')"
 
 alias ifl="ifconfig|less"
 # Docker aliases
 alias dsl="docker swarm leave --force"
-alias dsi="docker swarm init --advertise-addr=$(ifconfig wlp2s0 | grep inet | awk '/1/{print $2}')"
+alias dsi="docker swarm init --advertise-addr=$wifi_int_name"
 alias dsjtm="docker swarm join-token manager"
 alias dsjtw="docker swarm join-token worker"
 
-alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
-alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/wlp2s0/disable_ipv6'"
+alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
+alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
 
 # alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
 alias omg2="kwin --replace &"
@@ -225,8 +229,10 @@ alias lip="ifconfig $(route -n | head -n 3 | tail -n 1 | awk '{print $8}') | gre
 #alias tldr="rm -r /home/viktor/.tldr_cache/ &> /dev/null; tldr"
 alias sl=ls
 alias vimrc="vim ~/.vimrc"
+alias zshrc="vim ~/.zshrc"
 alias f="free -h"
 alias h="sudo htop"
+alias a="sudo atop"
 alias e="exa -bghHliS"
 alias hosts="sudo vim /etc/hosts"
 
@@ -348,6 +354,51 @@ function encrypt() {
     gpg --symmetric $1.tar.gz
     echo "Deleting $1 and $1.tar.gz"
     rm -rf $1 $1.tar.gz
+}
 
+function decrypt() {
+    gpg --decrypt $1 | tar xzvf -
+}
 
+alias kb=kubectl
+
+# use avr-gcc for latfortuna, but gcc works as well
+function make_tags() {
+avr-gcc -M $* | sed -e 's/[\\ ]/\n/g' | \
+        sed -e '/^$/d' -e '/\.o:[ \t]*$/d' | ctags -L - --c++-kinds=+p --fields=+iaS --extra=+q
+}
+#alias server="python3 -m http.server --bind 0.0.0.0 8000"
+alias server="/opt/miniserve-linux"
+alias gr="go run"
+alias hg="hugo -D server --bind 0.0.0.0"
+alias logout="qdbus org.kde.ksmserver /KSMServer logout 0 0 0"
+alias sucss="cd ~/pentesting/sucss-19 && workon sucss-playground-webapp"
+alias i="sudo iotop"
+alias ssucss="ssh sucss.ecs.soton.ac.uk"
+alias gpc="globalprotect connect; sudo sed -i '1 i\\nameserver 152.78.110.110' /etc/resolv.conf"
+alias gpd="globalprotect disconnect; sudo sed -i '1d' /etc/resolv.conf"
+
+function whoishome() {
+    # echo "Finding connected devices..."
+    ips=$(nmap -sn 192.168.0.1/24 | grep for | awk '{print $5}')
+
+    # echo "Getting entries from ARP table..."
+    # Get entries in arp table
+    python3 -c '
+import sys
+users={
+    "C8:21:58:98:29:25": "lubo-laptop",
+    "2C:0E:3D:A7:C1:19": "viktor-phone",
+    "18:F0:E4:2A:CB:B0": "lubo-phone",
+    "A0:32:99:C4:0E:38": "nasko-phone",
+    "48:01:C5:39:A6:3D": "ioana-phone",
+    "48:89:E7:18:0E:66": "viktor-laptop",
+}
+# print("Connected device: ")
+for line in sys.argv[1].split("\n"):
+    ip = line.split()[1].replace("(", "").replace(")", "")
+    mac = line.split()[3].upper()
+    if mac in users:
+        print(f"{users[mac]}")
+' "$(arp -a | grep -v incomplete)"
 }
