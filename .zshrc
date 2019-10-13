@@ -118,7 +118,8 @@ j () {
 
 # source /usr/local/bin/virtualenvwrapper.sh
 # eval ssh-agent > /dev/null
-VIRTUALENVWRAPPER_PYTHON=python3
+# VIRTUALENVWRAPPER_PYTHON=python3
+export PYTHONBREAKPOINT=ipdb.set_trace
 source ~/.zshenv
 
 # Color man pages
@@ -142,3 +143,16 @@ bindkey '^x^e' edit-command-line
 # Vi style:
 # zle -N edit-command-line
 # bindkey -M vicmd v edit-command-line
+
+# add GO to path
+export PATH="/home/viktor/go/bin:$PATH"
+
+# add JDK 12 go path
+export PATH="/opt/jdk-12.0.1/bin:$PATH"
+
+# add azure core tools to path
+export PATH="/opt/azure/:$PATH"
+
+# add k8s autocompletion
+# source <(kubectl completion zsh)
+unset command_not_found_handle
