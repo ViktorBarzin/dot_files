@@ -1,0 +1,25 @@
+{
+    "pasteImage.basePath": "",
+    "explorer.confirmDelete": false,
+    "pasteImage.path": "${projectRoot}/static/images",
+    "pasteImage.namePrefix": "${currentFileNameWithoutExt}-",
+    "pasteImage.insertPattern": "${imageSyntaxPrefix}/images/${imageFileName}${imageSyntaxSuffix}",
+    "pasteImage.defaultName": "e-HH-mm-ss",
+    "cSpell.userWords": [
+        "Barzin",
+        "Viktor"
+    ],
+    "workbench.editor.highlightModifiedTabs": true,
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.autoSave": "afterDelay",
+    "editor.formatOnSave": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "window.zoomLevel": 0,
+    "editor.minimap.enabled": true,
+    "editor.renderWhitespace": "all",
+    "editor.renderControlCharacters": true,
+    "workbench.activityBar.visible": true,
+    "window.menuBarVisibility": "toggle"
+}
