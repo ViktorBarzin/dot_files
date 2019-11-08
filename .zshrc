@@ -156,3 +156,9 @@ export PATH="/opt/azure/:$PATH"
 # add k8s autocompletion
 # source <(kubectl completion zsh)
 unset command_not_found_handle
+
+# Load nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"# This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] &&   \. "$NVM_DIR/bash_completion"# This loads nvm bash_completion
+

@@ -18,7 +18,7 @@ alias vi="vim"
 # git aliases
 alias gs='git status'
 alias ga='git add'
-alias gc='git commit'
+alias gc='git commit -S'
 alias gp='git push origin master'
 alias gpull='git pull origin master'
 
@@ -32,7 +32,7 @@ alias muzika='xdg-open /home/viktor/Documents/Music/njoy.m3u'
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
-alias omg="sudo service NetworkManager restart"
+alias omg="sudo systemctl restart NetworkManager"
 alias omg1.1="sudo rmmod iwlmvm && sudo rmmod iwlwifi; sudo modprobe iwlwifi"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
 alias myip="curl ifconfig.co"
@@ -234,6 +234,7 @@ alias f="free -h"
 alias h="sudo htop"
 alias a="sudo atop"
 alias e="exa -bghHliS"
+alias n="sudo nethogs"
 alias hosts="sudo vim /etc/hosts"
 
 # Source:

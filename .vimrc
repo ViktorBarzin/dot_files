@@ -437,12 +437,6 @@ augroup END
 let g:neocomplete#enable_at_startup = 1 " DO NOT MOVE in another file
 let g:xptemplate_key = '<Space><Space>'
 
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint'],
-\}
-
-
 " Put these lines at the very end of your vimrc file.
 
 " Load all plugins now.
