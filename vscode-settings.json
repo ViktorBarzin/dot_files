@@ -16,7 +16,7 @@
     "files.autoSave": "afterDelay",
     "editor.formatOnSave": true,
     "javascript.updateImportsOnFileMove.enabled": "always",
-    "window.zoomLevel": 0,
+    "window.zoomLevel": -1,
     "editor.minimap.enabled": true,
     "editor.renderWhitespace": "all",
     "editor.renderControlCharacters": true,
