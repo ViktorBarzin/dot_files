@@ -60,7 +60,7 @@ HIST_STAMPS="dd.mm.yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=()
+plugins=(zsh-autosuggestion zsh-syntax-highlighting encode64 gitignore)
 
 source $ZSH/oh-my-zsh.sh
 # tmux source-file /home/viktor/.tmux.conf
@@ -98,11 +98,6 @@ fi
 
 # Load aliases
 . ~/.bash_aliases
-
-j () {
-	local dir="$(jump cd $@)"
-	test -d "$dir" && cd "$dir"
-}
 
 # . ~/.bash_completion
 
@@ -151,7 +146,7 @@ export PATH="/home/viktor/go/bin:$PATH"
 export PATH="/opt/jdk-12.0.1/bin:$PATH"
 
 # add azure core tools to path
-export PATH="/opt/azure/:$PATH"
+# export PATH="/opt/azure/:$PATH"
 
 # add k8s autocompletion
 # source <(kubectl completion zsh)
@@ -162,3 +157,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"# This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] &&   \. "$NVM_DIR/bash_completion"# This loads nvm bash_completion
 
+export PATH="/home/viktor/.local/bin:$PATH"
+
+# Load Z to jump around recent dirs
+. ~/z.sh

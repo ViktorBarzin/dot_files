@@ -445,3 +445,7 @@ packloadall
 " Load all of the helptags now, after plugins have been loaded.
 " All messages and errors will be ignored.
 silent! helptags ALL
+
+let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
+
+au BufNewFile,BufRead,BufReadPost *.thrift set syntax=thrift

@@ -7,7 +7,7 @@ alias ipy='ipython3'
 alias whatisopen='sudo netstat -pnlt'
 alias calc='gcalccmd'
 alias pmr='python manage.py runserver'
-alias nopmr="netstat -pnlt | grep -E -o -e '[0-9]+/python' | cut -d '/' -f 1 | xargs kill"
+alias nopmr="ps auxw | grep runserver | awk '{print \$2}' | xargs kill"
 alias pmm='python manage.py migrate'
 alias pmmm='python manage.py makemigrations'
 
@@ -16,13 +16,27 @@ alias vim="vimx" # don't alias this - make symlink instead
 alias vi="vim"
 
 # git aliases
+alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit -S'
 alias gp='git push origin master'
-alias gpull='git pull origin master'
-
+alias gpull='git pull --rebase origin master'
+alias gl="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+alias gd="git diff"
+alias gb="git branch"
 alias gpp='git push production master' # push to production for personal website
+# useful for daily stand-up
+git-standup() {
+    AUTHOR=${AUTHOR:="`git config user.name`"}
+
+    since=yesterday
+    if [[ $(date +%u) == 1 ]] ; then
+        since="2 days ago"
+    fi
+
+    git log --all --since "$since" --oneline --author="$AUTHOR"
+}
 
 # MSR registers is responsible for lag after suspend
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
@@ -186,12 +200,14 @@ alias dsl="docker swarm leave --force"
 alias dsi="docker swarm init --advertise-addr=$wifi_int_name"
 alias dsjtm="docker swarm join-token manager"
 alias dsjtw="docker swarm join-token worker"
+alias sdk="sudo systemctl start docker"
 
 alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
 
 # alias omg2="killall plasmashell; plasmashell > /dev/null 2>&1 & disown"
 alias omg2="kwin --replace &"
+alias omg2.1="kquitapp5 plasmashell && kstart5 plasmashell"
 alias aliases="vim ~/.bash_aliases && source ~/.bash_aliases"
 
 # alias ghcirun="ghci --make $1; ./$1"
@@ -389,11 +405,13 @@ function whoishome() {
 import sys
 users={
     "C8:21:58:98:29:25": "lubo-laptop",
-    "2C:0E:3D:A7:C1:19": "viktor-phone",
     "18:F0:E4:2A:CB:B0": "lubo-phone",
-    "A0:32:99:C4:0E:38": "nasko-phone",
-    "48:01:C5:39:A6:3D": "ioana-phone",
+    "2C:0E:3D:A7:C1:19": "viktor-phone",
     "48:89:E7:18:0E:66": "viktor-laptop",
+    "A0:32:99:C4:0E:38": "nasko-phone",
+    "44:03:2C:6B:04:5E": "nasko-laptop",
+    "48:01:C5:39:A6:3D": "ioana-phone",
+    "F4:0F:24:2B:FE:14": "ioana-laptop",
 }
 # print("Connected device: ")
 for line in sys.argv[1].split("\n"):
@@ -403,3 +421,13 @@ for line in sys.argv[1].split("\n"):
         print(f"{users[mac]}")
 ' "$(arp -a | grep -v incomplete)"
 }
+
+alias wa="watch sensors"
+alias gtop="sudo intel_gpu_top"
+
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+bindkey '^[0' autosuggest-accept;
+# bindkey '^[9' forward-word;
+bindkey '^[9' autosuggest-fetch;
+# bindkey '^[9' autosuggest-clear;
+#bindkey '^ ' autosuggest-fetch
