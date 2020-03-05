@@ -218,12 +218,15 @@ syntax on
 vnoremap // y/<C-R>"<CR>
 
 " Showing line numbers and length
-set tw=79   " width of document (used by gd)
+set tw=0   " width of document (used by gd)
 " set tw=120   " width of document (used by gd)
 set nowrap  " don't automatically wrap on load
 set fo-=t   " don't automatically wrap text when typing
-set colorcolumn=120
-highlight ColorColumn ctermbg=233
+" set colorcolumn=80
+set colorcolumn=0
+" highlight ColorColumn ctermbg=233
+highlight ColorColumn ctermbg=001
+
 
 " Useful settings
 set history=700
@@ -449,3 +452,18 @@ silent! helptags ALL
 let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 
 au BufNewFile,BufRead,BufReadPost *.thrift set syntax=thrift
+
+" Autosave sessions
+fu! SaveSess()
+    execute 'mksession! ' . '~/.vim/tmp/sessions/' . substitute(getcwd(), "/", '!', "g"). '.session.vim'
+endfunction
+
+fu! RestoreSess()
+    let l:name = expand('~/.vim/tmp/sessions/') . substitute(getcwd(), "/", '!', "g") . '.session.vim'
+    if filereadable(l:name)
+        execute 'so ' . l:name
+    endif
+endfunction
+
+autocmd VimLeave,BufWritePost * call SaveSess()
+autocmd VimEnter * nested call RestoreSess()
