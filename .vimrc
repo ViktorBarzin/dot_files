@@ -1,3 +1,7 @@
+" Source vimrc on vim startup
+" autocmd! VimEnter * source ~/.vimrc
+
+" Load rename plugin
 " so ~/.vim/Rename.vim
 
 " let g:EclimCompletionMethod = 'omnifunc'
@@ -49,7 +53,6 @@ let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 " 3 errors is more than enough
 let g:syntastic_loc_list_height=3
-
 nnoremap <F10> :SyntasticCheck mypy<CR>
 " Set xptemplate trigger key to tab
 let g:xptemplate_key = '<Tab>'
@@ -463,7 +466,7 @@ fu! RestoreSess()
 endfunction
 
 autocmd VimLeave,BufWritePost * call SaveSess()
-autocmd VimEnter * nested call RestoreSess()
+" autocmd VimEnter * nested call RestoreSess()
 
 set updatetime=100
 
