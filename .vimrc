@@ -1,7 +1,3 @@
-" Source vimrc on vim startup
-" autocmd! VimEnter * source ~/.vimrc
-
-" Load rename plugin
 " so ~/.vim/Rename.vim
 
 " let g:EclimCompletionMethod = 'omnifunc'
@@ -332,7 +328,7 @@ noremap <leader>- :sp<CR>
 "autocmd VimEnter * wincmd p
 " Toggle NEDRTree plugin
 noremap <C-b> :NERDTreeToggle<CR>
-let NERDTreeIgnore = ['\.pyc$', '__pycache__']
+let NERDTreeIgnore = ['\.pyc$', '__pycache__', '.mypy_cache', '.pytest_cache']
 let NERDTreeShowHidden=1
 
 " Better navigating through omnicomplete option list
@@ -467,3 +463,9 @@ endfunction
 
 autocmd VimLeave,BufWritePost * call SaveSess()
 autocmd VimEnter * nested call RestoreSess()
+
+set updatetime=100
+
+" highlight GitGutterDelete    guifg=#990000 ctermfg=1
+" highlight GitGutterAdd       guifg=#009900 ctermfg=2
+" highlight GitGutterChange    guifg=#997c00 ctermfg=3
