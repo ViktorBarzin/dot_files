@@ -14,6 +14,7 @@ alias pmmm='python manage.py makemigrations'
 # Start vim with system clipboard
 alias vim="vimx" # don't alias this - make symlink instead
 alias vi="vim"
+alias vimdiff="vim -d"
 
 # git aliases
 alias g='git'
@@ -26,6 +27,8 @@ alias gl="git log --graph --abbrev-commit --decorate --format=format:'%C(bold bl
 alias gd="git diff"
 alias gb="git branch"
 alias gpp='git push production master' # push to production for personal website
+# pull all remote branches
+alias git-pull-branches='git branch -r | grep -v "\->" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done'
 # useful for daily stand-up
 git-standup() {
     AUTHOR=${AUTHOR:="`git config user.name`"}
@@ -412,13 +415,15 @@ users={
     "44:03:2C:6B:04:5E": "nasko-laptop",
     "48:01:C5:39:A6:3D": "ioana-phone",
     "F4:0F:24:2B:FE:14": "ioana-laptop",
+    "50:EB:71:23:BC:11": "gabi-laptop",
+    "FE:43:0A:04:03:BA": "gabi-phone",
 }
 # print("Connected device: ")
 for line in sys.argv[1].split("\n"):
     ip = line.split()[1].replace("(", "").replace(")", "")
     mac = line.split()[3].upper()
     if mac in users:
-        print(f"{users[mac]}")
+        print(f"{users[mac]}:{ip}")
 ' "$(arp -a | grep -v incomplete)"
 }
 
@@ -431,3 +436,26 @@ bindkey '^[0' autosuggest-accept;
 bindkey '^[9' autosuggest-fetch;
 # bindkey '^[9' autosuggest-clear;
 #bindkey '^ ' autosuggest-fetch
+alias sp="snapper -c home"
+
+function snp(){
+    # Runs a command wrapped in btrfs snapper pre-post snapshots.
+    # Usage: $ snp <commands>
+    # e.g.: $ snp dnf install htop
+
+    cmd="$@"
+
+    snapshot_nbr=$(snapper -c home create --type=pre --cleanup-algorithm=number --print-number --description="${cmd}")
+    # snapshot_nbr=$(sudo snapper create --type=pre --cleanup-algorithm=number --print-number --description="${cmd}")
+
+    eval "$cmd"
+
+    snapshot_nbr=$(snapper -c home create --type=post --cleanup-algorithm=number --print-number --pre-number="$snapshot_nbr")
+    # snapshot_nbr=$(sudo snapper create --type=post --cleanup-algorithm=number --print-number --pre-number="$snapshot_nbr")
+}
+
+function waitfor() {
+    while pidof $1 > /dev/null; do sleep 2; done;
+}
+alias toclip="xclip -selection clipboard"
+alias clearsessions="rm -rf ~/.vim/tmp/sessions/*"
