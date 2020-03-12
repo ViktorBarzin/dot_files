@@ -425,6 +425,7 @@ nnoremap ; :
 nnoremap : ;
 
 " Gundo docs https://sjl.bitbucket.io/gundo.vim/
+let g:gundo_prefer_python3 = 1
 nnoremap <F6> :GundoToggle<CR>
 
 " Auto encrypt files related to courseworks at uni
