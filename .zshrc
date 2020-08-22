@@ -60,7 +60,7 @@ HIST_STAMPS="dd.mm.yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zsh-autosuggestion zsh-syntax-highlighting encode64 gitignore)
+plugins=(zsh-autosuggestion zsh-syntax-highlighting encode64 gitignore zsh-z)
 
 source $ZSH/oh-my-zsh.sh
 # tmux source-file /home/viktor/.tmux.conf
@@ -160,4 +160,4 @@ export NVM_DIR="$HOME/.nvm"
 export PATH="/home/viktor/.local/bin:$PATH"
 
 # Load Z to jump around recent dirs
-. ~/z.sh
+#. ~/z.sh
