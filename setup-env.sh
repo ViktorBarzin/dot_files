@@ -3,54 +3,47 @@
 echo "Enter root password:"
 read -s password
 
+
+# Get packet manager
+declare -A osInfo;
+osInfo[/etc/redhat-release]=dnf
+osInfo[/etc/arch-release]=pacman
+osInfo[/etc/gentoo-release]=emerge
+osInfo[/etc/SuSE-release]=zypp
+osInfo[/etc/debian_version]=apt
+
+# for f in "${!osInfo[@]}" # bash version
+for f in "${(@k)osInfo}" # zsh version
+do
+    if [[ -f $f ]];then
+        pm=${osInfo[$f]}
+    fi
+done
+
+if [[ "$pm"  == "apt" ]]; then
+    sudo $pm update
+fi
+
 # Install zsh
-sudo apt update
-sudo apt upgrade --assume-yes
-sudo apt install zsh \
-                python-pip --assume-yes
+sudo $pm install -y zsh tmux wget && \
+
 # Setup oh-my-zsh
 wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh && chmod +x install.sh && echo "$password" | ./install.sh && \
 
-# Setup config files
-cp .zshrc ~/ && \
-cp  .bash_aliases ~/  && \
-sudo cp  virtualenvwrapper.sh /usr/local/bin/  && \
-cp  .zshenv ~/ && \
-cp bira.zsh-theme ~/.oh-my-zsh/themes/
-
-# Configure j (jump)
-# Debian like
-wget https://github.com/gsamokovarov/jump/releases/download/v0.18.0/jump_0.18.0_amd64.deb && \
-sudo dpkg -i jump_0.18.0_amd64.deb && \
-
-# RHEL like
-# wget https://github.com/gsamokovarov/jump/releases/download/v0.18.0/jump-0.18.0-1.x86_64.rpm
-# sudo rpm -i jump-0.18.0-1.x86_64.rpm
-# Setup vim
+# Setup zsh config files
+wget -O ~/.zshrc https://raw.githubusercontent.com/ViktorBarzin/dot_files/master/.zshrc && \
+wget -O ~/.bash_aliases https://raw.githubusercontent.com/ViktorBarzin/dot_files/master/.bash_aliases && \
+wget -O ~/.zshenv https://raw.githubusercontent.com/ViktorBarzin/dot_files/master/.zshenv && \
 
 
-# Setup pyenv
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv && \
-# Install python
-# pyenv install 3.6.4 # throws some error? :/
+# Setup tmux
+bash -c "cd ~ && git clone https://github.com/gpakosz/.tmux.git && ln -s -f .tmux/.tmux.conf && cp .tmux/.tmux.conf.local ."
 
-# Install pip
-sudo pip install --upgrade pip && \
-sudo pip install virtualenvwrapper && \
+wget -O ~/.tmux.conf.local https://raw.githubusercontent.com/ViktorBarzin/dot_files/master/.tmux.conf.local && \
 
-source ~/.zshrc && \
-
-# Check whether to install vim
-read -p "Setup vim? (Y/n)?" CONT
-if [ "$CONT" = "n" ]; then
-    echo Skipping vim installation
-  else
-      # Run vim installation script
-      ./setup-vim.sh
-    fi
-
-echo '
-
+# Configure z (jump)
+# git clone https://github.com/agkozak/zsh-z $ZSH_CUSTOM/plugins/zsh-z && \
+git clone https://github.com/agkozak/zsh-z ~/.oh-my-zsh/plugins/zsh-z && \
 
   ___ _   _  ___ ___ ___  ___ ___
  / __| | | |/ __/ __/ _ \/ __/ __|
