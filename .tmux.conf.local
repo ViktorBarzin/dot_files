@@ -179,11 +179,17 @@ tmux_conf_theme_right_separator_sub='\uE0B3'  #   PowerlineSymbols.otf font, see
 #     - #{uptime_s}
 #     - #{username}
 #     - #{username_ssh}
+
+# CPU info
+# CPU: #{cpu_icon} #{cpu_percentage} RAM: #{ram_icon} #{ram_percentage} ,
+
+# #(curl wttr.in/Southampton?format=3) ,  # - for weather
+cpu_percentage_format="%3.1f%%" # printf format to use to display percentage
 tmux_conf_theme_status_left=' ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} '
-# tmux_conf_theme_status_right='#{prefix}#{pairing}#{synchronized} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} '
-tmux_conf_theme_status_right="IP:#(ifconfig $(route -n | sed -n '3p' | awk '{print $8}') | grep 'inet ' | cut -d ' ' -f 10) , \
+#tmux_conf_theme_status_right='#{prefix}#{pairing}#{synchronized} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} '
+tmux_conf_theme_status_right=" IP:#(ip route get 8.8.8.8 | head -1 | cut -d' ' -f7) , \
 DNS:#(echo $(cat /etc/resolv.conf | grep 'nameserver [0-9]' | awk '{print $2}')) , \
-Gateway:#(echo $(route -n | sed -n '3p' | awk '{print $2}')) #{prefix}#{pairing} #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname}"
+Gateway:#(echo $(route -n | sed -n '3p' | awk '{print $2}')) #{prefix}#{pairing} #[fg=green]#($TMUX_PLUGIN_MANAGER_PATH/tmux-mem-cpu-load/tmux-mem-cpu-load --colors --powerline-right --interval 2) , #{?battery_status, #{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname}"
 
 
 # status left style
@@ -290,8 +296,8 @@ set -g status-keys vi
 set -g mode-keys vi
 
 # replace C-b by C-a instead of using both prefixes
-# set -gu prefix2
-# unbind C-a
+set -gu prefix2
+unbind C-a
 # unbind C-b
 # set -g prefix C-a
 # bind C-a send-prefix
@@ -302,6 +308,7 @@ bind M-x send-prefix
 #set -g status-position top
 
 bind \\ split-window -h -c "#{pane_current_path}" # Split panes horizontal
+bind - split-window -v -c "#{pane_current_path}"  # Split panes vertical
 
 # Use Alt-vim keys without prefix key to switch panes
 bind -n M-h select-pane -L
@@ -332,16 +339,16 @@ set-option -g default-shell /bin/zsh
 
 # Custom added - MUST be in the end
 # List of plugins
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
+# set -g @plugin 'tmux-plugins/tpm'
+# set -g @plugin 'tmux-plugins/tmux-sensible'
 
-set -g @plugin 'tmux-plugins/tmux-resurrect'
-set -g @resurrect-processes 'vi vim nvim man less more tail top htop'
+# set -g @plugin 'tmux-plugins/tmux-resurrect'
+# set -g @resurrect-processes 'vi vim nvim man less more tail top htop'
 
-set -g @plugin 'tmux-plugins/tmux-continuum'
+# set -g @plugin 'tmux-plugins/tmux-continuum'
 
-set -g @continuum-restore 'on'
+# set -g @continuum-restore 'on'
 
-# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-run -b '~/.tmux/plugins/tpm/tpm'
+# # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+# run -b '~/.tmux/plugins/tpm/tpm'
 
