@@ -60,7 +60,7 @@ HIST_STAMPS="dd.mm.yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zsh-syntax-highlighting encode64 gitignore zsh-z)
+plugins=(encode64 gitignore zsh-z)
 
 source $ZSH/oh-my-zsh.sh
 # Update PROMPT to include current time
@@ -169,4 +169,6 @@ export PATH="/home/viktor/.local/bin:$PATH"
 compinit
 
 # add k8s autocompletion, must be after compinit!
-source <(kubectl completion zsh)
+if which kubectl >/dev/null 2>/dev/null; then
+    source <(kubectl completion zsh)
+fi
