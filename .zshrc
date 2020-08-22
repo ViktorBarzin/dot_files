@@ -60,9 +60,13 @@ HIST_STAMPS="dd.mm.yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zsh-autosuggestion zsh-syntax-highlighting encode64 gitignore zsh-z)
+plugins=(zsh-syntax-highlighting encode64 gitignore zsh-z)
 
 source $ZSH/oh-my-zsh.sh
+# Update PROMPT to include current time
+local time='%{$terminfo[bold]$fg[red]%}%*%{$reset_color%}'
+PROMPT="╭─${user_host}${time}${current_dir}${rvm_ruby}${git_branch}${venv_prompt}
+╰─%B${user_symbol}%b "
 # tmux source-file /home/viktor/.tmux.conf
 
 # User configuration
@@ -141,6 +145,8 @@ bindkey '^x^e' edit-command-line
 
 # add GO to path
 export PATH="/home/viktor/go/bin:$PATH"
+#export GO111MODULE=on
+export GOPATH="/home/viktor/go"
 
 # add JDK 12 go path
 export PATH="/opt/jdk-12.0.1/bin:$PATH"
@@ -148,8 +154,6 @@ export PATH="/opt/jdk-12.0.1/bin:$PATH"
 # add azure core tools to path
 # export PATH="/opt/azure/:$PATH"
 
-# add k8s autocompletion
-# source <(kubectl completion zsh)
 unset command_not_found_handle
 
 # Load nvm
@@ -161,3 +165,8 @@ export PATH="/home/viktor/.local/bin:$PATH"
 
 # Load Z to jump around recent dirs
 #. ~/z.sh
+
+compinit
+
+# add k8s autocompletion, must be after compinit!
+source <(kubectl completion zsh)
