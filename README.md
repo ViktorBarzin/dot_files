@@ -1,6 +1,11 @@
 ![](./images/tmux_zsh.png)
 
-# Tmux settings
+# Dev environment
+
+I use [tmux](https://github.com/tmux/tmux/wiki) with [zshell with oh-my-zsh](https://ohmyz.sh/).
+
+On my personal machine I use [Konsole](https://konsole.kde.org/) as my terminal emulator and on my work machine I use [iTerm2](https://www.iterm2.com/).
+Profiles for both are included in the repo - [Konsole profile](https://github.com/ViktorBarzin/dot_files/blob/master/konsole.profile) and [iTerm2 Profile](https://github.com/ViktorBarzin/dot_files/blob/master/iterm2.json).
 
 My `tmux` settings are based on [`gpakosz`'s Oh-My-Tmux](https://github.com/gpakosz/.tmux) and I've added/changed some of the settings to better suite my taste.
 
@@ -12,7 +17,7 @@ Download and run [`setup.sh`](https://raw.githubusercontent.com/ViktorBarzin/dot
 curl -sL https://raw.githubusercontent.com/ViktorBarzin/dot_files/master/setup.sh | bash
 ```
 
-It will install `tmux` and `zsh` if missing and `wget` all the config files.
+This script installs `tmux` and `zsh` if missing and `wget`s all the config files.
 
 
 # Everyday hacks
