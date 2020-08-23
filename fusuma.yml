@@ -1,1 +1,39 @@
-/home/viktor/.gem/ruby/gems/fusuma-1.3.2/lib/fusuma/config.yml
+swipe:
+  3:
+    left:
+      command: 'xdotool key ctrl+alt+Left'
+    right:
+      command: 'xdotool key ctrl+alt+Right'
+    up:
+      command: 'xdotool key ctrl+alt+Up'
+    down:
+      command: 'xdotool key ctrl+alt+Down'
+  4:
+    left:
+      command: 'xdotool set_desktop_for_window $(xdotool getactivewindow) $(python -c "import sys;print((int(sys.argv[1]) - 1) % 4)" $(xdotool get_desktop_for_window $(xdotool getactivewindow))) && xdotool key ctrl+alt+Left'
+    right:
+      command: 'xdotool set_desktop_for_window $(xdotool getactivewindow) $(python -c "import sys;print((int(sys.argv[1]) + 1) % 4)" $(xdotool get_desktop_for_window $(xdotool getactivewindow))) && xdotool key ctrl+alt+Right'
+    up:
+      command: 'xdotool set_desktop_for_window $(xdotool getactivewindow) $(python -c "import sys;print((int(sys.argv[1]) - 2) % 4)" $(xdotool get_desktop_for_window $(xdotool getactivewindow))) && xdotool key ctrl+alt+Up'
+    down:
+      command: 'xdotool set_desktop_for_window $(xdotool getactivewindow) $(python -c "import sys;print((int(sys.argv[1]) + 2) % 4)" $(xdotool get_desktop_for_window $(xdotool getactivewindow))) && xdotool key ctrl+alt+Down'
+
+pinch:
+  3:
+    in:
+      command: 'xdotool key XF86MonBrightnessUp' # Brightness up
+    out:
+      command: 'xdotool key XF86MonBrightnessDown' # Brightness down
+  4:
+    in:
+      command: 'xdotooxdotool key super+Rightl key super+a'
+    out:
+      command: 'xdotool key super+s'
+
+threshold:
+  swipe: 0.2
+  pinch: 0.1
+
+interval:
+  swipe: 0.4
+  pinch: 1
