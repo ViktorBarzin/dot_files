@@ -1,1 +1,9 @@
-/home/viktor/.gitconfig
+[user]
+	emal = vbarzin@gmail.com
+	name = viktorbarzin
+	email = vbarzin@gmail.com
+	signingkey = 6AF253F1C94B5F00750FBBD40EB088298288D958
+[push]
+	default = tracking
+[branch]
+	autosetuprebase = always
