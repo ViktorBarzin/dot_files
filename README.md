@@ -30,11 +30,11 @@ They are focused around either 1) reduce the distance my fingers have to move or
 ## tmux
 | Feature                  | Shortcut                                                                                                                                               |
 |--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `tmux` Prefix            | `Alt-x`                                                                                                                                                |
+| `tmux` Prefix            | `Alt-x` / `Cmd-x`                                                                                                                                      |
 | text selection           | `Prefix Enter` to enter visual mode, then vim bindings to move, `V` to enter select mode and once happy with selection `Enter` to copy to OS clipboard |
 | Vertical split pane      | `Prefix \`                                                                                                                                             |
 | Horizontal pane split    | `Prefix -`                                                                                                                                             |
-| Pane movement            | Hold `Alt` and vim movement bindings (or arrows for normies) to move in all directions                                                                 |
+| Pane movement            | Hold `Alt`/ `Cmd` and vim movement bindings (or arrows for normies) to move in all directions                                                          |
 | Pane resize              | `Prefix` and vim movement                                                                                                                              |
 | Maximize current pane    | `Prefix z` (z for zoom)                                                                                                                                |
 | Toggle synchronize panes | `Prefix s` (s for synchronize)                                                                                                                         |
