@@ -22,9 +22,11 @@ alias gs='git status'
 alias ga='git add'
 alias gc='git commit -S'
 alias gp='git push origin master'
+# alias gp='for r in $(git remote); do echo "Pushing to $r" && git push $r master; done'
 alias gpull='git pull --rebase origin master'
 alias gl="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gd="git diff"
+alias gds="git diff --staged"
 alias gb="git branch"
 alias gpp='git push production master' # push to production for personal website
 # pull all remote branches
@@ -52,7 +54,7 @@ alias svali_papka=download_github_folder
 alias omg="sudo systemctl restart NetworkManager"
 alias omg1.1="sudo rmmod iwlmvm && sudo rmmod iwlwifi; sudo modprobe iwlwifi"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
-alias myip="curl ifconfig.co"
+alias myip="curl icanhazip.com"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
 alias root="sudo su -"
 
@@ -105,6 +107,7 @@ do
     fi
 done
 alias update="sudo $pm update"
+alias u="update"
 alias upgrade="sudo $pm upgrade"
 alias install="sudo $pm install"
 alias remove="sudo $pm remove"
@@ -118,8 +121,8 @@ alias reinstall="sudo $pm reinstall"
 #     sudo openvpn --config viktor.ovpn &
 # }
 
- in(){
-    if [ $# -ne 1 ] && [ $# -ne 2 ];
+ function in(){
+    if [ $# -lt 2 ];
     then
         echo "Usage:"
         echo "To start existing container:"
@@ -138,7 +141,7 @@ alias reinstall="sudo $pm reinstall"
     fi
 
     # Check if recreating a container or reuse existing
-    if [ "$1" = "new" ] && [ $# -eq 2 ]
+    if [ "$1" = "new" ]
     then
         image_name=$2
         if [[ $(docker container ls -a | grep "$container_name") ]]
@@ -149,12 +152,23 @@ alias reinstall="sudo $pm reinstall"
             fi
             docker rm $container_name >> /dev/null
         fi
-        docker run -it --name $container_name --publish-all=true $image_name /bin/bash
-        docker attach $container_name
+
+        if [ -z "$3" ]
+        then
+            cmd="/bin/bash"
+        else
+            cmd="$3"
+        fi
+        echo "Running $cmd in $container_name"
+        # docker run -it --name $container_name --publish-all=true $image_name "$cmd" && docker attach $container_name
+
+        xhost +local:root  # allow gui apps
+        docker run -it --name $container_name -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix $image_name "$cmd"
+        xhost -local:root
     else
-        docker start $container_name >> /dev/null
-        docker attach $container_name
-        # docker exec -it $container_name /bin/bash
+        xhost +local:root
+        docker start $container_name >> /dev/null && docker attach $container_name
+        xhost -local:root
     fi
 }
 
@@ -370,9 +384,9 @@ function dang_gcc(){
 }
 
 function encrypt() {
-    tar -czvf $1.tar.gz $1
-    gpg --symmetric $1.tar.gz
-    echo "Deleting $1 and $1.tar.gz"
+    tar -czvf $1.tar.gz $1 && \
+    gpg --symmetric --armor $1.tar.gz && \
+    echo "Deleting $1 and $1.tar.gz" && \
     rm -rf $1 $1.tar.gz
 }
 
@@ -459,3 +473,48 @@ function waitfor() {
 }
 alias toclip="xclip -selection clipboard"
 alias clearsessions="rm -rf ~/.vim/tmp/sessions/*"
+#alias restore_virtualenv_post_scripts="find /home/.snapshots/337/snapshot/viktor/.virtualenvs -name 'postactivate' | sed 's/\/home\/.snapshots\/337\/snapshot\/viktor\///' | xargs -I % rsync -va /home/.snapshots/337/snapshot/viktor/% ~/"
+
+# `clear` can be seen and flicker is annoying
+# function watch() {
+#     while sleep 1; do
+#         clear;
+#         ${SHELL-/bin/sh} -c "$*"
+#     done;
+# }
+alias vmon="sudo systemctl start vmware"
+alias vmoff="sudo systemctl stop vmware"
+alias dkon="sudo systemctl start docker"
+alias dkoff="sudo systemctl stop docker"
+alias tf="terraform"
+function b64() {
+    echo $1 | base64 -d
+}
+# alias fuck='sudo $(history -p !!)'
+alias fuck='sudo $(fc -ln -1)'
+alias curlb='curl -s -o /dev/null -w "%{time_starttransfer}\n" "$@"'
+alias nomicautoadjust='while sleep 0.5; do pacmd set-source-volume alsa_input.pci-0000_00_1f.3.analog-stereo 20000; done'
+
+# Needs to send dbus msg not sure how
+# function toggleLidClose() {
+#     # If action is none, make it suspend and vice-versa
+#     if grep 'lidAction=0' ~/.config/powermanagementprofilesrc > /dev/null; then
+#         sed -i 's/lidAction=0/lidAction=1/' ~/.config/powermanagementprofilesrc
+#     else
+#         sed -i 's/lidAction=1/lidAction=0/' ~/.config/powermanagementprofilesrc
+#     fi
+# }
+
+# Games
+alias medieval="sh -c 'cd ~/.wine/drive_c/Program\ Files\ \(x86\)/SEGA/Medieval\ II\ Total\ War/ && wine medieval2.exe'"
+
+alias kb="kubectl"
+alias kbp="kubectl get pods"
+alias kn="kubens"
+function cephpw() {
+    kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o yaml | grep "password:" | grep -v '{}'| awk '{print $2}' | base64 --decode
+}
+
+alias k8srole="ansible-playbook -i hosts.yaml linux.yml -e host='10.0.20.100' -t "
+alias wgon="wg-quick up ~/vpn-certs/viktor.conf"
+alias wgoff="wg-quick down ~/vpn-certs/viktor.conf"
