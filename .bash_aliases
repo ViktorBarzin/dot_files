@@ -12,7 +12,7 @@ alias pmm='python manage.py migrate'
 alias pmmm='python manage.py makemigrations'
 
 # Start vim with system clipboard
-alias vim="vimx" # don't alias this - make symlink instead
+#alias vim="vimx" # don't alias this - make symlink instead
 alias vi="vim"
 alias vimdiff="vim -d"
 
@@ -47,7 +47,7 @@ git-standup() {
 alias checkcpu='modprobe msr; rdmsr -a 0x19a'
 alias fixcpu='wrmsr -a 0x19a 0x0'
 
-alias muzika='xdg-open /home/viktor/Documents/Music/njoy.m3u'
+alias muzika='xdg-open ~/Documents/Music/njoy.m3u'
 alias randomstr="tr -dc a-z1-4 </dev/urandom | tr 1-2 ' \n' | awk 'length==0 || length>50' | tr 3-4 ' ' | sed 's/^ *//' | cat -s | sed 's/ / /g' |fmt"
 alias battery="upower -i /org/freedesktop/UPower/devices/battery_BAT0 | grep -E 'time to empty|state|to\ full|percentage'"
 alias svali_papka=download_github_folder
@@ -217,7 +217,6 @@ alias dsl="docker swarm leave --force"
 alias dsi="docker swarm init --advertise-addr=$wifi_int_name"
 alias dsjtm="docker swarm join-token manager"
 alias dsjtw="docker swarm join-token worker"
-alias sdk="sudo systemctl start docker"
 
 alias noip6="sudo sh -c 'echo 1 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
 alias yesip6="sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/$wifi_int_name/disable_ipv6'"
@@ -273,8 +272,8 @@ alias hosts="sudo vim /etc/hosts"
 # Source:
 # https://wiki.archlinux.org/index.php/Streaming_to_twitch.tv
  streaming() {
-     youtube_key="k1ms-wpmc-v652-7rjr" # Hide me
-     twitch_key="live_56376159_CCAGv99vT0rr3QwiBiMuDAdoPcYB5N" # and me
+     youtube_key="k1ms-wpmc-v652-7rjr" # Ancient, not used anymore
+     twitch_key="live_56376159_CCAGv99vT0rr3QwiBiMuDAdoPcYB5N" # Ancient, not user anymore
 
      if [ "$#" -ne 1 ]; then
          echo "Choose yt/tw"
@@ -355,9 +354,6 @@ alias lk1="sudo logkeys --start --output /home/viktor/tt --device /dev/input/eve
     "ssh-keygen -f '/home/viktor/.ssh/known_hosts' -R $1"
 }
 
-alias homep="sudo ssh root@samitor.com -L 80:localhost:80"
-alias homes="sudo ssh home"
-alias emergency_shell="ssh -t root@samitor.com 'ssh wizard@localhost -p 6060'"
 alias s="ssh"
 ytplaylist(){
         # if error try updating youtube-dl with: sudo youtube-dl -U
@@ -393,8 +389,6 @@ function encrypt() {
 function decrypt() {
     gpg --decrypt $1 | tar xzvf -
 }
-
-alias kb=kubectl
 
 # use avr-gcc for latfortuna, but gcc works as well
 function make_tags() {
