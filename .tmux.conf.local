@@ -336,19 +336,21 @@ bind-key s set-window-option synchronize-panes\; display-message "synchronize-pa
 
 set-option -g default-shell /bin/zsh
 
-
+# Putting this in .tmux.conf.local does not work :/ 3.0a
 # Custom added - MUST be in the end
 # List of plugins
-# set -g @plugin 'tmux-plugins/tpm'
-# set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
 
-# set -g @plugin 'tmux-plugins/tmux-resurrect'
-# set -g @resurrect-processes 'vi vim nvim man less more tail top htop'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @resurrect-processes 'vi vim nvim man less more tail top htop'
 
-# set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 
-# set -g @continuum-restore 'on'
+#set -g @continuum-restore 'on'
+set -g @continuum-restore 'off'
 
-# # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
-# run -b '~/.tmux/plugins/tpm/tpm'
+set -g @plugin 'thewtex/tmux-mem-cpu-load'
 
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run -b '~/.tmux/plugins/tpm/tpm'
