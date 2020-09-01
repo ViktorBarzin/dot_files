@@ -512,3 +512,4 @@ function cephpw() {
 alias k8srole="ansible-playbook -i hosts.yaml linux.yml -e host='10.0.20.100' -t "
 alias wgon="wg-quick up ~/vpn-certs/viktor.conf"
 alias wgoff="wg-quick down ~/vpn-certs/viktor.conf"
+alias svm="ssh viktorbarzin.sb.facebook.com tmux new -A -s main"
