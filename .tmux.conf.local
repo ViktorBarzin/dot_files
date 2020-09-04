@@ -336,6 +336,8 @@ bind-key s set-window-option synchronize-panes\; display-message "synchronize-pa
 
 set-option -g default-shell /bin/zsh
 
+set-window-option -g aggressive-resize
+
 # Putting this in .tmux.conf.local does not work :/ 3.0a
 # Custom added - MUST be in the end
 # List of plugins
