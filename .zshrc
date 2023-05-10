@@ -147,7 +147,7 @@ bindkey '^x^e' edit-command-line
 # add GO to path
 export PATH="/home/viktor/go/bin:$PATH"
 #export GO111MODULE=on
-export GOPATH="/home/viktor/go"
+export GOPATH="/home/$USER/go"
 
 # add JDK 12 go path
 export PATH="/opt/jdk-12.0.1/bin:$PATH"
