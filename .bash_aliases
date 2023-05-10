@@ -12,7 +12,7 @@ alias pmm='python manage.py migrate'
 alias pmmm='python manage.py makemigrations'
 
 # Start vim with system clipboard
-#alias vim="vimx" # don't alias this - make symlink instead
+alias vim="vimx" # don't alias this - make symlink instead
 alias vi="vim"
 alias vimdiff="vim -d"
 
@@ -54,7 +54,7 @@ alias svali_papka=download_github_folder
 alias omg="sudo systemctl restart NetworkManager"
 alias omg1.1="sudo rmmod iwlmvm && sudo rmmod iwlwifi; sudo modprobe iwlwifi"
 alias zsh_fix="mv ~/.zsh_history ~/.zsh_history_bad; strings ~/.zsh_history_bad > ~/.zsh_history;fc -R ~/.zsh_history; rm ~/.zsh_history_bad"
-alias myip="curl icanhazip.com"
+alias myip="curl https://icanhazip.com"
 alias rmswp="find ~/.vim/tmp/ -iname \"*swp\" -delete"
 alias root="sudo su -"
 
@@ -121,56 +121,56 @@ alias reinstall="sudo $pm reinstall"
 #     sudo openvpn --config viktor.ovpn &
 # }
 
- function in(){
-    if [ $# -lt 2 ];
-    then
-        echo "Usage:"
-        echo "To start existing container:"
-        echo "in <os you want>"
-        echo
-        echo "To start new container:"
-        echo "in new <os you want>"
-        return
-    fi
+ # function in(){
+ #    if [ $# -lt 2 ];
+ #    then
+ #        echo "Usage:"
+ #        echo "To start existing container:"
+ #        echo "in <os you want>"
+ #        echo
+ #        echo "To start new container:"
+ #        echo "in new <os you want>"
+ #        return
+ #    fi
 
-    if [ $# -eq 1 ]
-    then
-        container_name="${1/:/_}"
-    else
-        container_name="${2/:/_}"
-    fi
+ #    if [ $# -eq 1 ]
+ #    then
+ #        container_name="${1/:/_}"
+ #    else
+ #        container_name="${2/:/_}"
+ #    fi
 
-    # Check if recreating a container or reuse existing
-    if [ "$1" = "new" ]
-    then
-        image_name=$2
-        if [[ $(docker container ls -a | grep "$container_name") ]]
-        then
-            if [[ $(docker ps | grep $container_name) ]]
-            then
-                docker stop $container_name >> /dev/null
-            fi
-            docker rm $container_name >> /dev/null
-        fi
+ #    # Check if recreating a container or reuse existing
+ #    if [ "$1" = "new" ]
+ #    then
+ #        image_name=$2
+ #        if [[ $(docker container ls -a | grep "$container_name") ]]
+ #        then
+ #            if [[ $(docker ps | grep $container_name) ]]
+ #            then
+ #                docker stop $container_name >> /dev/null
+ #            fi
+ #            docker rm $container_name >> /dev/null
+ #        fi
 
-        if [ -z "$3" ]
-        then
-            cmd="/bin/bash"
-        else
-            cmd="$3"
-        fi
-        echo "Running $cmd in $container_name"
-        # docker run -it --name $container_name --publish-all=true $image_name "$cmd" && docker attach $container_name
+ #        if [ -z "$3" ]
+ #        then
+ #            cmd="/bin/bash"
+ #        else
+ #            cmd="$3"
+ #        fi
+ #        echo "Running $cmd in $container_name"
+ #        # docker run -it --name $container_name --publish-all=true $image_name "$cmd" && docker attach $container_name
 
-        xhost +local:root  # allow gui apps
-        docker run -it --name $container_name -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix $image_name "$cmd"
-        xhost -local:root
-    else
-        xhost +local:root
-        docker start $container_name >> /dev/null && docker attach $container_name
-        xhost -local:root
-    fi
-}
+ #        xhost +local:root  # allow gui apps
+ #        docker run -it --name $container_name -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix $image_name "$cmd"
+ #        xhost -local:root
+ #    else
+ #        xhost +local:root
+ #        docker start $container_name >> /dev/null && docker attach $container_name
+ #        xhost -local:root
+ #    fi
+# }
 
 #  stest(){
     # snapshot_name="rootsnap"
@@ -397,7 +397,7 @@ avr-gcc -M $* | sed -e 's/[\\ ]/\n/g' | \
 }
 #alias server="python3 -m http.server --bind 0.0.0.0 8000"
 alias server="/opt/miniserve-linux"
-alias gr="go run"
+alias gr="go run ."
 alias hg="hugo -D server --bind 0.0.0.0"
 alias logout="qdbus org.kde.ksmserver /KSMServer logout 0 0 0"
 alias sucss="cd ~/pentesting/sucss-19 && workon sucss-playground-webapp"
@@ -481,6 +481,7 @@ alias vmoff="sudo systemctl stop vmware"
 alias dkon="sudo systemctl start docker"
 alias dkoff="sudo systemctl stop docker"
 alias tf="terraform"
+alias tfa="tf apply"
 function b64() {
     echo $1 | base64 -d
 }
@@ -504,12 +505,51 @@ alias medieval="sh -c 'cd ~/.wine/drive_c/Program\ Files\ \(x86\)/SEGA/Medieval\
 
 alias kb="kubectl"
 alias kbp="kubectl get pods"
+alias kbpo="kubectl get pods -o wide"
+alias kbs="kubectl get svc"
+alias kbn="kubectl get nodes -o wide"
+alias kbd="kubectl describe pods"
+alias kbf="kubectl logs --all-containers --max-log-requests 50 -f"
 alias kn="kubens"
 function cephpw() {
     kubectl -n rook-ceph get secret rook-ceph-dashboard-password -o yaml | grep "password:" | grep -v '{}'| awk '{print $2}' | base64 --decode
 }
+function kbop() {
+    kb -n rook-ceph delete pods $(kbp |grep opera | awk '{print $1}')
+    kb -n rook-ceph logs -f $(kbp |grep operator | awk '{print $1}')
+}
 
 alias k8srole="ansible-playbook -i hosts.yaml linux.yml -e host='10.0.20.100' -t "
-alias wgon="wg-quick up ~/vpn-certs/viktor.conf"
-alias wgoff="wg-quick down ~/vpn-certs/viktor.conf"
-alias svm="et -c 'tmux new -A -s main' viktorbarzin.sb.facebook.com:8082"
+function wgon(){
+    wg-quick up ~/vpn-certs/viktor.conf
+    # Add ipv4 precedence because vpn is v4 onyl for now
+    bash -c "grep -qxF 'precedence ::ffff:0:0/96 100' /etc/gai.conf || echo 'precedence ::ffff:0:0/96 100' | sudo tee -a /etc/gai.conf"
+    # Add dns if missing
+    ns_str="nameserver 10.0.20.1 # Added by wgon function"
+    search_str="search viktorbarzin.lan # Added by wgon function"
+    resolv_conf="/etc/resolv.conf"
+    bash -c "grep -qxF '$search_str' $resolv_conf || echo '$search_str' | sudo tee -a $resolv_conf"
+    bash -c "grep -qxF '$ns_str' $resolv_conf || echo '$ns_str' | sudo sed -i -e '1i $ns_str' $resolv_conf"
+}
+function wgoff(){
+    wg-quick down ~/vpn-certs/viktor.conf
+
+    ns_str="nameserver 10.0.20.1 # Added by wgon function"
+    search_str="search viktorbarzin.lan # Added by wgon function"
+    resolv_conf="/etc/resolv.conf"
+
+    # Remove ipv4 precedence because vpn is v4 onyl for now
+    sudo sed -i '/precedence ::ffff:0:0\/96 100/d' /etc/gai.conf
+
+    sudo sed -i "/$search_str/d" $resolv_conf
+    sudo sed -i "/$ns_str/d" $resolv_conf
+}
+function wgs() {
+    kubectl scale -n wireguard deployment wireguard --replicas=$1
+}
+alias wg="sudo wg"
+alias svm="et -c 'tmux new -A -s main' 10.0.10.104:2022"
+alias calicoctl="kubectl exec -i -n kube-system calicoctl -- /calicoctl"
+alias ipcalc="ipcalc --no-decorate"
+alias ss-tunnel="snap run shadowsocks-libev.ss-tunnel"
+alias ss-local="snap run shadowsocks-libev.ss-local"
