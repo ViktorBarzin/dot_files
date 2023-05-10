@@ -55,7 +55,7 @@ let g:syntastic_check_on_wq = 0
 let g:syntastic_loc_list_height=3
 nnoremap <F10> :SyntasticCheck mypy<CR>
 " Set xptemplate trigger key to tab
-let g:xptemplate_key = '<Tab>'
+" let g:xptemplate_key = '<Tab>'
 
 " Autocomplete with Tab
 " inoremap <Tab> <C-x><Space><CR>
@@ -292,7 +292,7 @@ set wildignore+=*/coverage/*
 "" map <Leader>g :call RopeGotoDefinition()<CR>
 "" let ropevim_enable_shortcuts = 1
 "" let g:pymode_rope_goto_def_newwin = "vnew"
-"" let g:pymode_rope_extended_complete = 1
+" let g:pymode_rope_extended_complete = 1
 "" let g:pymode_breakpoint = 0
 "" let g:pymode_syntax = 1
 "" let g:pymode_syntax_builtin_objs = 0
@@ -467,9 +467,20 @@ endfunction
 
 autocmd VimLeave,BufWritePost * call SaveSess()
 " autocmd VimEnter * nested call RestoreSess()
+nnoremap <leader>r  :call RestoreSess()<CR>
 
 set updatetime=100
 
 " highlight GitGutterDelete    guifg=#990000 ctermfg=1
 " highlight GitGutterAdd       guifg=#009900 ctermfg=2
 " highlight GitGutterChange    guifg=#997c00 ctermfg=3
+
+" Move up and down in autocomplete with <c-j> and <c-k>
+" inoremap <expr> <c-j> ("\<C-n>")
+" inoremap <expr> <c-k> ("\<C-p>")
+" inoremap <expr> <TAB> pumvisible() ? '<C-n>' : <TAB> " pumvisible is slow
+" inoremap <expr> k pumvisible() ? '<C-p>' : 'k'
+"
+" inoremap <expr> <TAB> '<C-n>'
+" inoremap <expr> <S-TAB> '<C-p>'
+" let g:pymode=0

@@ -354,5 +354,7 @@ set -g @continuum-restore 'off'
 
 set -g @plugin 'thewtex/tmux-mem-cpu-load'
 
+set -g default-command "${SHELL}"
+
 # Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
 run -b '~/.tmux/plugins/tpm/tpm'
