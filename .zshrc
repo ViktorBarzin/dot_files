@@ -116,7 +116,7 @@ fi
 # PATH="$PYENV_ROOT/bin:$PATH"
 #eval "$(pyenv init -)"
 
-# source /usr/local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
 # eval ssh-agent > /dev/null
 # VIRTUALENVWRAPPER_PYTHON=python3
 export PYTHONBREAKPOINT=ipdb.set_trace
