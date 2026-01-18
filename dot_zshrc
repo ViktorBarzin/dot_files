@@ -39,6 +39,7 @@ plugins=(
     git
     encode64
     gitignore
+    kubectl
     z
 )
 
