@@ -22,6 +22,7 @@ alias gs='git status'
 alias ga='git add'
 alias gc='git commit -S'
 alias gp='git push origin master'
+alias gpf='git push -u forgejo master'
 # alias gp='for r in $(git remote); do echo "Pushing to $r" && git push $r master; done'
 alias gpull='git pull --rebase origin master'
 alias gl="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
