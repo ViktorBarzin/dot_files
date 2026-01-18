@@ -138,7 +138,7 @@ tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d
 
 # Status right: network info + mem/cpu + battery + time + user@host
 # Battery vars use #{?...} conditionals so they're safe on non-laptop systems
-tmux_conf_theme_status_right=" #{local_ip}#{gateway} #{prefix}#{mouse}#{pairing}#{synchronized} #{mem_cpu}#{battery_fallback} , %R , %d %b | #{username}#{root} | #{hostname} "
+tmux_conf_theme_status_right=" #(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _local_ip)#(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _gateway) #{prefix}#{mouse}#{pairing}#{synchronized} #(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _mem_cpu)#(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _battery_fallback) , %R , %d %b | #{username}#{root} | #{hostname} "
 
 # Status left colors: yellow, pink, green
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_7,$tmux_conf_theme_colour_8"
@@ -300,106 +300,86 @@ set -g @plugin 'thewtex/tmux-mem-cpu-load'
 
 # /!\ do not remove the following line
 # EOF
-
-# /!\ do not "uncomment" the functions: the leading "# " characters are needed
-
-# usage: #{local_ip}
-# Cross-platform: Linux (ip/hostname) and macOS (ipconfig/route)
-local_ip() {
-  # Try Linux first (ip command)
-  if command -v ip >/dev/null 2>&1; then
-    result=$(ip route get 8.8.8.8 2>/dev/null | grep -oP 'src \K[0-9.]+' | head -1)
-    [ -n "$result" ] && printf 'IP:%s' "$result" && return
-  fi
-  # macOS fallback (route + ifconfig)
-  if [ "$(uname)" = "Darwin" ]; then
-    iface=$(route get 8.8.8.8 2>/dev/null | awk '/interface:/ {print $2}')
-    if [ -n "$iface" ]; then
-      result=$(ipconfig getifaddr "$iface" 2>/dev/null)
-      [ -n "$result" ] && printf 'IP:%s' "$result" && return
-    fi
-  fi
-  # Final fallback: hostname -I (Linux)
-  result=$(hostname -I 2>/dev/null | awk '{print $1}')
-  [ -n "$result" ] && printf 'IP:%s' "$result" && return
-  # No IP found
-  printf 'IP:offline'
-}
-
-# usage: #{gateway}
-# Cross-platform: Linux and macOS
-gateway() {
-  # Try Linux first (ip command)
-  if command -v ip >/dev/null 2>&1; then
-    gw=$(ip route 2>/dev/null | awk '/default/ {print $3; exit}')
-    [ -n "$gw" ] && printf ' GW:%s' "$gw" && return
-  fi
-  # macOS fallback
-  if [ "$(uname)" = "Darwin" ]; then
-    gw=$(route -n get default 2>/dev/null | awk '/gateway:/ {print $2}')
-    [ -n "$gw" ] && printf ' GW:%s' "$gw" && return
-  fi
-  # No gateway - common on VPN or special network configs, don't show error
-  printf ''
-}
-
-# usage: #{mem_cpu}
-# Shows memory/CPU if tmux-mem-cpu-load plugin is installed
-mem_cpu() {
-  # Check common installation paths
-  for path in \
-    "${TMUX_PLUGIN_MANAGER_PATH:-$HOME/.tmux/plugins}/tmux-mem-cpu-load/tmux-mem-cpu-load" \
-    "$HOME/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load" \
-    "/usr/local/bin/tmux-mem-cpu-load" \
-    "/usr/bin/tmux-mem-cpu-load"
-  do
-    if [ -x "$path" ]; then
-      "$path" --colors --powerline-right --interval 2 2>/dev/null
-      return
-    fi
-  done
-  # Plugin not installed - show basic load average as fallback
-  if [ -f /proc/loadavg ]; then
-    load=$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)
-    [ -n "$load" ] && printf 'Load:%s' "$load" && return
-  fi
-  # macOS fallback
-  if [ "$(uname)" = "Darwin" ]; then
-    load=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2, $3, $4}')
-    [ -n "$load" ] && printf 'Load:%s' "$load" && return
-  fi
-  printf ''
-}
-
-# usage: #{battery_fallback}
-# Shows battery status or nothing on desktops/servers
-battery_fallback() {
-  # Linux: check /sys/class/power_supply
-  if [ -d /sys/class/power_supply/BAT0 ]; then
-    cap=$(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null)
-    status=$(cat /sys/class/power_supply/BAT0/status 2>/dev/null)
-    if [ -n "$cap" ]; then
-      icon="🔋"
-      [ "$status" = "Charging" ] && icon="🔌"
-      printf '%s%s%%' "$icon" "$cap"
-      return
-    fi
-  fi
-  # macOS: use pmset
-  if [ "$(uname)" = "Darwin" ]; then
-    battery=$(pmset -g batt 2>/dev/null | grep -o '[0-9]*%' | head -1)
-    if [ -n "$battery" ]; then
-      charging=$(pmset -g batt 2>/dev/null | grep -q 'AC Power' && echo 1)
-      icon="🔋"
-      [ -n "$charging" ] && icon="🔌"
-      printf '%s%s' "$icon" "$battery"
-      return
-    fi
-  fi
-  # No battery (desktop/server) - show nothing
-  printf ''
-}
-
-"$@"
-# /!\ do not remove the previous line
-#     do not write below this line
+#
+# # usage: #{local_ip}
+# # Cross-platform: Linux (ip/hostname) and macOS (ipconfig/route)
+# _local_ip() {
+#   if command -v ip >/dev/null 2>&1; then
+#     result=$(ip route get 8.8.8.8 2>/dev/null | grep -oP 'src \K[0-9.]+' | head -1)
+#     [ -n "$result" ] && printf 'IP:%s' "$result" && return
+#   fi
+#   if [ "$(uname)" = "Darwin" ]; then
+#     iface=$(route get 8.8.8.8 2>/dev/null | awk '/interface:/ {print $2}')
+#     if [ -n "$iface" ]; then
+#       result=$(ipconfig getifaddr "$iface" 2>/dev/null)
+#       [ -n "$result" ] && printf 'IP:%s' "$result" && return
+#     fi
+#   fi
+#   result=$(hostname -I 2>/dev/null | awk '{print $1}')
+#   [ -n "$result" ] && printf 'IP:%s' "$result" && return
+#   printf 'IP:offline'
+# }
+#
+# # usage: #{gateway}
+# # Cross-platform: Linux and macOS
+# _gateway() {
+#   if command -v ip >/dev/null 2>&1; then
+#     gw=$(ip route 2>/dev/null | awk '/default/ {print $3; exit}')
+#     [ -n "$gw" ] && printf ' GW:%s' "$gw" && return
+#   fi
+#   if [ "$(uname)" = "Darwin" ]; then
+#     gw=$(route -n get default 2>/dev/null | awk '/gateway:/ {print $2}')
+#     [ -n "$gw" ] && printf ' GW:%s' "$gw" && return
+#   fi
+#   printf ''
+# }
+#
+# # usage: #{mem_cpu}
+# # Shows memory/CPU if tmux-mem-cpu-load plugin is installed
+# _mem_cpu() {
+#   for path in "$HOME/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load" "/usr/local/bin/tmux-mem-cpu-load" "/usr/bin/tmux-mem-cpu-load"; do
+#     if [ -x "$path" ]; then
+#       "$path" --colors --powerline-right --interval 2 2>/dev/null
+#       return
+#     fi
+#   done
+#   if [ -f /proc/loadavg ]; then
+#     load=$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null)
+#     [ -n "$load" ] && printf 'Load:%s' "$load" && return
+#   fi
+#   if [ "$(uname)" = "Darwin" ]; then
+#     load=$(sysctl -n vm.loadavg 2>/dev/null | awk '{print $2, $3, $4}')
+#     [ -n "$load" ] && printf 'Load:%s' "$load" && return
+#   fi
+#   printf ''
+# }
+#
+# # usage: #{battery_fallback}
+# # Shows battery status or nothing on desktops/servers
+# _battery_fallback() {
+#   if [ -d /sys/class/power_supply/BAT0 ]; then
+#     cap=$(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null)
+#     status=$(cat /sys/class/power_supply/BAT0/status 2>/dev/null)
+#     if [ -n "$cap" ]; then
+#       icon="🔋"
+#       [ "$status" = "Charging" ] && icon="🔌"
+#       printf '%s%s%%' "$icon" "$cap"
+#       return
+#     fi
+#   fi
+#   if [ "$(uname)" = "Darwin" ]; then
+#     battery=$(pmset -g batt 2>/dev/null | grep -o '[0-9]*%' | head -1)
+#     if [ -n "$battery" ]; then
+#       charging=$(pmset -g batt 2>/dev/null | grep -q 'AC Power' && echo 1)
+#       icon="🔋"
+#       [ -n "$charging" ] && icon="🔌"
+#       printf '%s%s' "$icon" "$battery"
+#       return
+#     fi
+#   fi
+#   printf ''
+# }
+#
+# "$@"
+# # /!\ do not remove the previous line
+# #     do not write below this line
