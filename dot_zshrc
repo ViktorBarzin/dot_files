@@ -77,3 +77,9 @@ export LESS_TERMCAP_us=$'\e[1;4;31m'
 #   - secrets.zsh     : API tokens (gitignored)
 #   - tools/*.zsh     : Tool-specific configs (pyenv, nvm, kubectl)
 # ============================================================================
+
+czpush() {
+  local msg="${1:-Update dotfiles}"
+  cd "$(chezmoi source-path)" && git add -A && git commit -m "$msg" && git push
+  cd - > /dev/null
+}
