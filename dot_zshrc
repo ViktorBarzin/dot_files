@@ -1,3 +1,13 @@
+# ============================================================================
+# Fast compinit - cache completions, regenerate once daily
+# ============================================================================
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
 # ~/.zshrc - Zsh configuration for interactive shells
 # Customizations are in ~/.oh-my-zsh/custom/*.zsh (auto-loaded)
 
@@ -39,9 +49,12 @@ plugins=(
     git
     encode64
     gitignore
-    kubectl
     z
 )
+
+# Skip compinit in oh-my-zsh (we handle it above)
+export ZSH_DISABLE_COMPFIX=true
+skip_global_compinit=1
 
 # ============================================================================
 # Load Oh-My-Zsh
