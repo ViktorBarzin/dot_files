@@ -1,0 +1,42 @@
+{
+  "Meta": {
+    "installLocation": "/usr/local/bin/claude_code/",
+    "lastUpdated": "2025-10-10T13:44:43.103Z",
+    "source": {
+      "path": "/usr/local/bin/claude_code/marketplace.json",
+      "source": "file"
+    }
+  },
+  "anthropic-agent-skills": {
+    "installLocation": "/Users/viktorbarzin/.claude/plugins/marketplaces/anthropic-agent-skills",
+    "lastUpdated": "2026-01-17T12:41:25.557Z",
+    "source": {
+      "repo": "anthropics/skills",
+      "source": "github"
+    }
+  },
+  "claude-plugins-official": {
+    "installLocation": "/Users/viktorbarzin/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-01-17T12:11:25.823Z",
+    "source": {
+      "repo": "anthropics/claude-plugins-official",
+      "source": "github"
+    }
+  },
+  "claude-templates": {
+    "installLocation": "/opt/facebook/claude-templates-cli/components",
+    "lastUpdated": "2026-02-03T19:32:45.113Z",
+    "source": {
+      "path": "/opt/facebook/claude-templates-cli/components/.claude-plugin/marketplace.json",
+      "source": "file"
+    }
+  },
+  "superpowers-marketplace": {
+    "installLocation": "/Users/viktorbarzin/.claude/plugins/marketplaces/superpowers-marketplace",
+    "lastUpdated": "2026-01-25T11:47:21.202Z",
+    "source": {
+      "repo": "obra/superpowers-marketplace",
+      "source": "github"
+    }
+  }
+}
