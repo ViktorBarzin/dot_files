@@ -12,6 +12,7 @@
     "llm-rules@Meta": true,
     "meta@Meta": true,
     "ralph-loop@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
     "trajectory@Meta": true
   }
 }
