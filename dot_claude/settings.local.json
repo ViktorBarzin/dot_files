@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(top:*)",
+      "Bash(log show:*)",
+      "Bash(sudo log show:*)",
+      "Bash(dscl:*)",
+      "Bash(odutil show:*)",
+      "Bash(dsconfigad:*)",
+      "Bash(sample opendirectoryd:*)",
+      "Bash(log stream:*)",
+      "Bash(defaults read:*)",
+      "Bash(networksetup -listallnetworkservices:*)",
+      "Bash(scutil --dns:*)",
+      "Bash(time id:*)",
+      "Bash(odutil reset:*)",
+      "Bash(profiles list:*)",
+      "Bash(app-sso:*)",
+      "Bash(plutil:*)",
+      "Bash(system_profiler:*)",
+      "Bash(dscacheutil -flushcache:*)",
+      "Bash(launchctl kickstart:*)",
+      "Bash(chezmoi source-path:*)",
+      "Bash(chezmoi managed:*)",
+      "Bash(chezmoi add:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Skill(remote)"
+    ]
+  }
+}
