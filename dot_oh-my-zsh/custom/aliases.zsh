@@ -152,3 +152,12 @@ alias upgrade="sudo $pm upgrade"
 alias install="sudo $pm install"
 alias remove="sudo $pm remove"
 alias reinstall="sudo $pm reinstall"
+
+# ============================================================================
+# Chezmoi (dotfiles management)
+# ============================================================================
+alias cmu="chezmoi update"           # Pull from remote and apply changes
+alias cma="chezmoi apply"            # Apply changes from local source
+alias cms="chezmoi status"           # Show what would change
+alias cmd="chezmoi diff"             # Show diff of pending changes
+alias cme="chezmoi edit"             # Edit a managed file
