@@ -22,9 +22,16 @@ ssh "$REMOTE" 'cd ~ && tar -xzf /tmp/dotfiles.tar.gz && rm /tmp/dotfiles.tar.gz'
 echo "Extracting Claude marketplaces..."
 ssh "$REMOTE" 'mkdir -p ~/.claude/plugins && tar -xzf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins && rm /tmp/claude-marketplaces.tar.gz'
 
-echo "Fixing plugin paths for remote home directory..."
-ssh "$REMOTE" "sed -i.bak 's|$LOCAL_HOME|\$HOME|g' ~/.claude/plugins/installed_plugins.json && rm -f ~/.claude/plugins/installed_plugins.json.bak"
-# Expand $HOME on remote
-ssh "$REMOTE" 'sed -i.bak "s|\$HOME|$HOME|g" ~/.claude/plugins/installed_plugins.json && rm -f ~/.claude/plugins/installed_plugins.json.bak'
+echo "Fixing paths for remote home directory..."
+# Fix paths in all Claude plugin JSON files
+ssh "$REMOTE" "
+  for f in ~/.claude/plugins/installed_plugins.json ~/.claude/plugins/known_marketplaces.json; do
+    if [ -f \"\$f\" ]; then
+      sed -i.bak 's|$LOCAL_HOME|\$HOME|g' \"\$f\"
+      sed -i.bak \"s|\\\$HOME|\$HOME|g\" \"\$f\"
+      rm -f \"\$f.bak\"
+    fi
+  done
+"
 
 echo "Done! Dotfiles and Claude marketplaces synced to $REMOTE"
