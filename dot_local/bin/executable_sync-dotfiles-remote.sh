@@ -7,31 +7,36 @@ set -e
 REMOTE="${1:?Usage: $0 user@host}"
 LOCAL_HOME="$HOME"
 
-echo "Creating dotfiles archive..."
+echo "Creating archives..."
 chezmoi archive --output=/tmp/dotfiles.tar.gz
-
-echo "Creating Claude marketplaces archive..."
 tar -czf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins marketplaces
 
 echo "Copying to $REMOTE..."
 scp /tmp/dotfiles.tar.gz /tmp/claude-marketplaces.tar.gz "$REMOTE":/tmp/
 
-echo "Extracting dotfiles..."
-ssh "$REMOTE" 'cd ~ && tar -xzf /tmp/dotfiles.tar.gz && rm /tmp/dotfiles.tar.gz'
-
-echo "Extracting Claude marketplaces..."
-ssh "$REMOTE" 'mkdir -p ~/.claude/plugins && tar -xzf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins && rm /tmp/claude-marketplaces.tar.gz'
-
-echo "Fixing paths for remote home directory..."
-# Fix paths in all Claude plugin JSON files
+echo "Extracting and configuring on remote..."
 ssh "$REMOTE" "
+  set -e
+
+  echo 'Extracting dotfiles...'
+  cd ~ && tar -xzf /tmp/dotfiles.tar.gz
+
+  echo 'Extracting Claude marketplaces...'
+  mkdir -p ~/.claude/plugins
+  tar -xzf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins
+
+  echo 'Fixing paths for home directory...'
   for f in ~/.claude/plugins/installed_plugins.json ~/.claude/plugins/known_marketplaces.json; do
     if [ -f \"\$f\" ]; then
-      sed -i.bak 's|$LOCAL_HOME|\$HOME|g' \"\$f\"
-      sed -i.bak \"s|\\\$HOME|\$HOME|g\" \"\$f\"
+      sed -i.bak 's|$LOCAL_HOME|'\$HOME'|g' \"\$f\"
       rm -f \"\$f.bak\"
     fi
   done
+
+  echo 'Cleaning up...'
+  rm -f /tmp/dotfiles.tar.gz /tmp/claude-marketplaces.tar.gz
+
+  echo 'Done!'
 "
 
-echo "Done! Dotfiles and Claude marketplaces synced to $REMOTE"
+echo "Dotfiles and Claude marketplaces synced to $REMOTE"
