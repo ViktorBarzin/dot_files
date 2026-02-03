@@ -11,19 +11,19 @@ echo "Creating archives..."
 chezmoi archive --output=/tmp/dotfiles.tar.gz
 tar -czf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins marketplaces
 
-echo "Copying to $REMOTE..."
-scp /tmp/dotfiles.tar.gz /tmp/claude-marketplaces.tar.gz "$REMOTE":/tmp/
+# Combine into single archive
+echo "Combining archives..."
+mkdir -p /tmp/dotfiles-sync
+tar -xzf /tmp/dotfiles.tar.gz -C /tmp/dotfiles-sync
+mkdir -p /tmp/dotfiles-sync/.claude/plugins
+tar -xzf /tmp/claude-marketplaces.tar.gz -C /tmp/dotfiles-sync/.claude/plugins
 
-echo "Extracting and configuring on remote..."
-ssh "$REMOTE" "
+echo "Syncing to $REMOTE (single connection)..."
+tar -czf - -C /tmp/dotfiles-sync . | ssh "$REMOTE" "
   set -e
 
   echo 'Extracting dotfiles...'
-  cd ~ && tar -xzf /tmp/dotfiles.tar.gz
-
-  echo 'Extracting Claude marketplaces...'
-  mkdir -p ~/.claude/plugins
-  tar -xzf /tmp/claude-marketplaces.tar.gz -C ~/.claude/plugins
+  cd ~ && tar -xzf -
 
   echo 'Fixing paths for home directory...'
   for f in ~/.claude/plugins/installed_plugins.json ~/.claude/plugins/known_marketplaces.json; do
@@ -33,10 +33,10 @@ ssh "$REMOTE" "
     fi
   done
 
-  echo 'Cleaning up...'
-  rm -f /tmp/dotfiles.tar.gz /tmp/claude-marketplaces.tar.gz
-
   echo 'Done!'
 "
+
+# Cleanup local temp files
+rm -rf /tmp/dotfiles-sync /tmp/dotfiles.tar.gz /tmp/claude-marketplaces.tar.gz
 
 echo "Dotfiles and Claude marketplaces synced to $REMOTE"
