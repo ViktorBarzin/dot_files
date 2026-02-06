@@ -3,12 +3,13 @@
 ## Preferences
 
 ### Chezmoi Sync
-When making changes to dotfiles (including Claude files in `~/.claude/`), always:
+When making changes to dotfiles (including Claude files in `~/.claude/`), sync with chezmoi **only if it is installed** (`command -v chezmoi`):
 1. Sync with chezmoi:
    - `chezmoi add <file>` for new files
    - `chezmoi re-add <file>` for updated files
 2. Commit the changes in the chezmoi source directory:
    - `cd $(chezmoi source-path) && git add -A && git commit -m "<descriptive message>"`
+If chezmoi is not installed, skip the sync steps and just make the changes directly.
 
 ### Claude Plugins
 When installing new Claude plugins or marketplaces, update these files:
