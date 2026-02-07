@@ -2,6 +2,7 @@
 
 ## Instructions
 - **When the user says "remember" something**: Always save to the **project** knowledge file (`.claude/CLAUDE.md` in the current repo) by default. Only save to global `~/.claude/CLAUDE.md` if the user explicitly says "remember globally" or the info clearly applies across all projects.
+- **After updating any `.claude/` files**: Always commit them immediately (e.g., `git add .claude/ && git commit -m "update claude knowledge"`) to avoid building up unstaged changes. Use `[ci skip]` in commit messages since these are not infrastructure changes.
 
 ## Preferences
 
