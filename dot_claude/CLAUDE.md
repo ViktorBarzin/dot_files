@@ -1,5 +1,8 @@
 # Claude Memory
 
+## Instructions
+- **When the user says "remember" something**: Always update the relevant knowledge file (global `~/.claude/CLAUDE.md` for general preferences, or project `.claude/CLAUDE.md` for project-specific info) so it persists across sessions.
+
 ## Preferences
 
 ### Chezmoi Sync
