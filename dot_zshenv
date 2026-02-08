@@ -11,6 +11,3 @@ export EDITOR='vim'
 
 # Cargo/Rust
 [[ -f "$HOME/.cargo/env"  ]] && . "$HOME/.cargo/env"
-
-# Claude Code
-export META_CLAUDE_CODE_RELEASE=latest

@@ -3,7 +3,7 @@
     "installLocation": "/usr/local/bin/claude_code/",
     "lastUpdated": "2025-10-10T13:44:43.103Z",
     "source": {
-      "path": "/usr/local/bin/claude_code/marketplace.json",
+      "path": "/usr/local/bin/claude_code/.claude-plugin/marketplace.json",
       "source": "file"
     }
   },
@@ -25,7 +25,7 @@
   },
   "claude-templates": {
     "installLocation": "/opt/facebook/claude-templates-cli/components",
-    "lastUpdated": "2026-02-03T19:32:45.113Z",
+    "lastUpdated": "2026-02-08T15:38:15.833Z",
     "source": {
       "path": "/opt/facebook/claude-templates-cli/components/.claude-plugin/marketplace.json",
       "source": "file"
