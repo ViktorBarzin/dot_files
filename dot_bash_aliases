@@ -21,15 +21,15 @@ alias g='git'
 alias gs='git status'
 alias ga='git add'
 alias gc='git commit -S'
-alias gp='git push origin master'
-alias gpf='git push -u forgejo master'
+alias gp='git push origin $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)'
+alias gpf='git push -u forgejo $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)'
 # alias gp='for r in $(git remote); do echo "Pushing to $r" && git push $r master; done'
-alias gpull='git pull --rebase origin master'
+alias gpull='git pull --rebase origin $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)'
 alias gl="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
 alias gd="git diff"
 alias gds="git diff --staged"
 alias gb="git branch"
-alias gpp='git push production master' # push to production for personal website
+alias gpp='git push production $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)' # push to production for personal website
 # pull all remote branches
 alias git-pull-branches='git branch -r | grep -v "\->" | while read remote; do git branch --track "${remote#origin/}" "$remote"; done'
 # useful for daily stand-up
