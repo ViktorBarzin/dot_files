@@ -510,7 +510,7 @@ alias kbpo="kubectl get pods -o wide"
 alias kbs="kubectl get svc"
 alias kbn="kubectl get nodes -o wide"
 alias kbd="kubectl describe pods"
-alias kbf="kubectl logs --all-containers --max-log-requests 50 -f --since=5m"
+alias kbf="kubectl logs --all-containers --max-log-requests 50 --prefix --ignore-errors -f --since=5m"
 alias kbe='kubectl exec -it $(kbp | tail -n 1 | awk "{print \$1}") -- sh'
 alias kn="kubens"
 function cephpw() {
