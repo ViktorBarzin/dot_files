@@ -1,11 +1,15 @@
-# Pyenv configuration
+# Pyenv configuration (lazy-loaded)
 # Auto-loaded by oh-my-zsh from $ZSH_CUSTOM/tools/
 
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
-if command -v pyenv >/dev/null 2>&1; then
-    eval "$(pyenv init - zsh)"
+if (( $+commands[pyenv] )); then
+    function pyenv() {
+        unfunction pyenv
+        eval "$(command pyenv init - zsh)"
+        pyenv "$@"
+    }
 fi
 
 # Virtualenvwrapper

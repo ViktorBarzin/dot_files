@@ -1,13 +1,3 @@
-# ============================================================================
-# Fast compinit - cache completions, regenerate once daily
-# ============================================================================
-autoload -Uz compinit
-if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
-  compinit
-else
-  compinit -C
-fi
-
 # ~/.zshrc - Zsh configuration for interactive shells
 # Customizations are in ~/.oh-my-zsh/custom/*.zsh (auto-loaded)
 
