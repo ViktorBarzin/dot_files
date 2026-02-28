@@ -95,4 +95,4 @@ export PARA_MODE="local"
 export PARA_ROOT="/Users/viktorbarzin/Nextcloud/Viktor Nextcloud/para"
 
 # Atuin shell history sync
-eval "$(atuin init zsh)"
+command -v atuin &>/dev/null && eval "$(atuin init zsh)"
