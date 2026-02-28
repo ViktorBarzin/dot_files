@@ -89,3 +89,8 @@ czpush() {
 
 # Claude Code auto memory
 export CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
+
+# PARA workspace configuration
+export PARA_MODE="local"
+export PARA_ROOT="/Users/viktorbarzin/Nextcloud/Viktor Nextcloud/para"
+export PARA_AUTO_CONTEXT="1"
