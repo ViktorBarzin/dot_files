@@ -86,3 +86,6 @@ czpush() {
   cd "$(chezmoi source-path)" && git add -A && git commit -m "$msg" && git push
   cd - > /dev/null
 }
+
+# Claude Code auto memory
+export CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
