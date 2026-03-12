@@ -20,3 +20,12 @@ When installing new Claude plugins or marketplaces, update these files:
 - `~/.local/bin/sync-dotfiles-remote.sh` - add new marketplace/plugin install commands
 - `~/.local/share/chezmoi/run_once_after_install-claude-plugins.sh` - add to chezmoi run_once script
 Then sync and commit both to chezmoi.
+
+### CC Config Sync
+Claude Code config is synced across machines via `~/.claude/cc-config/` (git repo backed by NFS bare repo on TrueNAS at `/mnt/main/openclaw/cc-config/cc-config.git`).
+- **Push**: `~/.claude/cc-config/sync.sh push` — exports CLAUDE.md, skills, settings (templated), MetaClaw memory, project memory
+- **Pull**: `~/.claude/cc-config/sync.sh pull` — imports and renders templates with local paths
+- **OpenClaw**: `sync.sh apply-openclaw` — copies shared config to OpenClaw NFS home (runs in init container on pod start)
+- **Automation**: launchd runs `push` every 30 min (`com.cc-config.sync` plist)
+- Settings and installed_plugins use `{{HOME}}`/`{{CLAUDE_DIR}}` placeholders for path portability
+- After modifying skills, hooks, or CLAUDE.md, run `sync.sh push` to share changes
