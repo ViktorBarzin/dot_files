@@ -3,9 +3,9 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
     "CLAUDE_MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
+    "DISABLE_AUTOUPDATER": "1",
     "MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
     "MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
-    "DISABLE_AUTOUPDATER": "1",
     "STATUSLINE_DISABLE_BRANCH": "1",
     "STATUSLINE_DISABLE_CALENDAR": "1",
     "STATUSLINE_DISABLE_DIRECTORY": "1",
@@ -42,13 +42,16 @@
     "defaultMode": "dontAsk"
   },
   "model": "claude-opus-4-6[1m]",
+  "enableAllProjectMcpServers": true,
   "hooks": {
-    "SessionStart": [
+    "PermissionRequest": [
       {
+        "matcher": "mcp__.*claude_memory__memory_|mcp__.*claude_memory__secret_",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/Users/viktorbarzin/.claude/hooks/gsd-check-update.js\""
+            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-allow-memory-tools.py",
+            "timeout": 3
           }
         ]
       }
@@ -60,6 +63,27 @@
             "type": "command",
             "command": "/Users/viktorbarzin/code/claude-memory-mcp/hooks/pre-compact-backup.sh",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/viktorbarzin/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-learn.py",
+            "async": true
           }
         ]
       }
@@ -80,29 +104,6 @@
             "type": "command",
             "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/user-prompt-recall.py",
             "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-learn.py",
-            "async": true
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "matcher": "mcp__.*claude_memory__memory_|mcp__.*claude_memory__secret_",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-allow-memory-tools.py",
-            "timeout": 3
           }
         ]
       }
@@ -128,7 +129,6 @@
     "meta@Meta": true,
     "meta_codesearch@Meta": true,
     "meta_knowledge@Meta": true,
-    "metaclaw-memory@claude-templates": false,
     "para-workspace-core@claude-templates": true,
     "para-workspace-gdrive@claude-templates": true,
     "para-workspace-integrations@claude-templates": true,
