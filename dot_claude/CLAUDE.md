@@ -23,7 +23,7 @@ Then sync and commit both to chezmoi.
 
 ### CC Config Sync
 Claude Code config is synced across machines via `~/.claude/cc-config/` (git repo backed by NFS bare repo on TrueNAS at `/mnt/main/openclaw/cc-config/cc-config.git`).
-- **Push**: `~/.claude/cc-config/sync.sh push` — exports CLAUDE.md, skills, settings (templated), MetaClaw memory, project memory
+- **Push**: `~/.claude/cc-config/sync.sh push` — exports CLAUDE.md, skills, settings (templated), claude-memory data, project memory
 - **Pull**: `~/.claude/cc-config/sync.sh pull` — imports and renders templates with local paths
 - **OpenClaw**: `sync.sh apply-openclaw` — copies shared config to OpenClaw NFS home (runs in init container on pod start)
 - **Automation**: launchd runs `push` every 30 min (`com.cc-config.sync` plist)
