@@ -1,20 +1,144 @@
 {
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "DISABLE_AUTOUPDATER": "1"
+    "CLAUDE_MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
+    "CLAUDE_MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
+    "MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
+    "MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
+    "DISABLE_AUTOUPDATER": "1",
+    "STATUSLINE_DISABLE_BRANCH": "1",
+    "STATUSLINE_DISABLE_CALENDAR": "1",
+    "STATUSLINE_DISABLE_DIRECTORY": "1",
+    "STATUSLINE_DISABLE_HOSTNAME": "1",
+    "STATUSLINE_DISABLE_SESSION_NAME": "1",
+    "STATUSLINE_DISABLE_TURNS": "1"
   },
-  "model": "opus[1m]",
+  "permissions": {
+    "allow": [
+      "Bash(ssh:*)",
+      "Bash(curl:*)",
+      "Bash(ping:*)",
+      "Bash(kubectl:*)",
+      "Bash(GIT_OPTIONAL_LOCKS=0 git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(openssl rand:*)",
+      "Bash(terraform fmt:*)",
+      "Bash(terraform init:*)",
+      "Bash(python3:*)",
+      "Read",
+      "mcp__ide__getDiagnostics",
+      "mcp__plugin_meta_mux__search_files",
+      "mcp__plugin_meta_mux__get_phabricator_diff_details",
+      "mcp__plugin_meta_mux__knowledge_load",
+      "mcp__plugin_meta_mux__knowledge_filtered_search",
+      "mcp__plugin_meta_mux__metamate_knowledge_search"
+    ],
+    "deny": [
+      "mcp__mux_user__headless_analytics_agent",
+      "mcp__plugin_demate_demate__headless_analytics_agent"
+    ],
+    "defaultMode": "dontAsk"
+  },
+  "model": "claude-opus-4-6[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/viktorbarzin/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/viktorbarzin/code/claude-memory-mcp/hooks/pre-compact-backup.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/viktorbarzin/code/claude-memory-mcp/hooks/post-compact-recovery.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/user-prompt-recall.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-learn.py",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "mcp__.*claude_memory__memory_|mcp__.*claude_memory__secret_",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-allow-memory-tools.py",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh",
-    "padding": 0
+    "command": "bash \"$(find $HOME/.claude/plugins/cache -path '*/meta-statusline-pro/*/bin/statusline.sh' 2>/dev/null | sort -V | tail -1)\""
   },
   "enabledPlugins": {
+    "browser@claude-templates": true,
+    "code-review@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
+    "code_provenance@Meta": true,
+    "data@claude-templates": true,
+    "debrief@claude-templates": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true,
+    "frontend-design@claude-plugins-official": true,
+    "gdrive-mount@claude-templates": true,
     "llm-rules@Meta": true,
+    "meta-statusline-pro@claude-templates": true,
     "meta@Meta": true,
+    "meta_codesearch@Meta": true,
+    "meta_knowledge@Meta": true,
+    "metaclaw-memory@claude-templates": false,
+    "para-workspace-core@claude-templates": true,
+    "para-workspace-gdrive@claude-templates": true,
+    "para-workspace-integrations@claude-templates": true,
+    "para-workspace-meetings@claude-templates": true,
+    "para-workspace-reporting@claude-templates": true,
+    "para-workspace@claude-templates": true,
     "ralph-loop@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "trajectory@Meta": true
-  }
+  },
+  "autoMemoryEnabled": true,
+  "skipDangerousModePermissionPrompt": true
 }
