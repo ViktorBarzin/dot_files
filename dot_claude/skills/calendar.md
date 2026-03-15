@@ -32,13 +32,22 @@ bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWO
 # This week
 bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py week
 
+# Next week
+bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py events --date "next week"
+
 # This month
 bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py month
+
+# Next N days
+bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py events --days N
 ```
 
 #### Custom date range
 ```bash
+# From a specific date
 bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py events --date YYYY-MM-DD --days N
+
+# Supported --date values: YYYY-MM-DD, today, tomorrow, week, "this week", "next week", month, "this month"
 ```
 
 #### Filter by calendar
