@@ -88,9 +88,9 @@ If True, the return date will be Monday instead of Sunday.
 
 #### Calendar Conflict Check (best-effort)
 ```bash
-python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py events --date <start> --days <length> --json
+bw-vault inject "76169a13-9830-48ee-b583-6cc9055ed03c" --as NEXTCLOUD_APP_PASSWORD -- env NEXTCLOUD_USER=admin ~/.venvs/claude/bin/python3 /Users/viktorbarzin/code/infra/.claude/calendar-query.py events --date <start> --days <length> --json
 ```
-Requires `NEXTCLOUD_USER` and `NEXTCLOUD_APP_PASSWORD` env vars. If the script fails or creds are missing, note "calendar check skipped" and proceed. If conflicts found, report them and ask user to confirm or shift dates.
+Uses `bw-vault inject` for secure credential injection. If the script fails, note "calendar check skipped" and proceed. If conflicts found, report them and ask user to confirm or shift dates.
 
 ### Step 2 — Phase 1: Parallel Research (3 agents)
 
