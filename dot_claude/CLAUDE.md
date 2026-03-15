@@ -21,11 +21,8 @@ When installing new Claude plugins or marketplaces, update these files:
 - `~/.local/share/chezmoi/run_once_after_install-claude-plugins.sh` - add to chezmoi run_once script
 Then sync and commit both to chezmoi.
 
-### CC Config Sync
-Claude Code config is synced across machines via `~/.claude/cc-config/` (git repo backed by NFS bare repo on TrueNAS at `/mnt/main/openclaw/cc-config/cc-config.git`).
-- **Push**: `~/.claude/cc-config/sync.sh push` — exports CLAUDE.md, skills, settings (templated), claude-memory data, project memory
-- **Pull**: `~/.claude/cc-config/sync.sh pull` — imports and renders templates with local paths
-- **OpenClaw**: `sync.sh apply-openclaw` — copies shared config to OpenClaw NFS home (runs in init container on pod start)
-- **Automation**: launchd runs `push` every 30 min (`com.cc-config.sync` plist)
-- Settings and installed_plugins use `{{HOME}}`/`{{CLAUDE_DIR}}` placeholders for path portability
-- After modifying skills, hooks, or CLAUDE.md, run `sync.sh push` to share changes
+### Skills/Agents Sync
+All Claude Code skills, agents, and hooks live in the **dotfiles repo** (`~/.local/share/chezmoi/dot_claude/`), synced via chezmoi.
+- **Add new skill/agent**: Create in `~/.claude/skills/` or `~/.claude/agents/`, then `chezmoi add ~/.claude/skills/<name>` and commit
+- **OpenClaw**: Init container clones dotfiles repo and runs `executable_openclaw-install.sh` on pod start — no manual sync needed
+- **After modifying skills/hooks**: `chezmoi re-add ~/.claude/skills && cd $(chezmoi source-path) && git add -A && git commit -m "update skills" && git push`
