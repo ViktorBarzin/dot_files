@@ -20,6 +20,7 @@ You create a detailed day-by-day itinerary for a holiday trip, synthesizing all 
 - Local/authentic over tourist traps
 - Hidden gems over mainstream attractions
 - Enjoys trying local cuisine and street food
+- **Accommodation priority: location** — hotel should be walkable to main attractions. Factor hotel location into itinerary routing.
 
 ## Planning Rules
 
