@@ -82,12 +82,15 @@ if [ -f "$SRC/CLAUDE.md" ]; then
   log "Installed CLAUDE.md"
 fi
 
-# Install settings (render template: replace {{HOME}} and {{CLAUDE_DIR}} with actual paths)
+# Install settings — rewrite hardcoded Mac paths to OpenClaw paths
+# Source has /Users/viktorbarzin/.claude/... paths from the Mac; replace with OpenClaw equivalents
 if [ -f "$SRC/settings.json" ]; then
-  sed -e "s|{{CLAUDE_DIR}}|$OPENCLAW_HOME|g" \
+  sed -e "s|/Users/viktorbarzin/.claude|$OPENCLAW_HOME|g" \
+      -e "s|/Users/viktorbarzin|$(dirname "$OPENCLAW_HOME")|g" \
+      -e "s|{{CLAUDE_DIR}}|$OPENCLAW_HOME|g" \
       -e "s|{{HOME}}|$(dirname "$OPENCLAW_HOME")|g" \
       "$SRC/settings.json" > "$OPENCLAW_HOME/settings.json"
-  log "Installed settings.json (templated)"
+  log "Installed settings.json (paths rewritten)"
 fi
 
 # Fix ownership if running as root (init container)
