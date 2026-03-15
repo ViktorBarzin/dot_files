@@ -1,0 +1,274 @@
+#!/bin/bash
+# bw-vault-unlock — Privileged Bitwarden CLI wrapper
+# Installed to /usr/local/bin/bw-vault-unlock (root:wheel 0755)
+# Called via sudo from ~/.local/bin/bw-vault
+#
+# Security: passwords never printed to stdout. Only metadata, exit codes,
+# and "Copied to clipboard" messages are returned.
+set -euo pipefail
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin"
+
+BW_BIN="/opt/homebrew/bin/bw"
+BW_HASH_FILE="/var/root/.bw-hash"
+
+# Verify bw binary integrity
+if [[ -f "$BW_HASH_FILE" ]]; then
+    EXPECTED_HASH=$(/usr/bin/head -1 "$BW_HASH_FILE")
+    ACTUAL_HASH=$(/usr/bin/shasum -a 256 "$BW_BIN" | /usr/bin/awk '{print $1}')
+    if [[ "$EXPECTED_HASH" != "$ACTUAL_HASH" ]]; then
+        echo "ERROR: bw binary integrity check failed" >&2
+        echo "Expected: $EXPECTED_HASH" >&2
+        echo "Actual:   $ACTUAL_HASH" >&2
+        echo "Run: sudo shasum -a 256 /opt/homebrew/bin/bw | awk '{print \$1}' > /var/root/.bw-hash" >&2
+        exit 1
+    fi
+fi
+
+export BITWARDENCLI_APPDATA_DIR="/var/root/.bw-data"
+
+# Subcommand allowlist
+SUBCMD="${1:-}"
+case "$SUBCMD" in
+    search|inject|copy|file|create|edit) ;;
+    *)
+        echo "Usage: bw-vault {search|inject|copy|file|create|edit} [args...]" >&2
+        echo "" >&2
+        echo "Commands:" >&2
+        echo "  search <query>                          Search vault (metadata only)" >&2
+        echo "  inject <id> --as <VAR> -- <cmd...>      Run command with secret as env var" >&2
+        echo "  copy <id> [field]                        Copy secret to clipboard" >&2
+        echo "  file <id> <path>                         Write secret to file (0600)" >&2
+        echo "  create                                   Create new vault item" >&2
+        echo "  edit <id>                                Edit existing vault item" >&2
+        exit 1
+        ;;
+esac
+
+# Read credentials using awk (not source — prevents env leakage)
+CRED_FILE="/var/root/.bw-credentials"
+if [[ ! -f "$CRED_FILE" ]]; then
+    echo "ERROR: credentials file not found at $CRED_FILE" >&2
+    echo "Run the setup script first: sudo bw-vault-setup" >&2
+    exit 1
+fi
+
+BW_CLIENTID=$(/usr/bin/awk -F= '/^BW_CLIENTID=/{print $2}' "$CRED_FILE")
+BW_CLIENTSECRET=$(/usr/bin/awk -F= '/^BW_CLIENTSECRET=/{print $2}' "$CRED_FILE")
+BW_PASSWORD=$(/usr/bin/awk -F= '/^BW_PASSWORD=/{print $2}' "$CRED_FILE")
+
+cleanup() {
+    # Logout on exit (best-effort)
+    env -i PATH="$PATH" BITWARDENCLI_APPDATA_DIR="$BITWARDENCLI_APPDATA_DIR" \
+        "$BW_BIN" logout --nointeraction 2>/dev/null || true
+}
+trap cleanup EXIT
+
+# Login with API key (clean env, idempotent)
+env -i PATH="$PATH" BITWARDENCLI_APPDATA_DIR="$BITWARDENCLI_APPDATA_DIR" \
+    BW_CLIENTID="$BW_CLIENTID" BW_CLIENTSECRET="$BW_CLIENTSECRET" \
+    "$BW_BIN" login --apikey --nointeraction 2>/dev/null || true
+
+# Unlock vault — password via stdin
+SESSION=$(echo "$BW_PASSWORD" | env -i PATH="$PATH" \
+    BITWARDENCLI_APPDATA_DIR="$BITWARDENCLI_APPDATA_DIR" \
+    "$BW_BIN" unlock --passwordfile /dev/stdin --raw 2>/dev/null)
+
+# Clear credentials from memory ASAP
+unset BW_CLIENTID BW_CLIENTSECRET BW_PASSWORD
+
+if [[ -z "$SESSION" ]]; then
+    echo "ERROR: failed to unlock vault" >&2
+    exit 1
+fi
+
+# Helper to run bw commands with session
+bw_cmd() {
+    env -i PATH="$PATH" BITWARDENCLI_APPDATA_DIR="$BITWARDENCLI_APPDATA_DIR" \
+        "$BW_BIN" "$@" --session "$SESSION" 2>/dev/null
+}
+
+case "$SUBCMD" in
+    search)
+        shift
+        if [[ $# -eq 0 ]]; then
+            echo "ERROR: search requires a query" >&2
+            exit 1
+        fi
+        QUERY="$*"
+        # Return metadata only — strip password, notes, totp, fields
+        bw_cmd list items --search "$QUERY" | \
+            /usr/bin/python3 -c "
+import sys, json
+try:
+    items = json.load(sys.stdin)
+except json.JSONDecodeError:
+    print('[]')
+    sys.exit(0)
+for i in items:
+    i.pop('notes', None)
+    i.pop('fields', None)
+    i.pop('passwordHistory', None)
+    if 'login' in i and i['login']:
+        i['login'].pop('password', None)
+        i['login'].pop('totp', None)
+    if 'card' in i and i['card']:
+        i['card'].pop('number', None)
+        i['card'].pop('code', None)
+    if 'identity' in i and i['identity']:
+        i['identity'].pop('ssn', None)
+json.dump(items, sys.stdout, indent=2)
+"
+        ;;
+    inject)
+        shift
+        if [[ $# -lt 4 ]]; then
+            echo "ERROR: usage: inject <item-id> --as <VAR> -- <command...>" >&2
+            exit 1
+        fi
+        ITEM_ID="$1"; shift
+        if [[ "$1" != "--as" ]]; then
+            echo "ERROR: expected --as, got '$1'" >&2
+            exit 1
+        fi
+        shift
+        VAR_NAME="$1"; shift
+        # Validate var name (alphanumeric + underscore only)
+        if [[ ! "$VAR_NAME" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+            echo "ERROR: invalid env var name '$VAR_NAME'" >&2
+            exit 1
+        fi
+        if [[ "$1" != "--" ]]; then
+            echo "ERROR: expected --, got '$1'" >&2
+            exit 1
+        fi
+        shift
+        if [[ $# -eq 0 ]]; then
+            echo "ERROR: no command specified after --" >&2
+            exit 1
+        fi
+        SECRET=$(bw_cmd get password "$ITEM_ID")
+        if [[ -z "$SECRET" ]]; then
+            echo "ERROR: failed to retrieve password for '$ITEM_ID'" >&2
+            exit 1
+        fi
+        # Run the target command with the secret as an env var
+        export "$VAR_NAME=$SECRET"
+        unset SECRET
+        "$@"
+        ;;
+    copy)
+        shift
+        if [[ $# -eq 0 ]]; then
+            echo "ERROR: copy requires an item id/name" >&2
+            exit 1
+        fi
+        ITEM_ID="$1"
+        FIELD="${2:-password}"
+        bw_cmd get "$FIELD" "$ITEM_ID" | /usr/bin/pbcopy
+        echo "Copied $FIELD to clipboard"
+        ;;
+    file)
+        shift
+        if [[ $# -lt 2 ]]; then
+            echo "ERROR: usage: file <item-id> <output-path>" >&2
+            exit 1
+        fi
+        ITEM_ID="$1"
+        OUTPATH="$2"
+        umask 077
+        bw_cmd get password "$ITEM_ID" > "$OUTPATH"
+        chmod 600 "$OUTPATH"
+        echo "Written to $OUTPATH (mode 0600)"
+        ;;
+    create)
+        shift
+        echo "Interactive item creation:"
+        read -rp "Item name: " ITEM_NAME
+        read -rp "Username: " ITEM_USER
+        read -rp "URL (optional): " ITEM_URL
+        read -rp "Generate password? [Y/n]: " GEN_PASS
+        if [[ "${GEN_PASS,,}" != "n" ]]; then
+            ITEM_PASS=$(bw_cmd generate -ulns --length 32)
+        else
+            read -rsp "Password: " ITEM_PASS
+            echo
+        fi
+        # Build the item JSON
+        ITEM_JSON=$(/usr/bin/python3 -c "
+import json, sys
+item = {
+    'organizationId': None,
+    'folderId': None,
+    'type': 1,
+    'name': sys.argv[1],
+    'notes': None,
+    'favorite': False,
+    'login': {
+        'uris': [{'match': None, 'uri': sys.argv[3]}] if sys.argv[3] else [],
+        'username': sys.argv[2],
+        'password': sys.argv[4],
+        'totp': None
+    },
+    'fields': [],
+    'reprompt': 0
+}
+print(json.dumps(item))
+" "$ITEM_NAME" "$ITEM_USER" "$ITEM_URL" "$ITEM_PASS")
+        unset ITEM_PASS
+        RESULT=$(echo "$ITEM_JSON" | bw_cmd encode | bw_cmd create item)
+        CREATED_ID=$(echo "$RESULT" | /usr/bin/python3 -c "import sys,json; print(json.load(sys.stdin).get('id','unknown'))" 2>/dev/null || echo "unknown")
+        echo "Created item: $CREATED_ID (use 'bw-vault copy $CREATED_ID' to retrieve password)"
+        ;;
+    edit)
+        shift
+        if [[ $# -eq 0 ]]; then
+            echo "ERROR: edit requires an item id/name" >&2
+            exit 1
+        fi
+        ITEM_ID="$1"
+        # Get current item
+        CURRENT=$(bw_cmd get item "$ITEM_ID")
+        if [[ -z "$CURRENT" ]]; then
+            echo "ERROR: item '$ITEM_ID' not found" >&2
+            exit 1
+        fi
+        CURRENT_NAME=$(echo "$CURRENT" | /usr/bin/python3 -c "import sys,json; print(json.load(sys.stdin).get('name',''))")
+        CURRENT_USER=$(echo "$CURRENT" | /usr/bin/python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('login',{}).get('username','') if d.get('login') else '')")
+        echo "Editing: $CURRENT_NAME (user: $CURRENT_USER)"
+        read -rp "New username (enter to keep): " NEW_USER
+        read -rp "New password? [y/N]: " CHANGE_PASS
+        if [[ "${CHANGE_PASS,,}" == "y" ]]; then
+            read -rp "Generate password? [Y/n]: " GEN_PASS
+            if [[ "${GEN_PASS,,}" != "n" ]]; then
+                NEW_PASS=$(bw_cmd generate -ulns --length 32)
+            else
+                read -rsp "New password: " NEW_PASS
+                echo
+            fi
+            UPDATED=$(echo "$CURRENT" | /usr/bin/python3 -c "
+import sys, json
+item = json.load(sys.stdin)
+new_user = sys.argv[1] if sys.argv[1] else None
+new_pass = sys.argv[2] if sys.argv[2] else None
+if new_user and item.get('login'):
+    item['login']['username'] = new_user
+if new_pass and item.get('login'):
+    item['login']['password'] = new_pass
+print(json.dumps(item))
+" "$NEW_USER" "$NEW_PASS")
+            unset NEW_PASS
+        else
+            UPDATED=$(echo "$CURRENT" | /usr/bin/python3 -c "
+import sys, json
+item = json.load(sys.stdin)
+new_user = sys.argv[1] if sys.argv[1] else None
+if new_user and item.get('login'):
+    item['login']['username'] = new_user
+print(json.dumps(item))
+" "$NEW_USER")
+        fi
+        ITEM_REAL_ID=$(echo "$CURRENT" | /usr/bin/python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+        echo "$UPDATED" | bw_cmd encode | bw_cmd edit item "$ITEM_REAL_ID" >/dev/null
+        echo "Updated item: $ITEM_REAL_ID"
+        ;;
+esac

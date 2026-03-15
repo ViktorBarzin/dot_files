@@ -1,0 +1,192 @@
+#!/bin/bash
+# bw-vault-setup — One-time setup for bw-vault (Vaultwarden CLI integration)
+# Run this script manually: bash ~/.local/bin/bw-vault-setup
+set -euo pipefail
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+info()  { echo -e "${GREEN}[+]${NC} $*"; }
+warn()  { echo -e "${YELLOW}[!]${NC} $*"; }
+error() { echo -e "${RED}[✗]${NC} $*" >&2; }
+
+# Check we're running as the user (not root)
+if [[ $EUID -eq 0 ]]; then
+    error "Run this script as your user (not sudo). It will prompt for sudo when needed."
+    exit 1
+fi
+
+echo "============================================"
+echo "  bw-vault Setup — Vaultwarden CLI for Claude Code"
+echo "============================================"
+echo ""
+
+# Step 1: Fix Homebrew permissions if needed
+info "Checking Homebrew..."
+if ! brew --version >/dev/null 2>&1; then
+    error "Homebrew not found. Install it first: https://brew.sh"
+    exit 1
+fi
+
+# Check if brew dirs are writable
+if [[ ! -w /opt/homebrew/Cellar ]]; then
+    warn "Homebrew directories not writable. Fixing ownership..."
+    sudo chown -R "$(whoami)" /opt/homebrew
+fi
+
+# Step 2: Install dependencies
+info "Installing bitwarden-cli and pam-reattach..."
+brew install bitwarden-cli pam-reattach 2>/dev/null || {
+    # May already be installed
+    brew upgrade bitwarden-cli pam-reattach 2>/dev/null || true
+}
+
+# Verify installations
+if ! command -v bw >/dev/null; then
+    error "bitwarden-cli installation failed"
+    exit 1
+fi
+info "bw CLI version: $(bw --version)"
+
+if [[ ! -f /opt/homebrew/lib/pam/pam_reattach.so ]]; then
+    error "pam-reattach installation failed"
+    exit 1
+fi
+info "pam-reattach installed"
+
+# Step 3: Configure Touch ID for sudo (with tmux support)
+info "Configuring Touch ID for sudo..."
+SUDO_LOCAL="/etc/pam.d/sudo_local"
+if [[ -f "$SUDO_LOCAL" ]] && grep -q pam_tid "$SUDO_LOCAL"; then
+    info "Touch ID for sudo already configured"
+else
+    sudo bash -c "cat > $SUDO_LOCAL << 'PAMEOF'
+# pam-reattach: required for Touch ID to work in tmux/screen
+auth       optional       /opt/homebrew/lib/pam/pam_reattach.so
+auth       sufficient     pam_tid.so
+PAMEOF"
+    info "Created $SUDO_LOCAL"
+fi
+
+# Step 4: Configure scoped sudo for bw-vault
+info "Configuring scoped sudo for bw-vault..."
+SUDOERS_FILE="/etc/sudoers.d/bw-vault"
+if [[ -f "$SUDOERS_FILE" ]]; then
+    info "Sudoers config already exists"
+else
+    CURRENT_USER=$(whoami)
+    sudo bash -c "cat > $SUDOERS_FILE << SUDOEOF
+Cmnd_Alias BW_VAULT = /usr/local/bin/bw-vault-unlock
+Defaults!BW_VAULT timestamp_timeout=0
+$CURRENT_USER ALL=(root) BW_VAULT
+SUDOEOF
+chmod 0440 $SUDOERS_FILE"
+    # Validate sudoers syntax
+    if sudo visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
+        info "Sudoers config validated and installed"
+    else
+        error "Sudoers config has syntax errors — removing"
+        sudo rm -f "$SUDOERS_FILE"
+        exit 1
+    fi
+fi
+
+# Step 5: Create root bw data directory
+info "Creating root bw data directory..."
+sudo bash -c 'mkdir -p /var/root/.bw-data && chmod 700 /var/root/.bw-data'
+
+# Step 6: Configure bw CLI server URL (as root)
+info "Configuring Bitwarden CLI server URL..."
+sudo BITWARDENCLI_APPDATA_DIR=/var/root/.bw-data /opt/homebrew/bin/bw config server https://vaultwarden.viktorbarzin.me
+
+# Step 7: Store API credentials
+info "Setting up Vaultwarden API credentials..."
+echo ""
+echo "You need your Vaultwarden Personal API Key."
+echo "Get it from: https://vaultwarden.viktorbarzin.me/#/settings/security/security-keys"
+echo "  → API Key section → View API Key"
+echo ""
+
+if sudo test -f /var/root/.bw-credentials; then
+    read -rp "Credentials file already exists. Overwrite? [y/N]: " OVERWRITE
+    if [[ "${OVERWRITE,,}" != "y" ]]; then
+        info "Keeping existing credentials"
+    else
+        _store_creds=true
+    fi
+else
+    _store_creds=true
+fi
+
+if [[ "${_store_creds:-}" == "true" ]]; then
+    read -rp "BW_CLIENTID (e.g. user.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx): " _clientid
+    read -rp "BW_CLIENTSECRET: " _clientsecret
+    read -rsp "Master password: " _password
+    echo ""
+
+    sudo bash -c "umask 077; cat > /var/root/.bw-credentials << CREDEOF
+BW_CLIENTID=$_clientid
+BW_CLIENTSECRET=$_clientsecret
+BW_PASSWORD=$_password
+CREDEOF"
+    unset _clientid _clientsecret _password
+    info "Credentials stored in /var/root/.bw-credentials (root:wheel 0600)"
+fi
+
+# Step 8: Install the privileged unlock script
+info "Installing bw-vault-unlock to /usr/local/bin/..."
+sudo cp ~/.local/bin/bw-vault-unlock /usr/local/bin/bw-vault-unlock
+sudo chown root:wheel /usr/local/bin/bw-vault-unlock
+sudo chmod 0755 /usr/local/bin/bw-vault-unlock
+
+# Step 9: Pin bw binary hash
+info "Pinning bw binary hash..."
+BW_HASH=$(shasum -a 256 /opt/homebrew/bin/bw | awk '{print $1}')
+sudo bash -c "echo '$BW_HASH' > /var/root/.bw-hash && chmod 600 /var/root/.bw-hash"
+info "Hash: $BW_HASH"
+
+# Step 10: Verify
+echo ""
+echo "============================================"
+echo "  Verification"
+echo "============================================"
+echo ""
+
+# Test sudo Touch ID
+info "Testing sudo (Touch ID should appear)..."
+if sudo echo "sudo works"; then
+    info "sudo + Touch ID: OK"
+else
+    warn "sudo test failed"
+fi
+
+# Test credential file is protected
+if cat /var/root/.bw-credentials 2>/dev/null; then
+    error "SECURITY: credentials file is readable by user!"
+else
+    info "Credential file protected: OK"
+fi
+
+# Test bw-vault search
+info "Testing bw-vault search (Touch ID will appear)..."
+if bw-vault search "test" >/dev/null 2>&1; then
+    info "bw-vault search: OK"
+else
+    warn "bw-vault search test failed (may be normal if vault is empty)"
+fi
+
+echo ""
+info "Setup complete!"
+echo ""
+echo "Usage:"
+echo "  bw-vault search <query>                          # Search (metadata only)"
+echo "  bw-vault inject <id> --as <VAR> -- <cmd...>      # Inject secret into command"
+echo "  bw-vault copy <id> [field]                        # Copy to clipboard"
+echo "  bw-vault file <id> <path>                         # Write to file (0600)"
+echo "  bw-vault create                                   # Create new item"
+echo "  bw-vault edit <id>                                # Edit item"
+echo ""
+echo "After brew upgrade bitwarden-cli, update the hash:"
+echo "  sudo bash -c \"\$(shasum -a 256 /opt/homebrew/bin/bw | awk '{print \\\$1}') > /var/root/.bw-hash\""

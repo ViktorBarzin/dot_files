@@ -1,0 +1,3 @@
+#!/bin/bash
+# User-facing wrapper — triggers Touch ID via sudo → runs privileged bw operation
+sudo /usr/local/bin/bw-vault-unlock "$@"
