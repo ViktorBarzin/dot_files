@@ -48,9 +48,9 @@ Search for all-inclusive or flight+hotel packages on:
 - On the Beach
 - Love Holidays
 
-### 5. Free Activities & Walking Tours
+### 5. Free Activities & Walking Tours (HIGH PRIORITY — user loves these)
 Search for:
-- Free walking tours (GuruWalk, Free Tour)
+- **Free walking tours** (GuruWalk, Free Tour, Civitatis free tours) — find ALL available tours, especially history-focused ones. Include meeting point, duration, and booking links.
 - Free museums / free entry days
 - Free viewpoints, parks, beaches
 - Local markets and street food areas

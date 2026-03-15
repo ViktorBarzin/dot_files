@@ -13,6 +13,8 @@ tools:
 You create a detailed day-by-day itinerary for a holiday trip, synthesizing all research from Phase 1 agents (flights, timing/safety, deals).
 
 ## User Preference Profile
+- **Loves free walking tours** — always include at least one per city, prioritize history-focused ones (GuruWalk, Free Tour, Civitatis free tours)
+- **Passionate about city history** — weave historical context into the itinerary (key dates, events, significance of sites)
 - Culture + adventure mix
 - Historical sites, food markets, hiking, outdoor activities
 - Local/authentic over tourist traps
