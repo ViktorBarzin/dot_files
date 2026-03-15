@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-allow-memory-tools.py",
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-allow-memory-tools.py",
             "timeout": 3
           }
         ]
@@ -61,7 +61,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/viktorbarzin/code/claude-memory-mcp/hooks/pre-compact-backup.sh",
+            "command": "/Users/viktorbarzin/.claude/hooks/pre-compact-backup.sh",
             "timeout": 30
           }
         ]
@@ -82,7 +82,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/auto-learn.py",
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-learn.py",
             "async": true
           }
         ]
@@ -93,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/viktorbarzin/code/claude-memory-mcp/hooks/post-compact-recovery.sh",
+            "command": "/Users/viktorbarzin/.claude/hooks/post-compact-recovery.sh",
             "timeout": 10
           }
         ]
@@ -102,7 +102,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 /Users/viktorbarzin/code/claude-memory-mcp/hooks/user-prompt-recall.py",
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/user-prompt-recall.py",
             "timeout": 5
           }
         ]
