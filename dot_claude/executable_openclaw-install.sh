@@ -34,6 +34,7 @@ log "OPENCLAW_HOME=$OPENCLAW_HOME"
 log "DOTFILES_DIR=$DOTFILES_DIR"
 
 # Clone or pull
+git config --global --add safe.directory "$DOTFILES_DIR" 2>/dev/null || true
 if [ -d "$DOTFILES_DIR/.git" ]; then
   log "Pulling latest dotfiles..."
   git -C "$DOTFILES_DIR" pull --ff-only 2>/dev/null || git -C "$DOTFILES_DIR" pull --rebase || true
