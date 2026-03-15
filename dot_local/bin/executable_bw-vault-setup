@@ -73,16 +73,26 @@ fi
 # Step 4: Configure scoped sudo for bw-vault
 info "Configuring scoped sudo for bw-vault..."
 SUDOERS_FILE="/etc/sudoers.d/bw-vault"
+
+# Ensure /etc/sudoers.d/ exists and is included by sudoers
+if [[ ! -d /etc/sudoers.d ]]; then
+    info "Creating /etc/sudoers.d/ directory..."
+    sudo mkdir -p /etc/sudoers.d
+    sudo chmod 0755 /etc/sudoers.d
+fi
+if ! sudo grep -q '#includedir /etc/sudoers.d' /etc/sudoers; then
+    info "Adding #includedir directive to /etc/sudoers..."
+    echo '#includedir /etc/sudoers.d' | sudo tee -a /etc/sudoers >/dev/null
+fi
+
 if [[ -f "$SUDOERS_FILE" ]]; then
     info "Sudoers config already exists"
 else
     CURRENT_USER=$(whoami)
-    sudo bash -c "cat > $SUDOERS_FILE << SUDOEOF
-Cmnd_Alias BW_VAULT = /usr/local/bin/bw-vault-unlock
-Defaults!BW_VAULT timestamp_timeout=0
-$CURRENT_USER ALL=(root) BW_VAULT
-SUDOEOF
-chmod 0440 $SUDOERS_FILE"
+    # Use printf + tee (heredoc inside bash -c is fragile)
+    printf 'Cmnd_Alias BW_VAULT = /usr/local/bin/bw-vault-unlock\nDefaults!BW_VAULT timestamp_timeout=0\n%s ALL=(root) BW_VAULT\n' "$CURRENT_USER" \
+        | sudo tee "$SUDOERS_FILE" >/dev/null
+    sudo chmod 0440 "$SUDOERS_FILE"
     # Validate sudoers syntax
     if sudo visudo -cf "$SUDOERS_FILE" >/dev/null 2>&1; then
         info "Sudoers config validated and installed"
@@ -126,11 +136,10 @@ if [[ "${_store_creds:-}" == "true" ]]; then
     read -rsp "Master password: " _password
     echo ""
 
-    sudo bash -c "umask 077; cat > /var/root/.bw-credentials << CREDEOF
-BW_CLIENTID=$_clientid
-BW_CLIENTSECRET=$_clientsecret
-BW_PASSWORD=$_password
-CREDEOF"
+    printf 'BW_CLIENTID=%s\nBW_CLIENTSECRET=%s\nBW_PASSWORD=%s\n' \
+        "$_clientid" "$_clientsecret" "$_password" \
+        | sudo tee /var/root/.bw-credentials >/dev/null
+    sudo chmod 0600 /var/root/.bw-credentials
     unset _clientid _clientsecret _password
     info "Credentials stored in /var/root/.bw-credentials (root:wheel 0600)"
 fi
