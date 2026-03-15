@@ -2,13 +2,7 @@
   "mcpServers": {
     "claude_memory": {
       "type": "stdio",
-      "command": "python3",
-      "args": ["/Users/viktorbarzin/code/claude-memory-mcp/src/claude_memory/mcp_server.py"],
-      "env": {
-        "MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
-        "MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
-        "PYTHONPATH": "/Users/viktorbarzin/code/claude-memory-mcp/src"
-      }
+      "command": "/Users/viktorbarzin/.local/bin/claude-memory-mcp-wrapper"
     }
   }
 }

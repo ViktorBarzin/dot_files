@@ -1,0 +1,7 @@
+#!/bin/bash
+# Wrapper for claude-memory MCP server that sources secrets from GPG-encrypted file.
+# This avoids committing API keys in plaintext JSON configs.
+source ~/.oh-my-zsh/custom/secrets.zsh 2>/dev/null
+export MEMORY_API_URL="${MEMORY_API_URL:-https://claude-memory.viktorbarzin.me}"
+export PYTHONPATH="/Users/viktorbarzin/code/claude-memory-mcp/src"
+exec python3 /Users/viktorbarzin/code/claude-memory-mcp/src/claude_memory/mcp_server.py "$@"

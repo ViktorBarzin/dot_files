@@ -1,11 +1,7 @@
 {
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
-    "CLAUDE_MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
     "DISABLE_AUTOUPDATER": "1",
-    "MEMORY_API_KEY": "REDACTED_ROTATED_KEY",
-    "MEMORY_API_URL": "https://claude-memory.viktorbarzin.me",
     "STATUSLINE_DISABLE_BRANCH": "1",
     "STATUSLINE_DISABLE_CALENDAR": "1",
     "STATUSLINE_DISABLE_DIRECTORY": "1",
