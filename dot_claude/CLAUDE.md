@@ -1,8 +1,8 @@
 # Claude Memory
 
 ## Instructions
-- **When the user says "remember" something**: Always save to the **project** knowledge file (`.claude/CLAUDE.md` in the current repo) by default. Only save to global `~/.claude/CLAUDE.md` if the user explicitly says "remember globally" or the info clearly applies across all projects.
-- **After updating any `.claude/` files**: Always commit them immediately (e.g., `git add .claude/ && git commit -m "update claude knowledge"`) to avoid building up unstaged changes. Use `[ci skip]` in commit messages since these are not infrastructure changes.
+- **"remember X"**: Store via `memory_store` MCP tool. For project-specific static info (commands, architecture), update the project's `.claude/CLAUDE.md` instead.
+- **Skills/agents**: Create in `~/.claude/skills/` or `~/.claude/agents/`, sync via chezmoi, commit to dotfiles repo.
 
 ## Preferences
 
