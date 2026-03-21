@@ -36,15 +36,113 @@ Block middle seats (B/E) on Ryanair/Wizzair flights by creating dummy bookings t
 
 ## Input Parsing
 
-The user provides either:
-- **Flight number + date**: e.g. `FR 1926 2026-04-15`
-- **Booking reference + airline**: e.g. `ABC123 ryanair`
+The user can provide input in any of these forms (from most to least specific):
 
-Parse airline from flight prefix:
+1. **Flight number + date**: e.g. `FR 1926 2026-04-15`
+2. **Booking reference + airline**: e.g. `ABC123 ryanair`
+3. **Rough description**: e.g. `Stansted to Sofia, 21st March, 16:55` or `London to Malaga tomorrow evening`
+
+For forms 1 and 2, parse airline from flight prefix:
 - `FR` = Ryanair
 - `W6` or `W9` = Wizzair
 
-If ambiguous, ask the user which airline.
+For form 3 (rough description), proceed to **Phase 0: Flight Search** to resolve the exact flight.
+
+### Airport Name Resolution
+
+Map common city/airport names to IATA codes. Handle misspellings with fuzzy matching:
+- "Stansted" / "Stanstead" → STN
+- "Luton" → LTN
+- "Gatwick" → LGW
+- "Sofia" → SOF
+- "Malaga" / "Málaga" → AGP
+- "Barcelona" / "Barca" → BCN
+- "Budapest" → BUD
+- "Bucharest" → OTP
+- "Faro" → FAO
+- "Athens" → ATH
+- "Naples" / "Napoli" → NAP
+- "Rome" / "Roma" → FCO/CIA
+- "Milan" / "Milano" → MXP/BGY
+- "Palma" / "Mallorca" / "Majorca" → PMI
+- "Lisbon" / "Lisboa" → LIS
+
+For "London" without a specific airport, search ALL London airports (STN, LTN, LGW) across both airlines.
+
+If a city name can't be resolved, ask the user for the IATA code.
+
+## Phase 0: Flight Search
+
+When the user provides a rough description instead of an exact flight number, use the airline APIs to find matching flights and ask for confirmation.
+
+### Step 1: Determine Airlines to Search
+
+- If origin/destination is known to be Ryanair-only or Wizzair-only, search just that airline
+- Otherwise, search BOTH airlines in parallel (Ryanair first, then Wizzair)
+
+### Step 2: Query Ryanair Availability API
+
+```bash
+curl -s "https://www.ryanair.com/api/booking/v4/en-gb/availability?ADT=1&CHD=0&INF=0&TEEN=0&DateOut=YYYY-MM-DD&Origin=XXX&Destination=YYY&FlexDaysOut=0&FlexDaysIn=0&RoundTrip=false&ToUs=AGREED" \
+  -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+```
+
+Response contains `trips[].dates[].flights[]` with:
+- `flightNumber`: e.g. "FR 1926"
+- `time`: `["2026-04-15T16:55:00.000", "2026-04-15T20:25:00.000"]` (departure, arrival)
+- `duration`: e.g. "03:30"
+- `faresLeft`: seats remaining (-1 = plenty)
+- `regularFare.fares[].amount`: price per person
+
+### Step 3: Query Wizzair Timetable API
+
+First discover the API version:
+```bash
+WIZZ_VERSION=$(curl -sL https://wizzair.com | grep -oP 'be\.wizzair\.com(?:\\u002F|/)(\d+\.\d+\.\d+)' | head -1 | grep -oP '\d+\.\d+\.\d+')
+```
+
+Then search flights:
+```bash
+curl -s -X POST "https://be.wizzair.com/${WIZZ_VERSION}/Api/search/search" \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://wizzair.com" \
+  -H "Referer: https://wizzair.com/" \
+  -d '{"flightList":[{"departureStation":"LTN","arrivalStation":"SOF","departureDate":"2026-04-15"}],"adultCount":1,"childCount":0,"infantCount":0}'
+```
+
+Fallback to fare chart API if search endpoint is restricted:
+```bash
+curl -s -X POST "https://be.wizzair.com/${WIZZ_VERSION}/Api/asset/farechart" \
+  -H "Content-Type: application/json" \
+  -H "Origin: https://wizzair.com" \
+  -H "Referer: https://wizzair.com/" \
+  -d '{"adultCount":1,"childCount":0,"infantCount":0,"dayInterval":1,"wdc":false,"isRescueFare":false,"flightList":[{"departureStation":"LTN","arrivalStation":"SOF","date":"2026-04-15"}]}'
+```
+
+Note: Wizzair prices are Discount Club prices — add £9.20/leg for non-member pricing.
+
+### Step 4: Match User's Description
+
+If the user specified a time (e.g. "16:55"), find the flight closest to that time. If multiple flights exist on that date, rank by time proximity.
+
+If the user said "evening", filter to flights departing 17:00-23:59. "Morning" = 05:00-11:59. "Afternoon" = 12:00-16:59.
+
+### Step 5: Confirm with User
+
+Present the matched flight(s) to the user and ask for confirmation:
+
+```
+Found matching flight:
+  FR 1926 | STN → SOF | 21 Mar 2026
+  Departs: 16:55 → Arrives: 22:25 (3h 30m)
+  Price: £45/person | Seats left: plenty
+
+Is this the correct flight? (yes/no)
+```
+
+If multiple close matches exist, present up to 3 options and ask the user to pick one.
+
+Only proceed to Phase 1 after user confirms the flight.
 
 ## Anti-Bot Stealth
 
