@@ -13,7 +13,7 @@ Run the cluster healthcheck script and interpret the results. If issues are foun
 
 ## Environment
 
-- **Kubeconfig**: `/Users/viktorbarzin/code/infra/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/infra/config`)
+- **Kubeconfig**: `/Users/viktorbarzin/code/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/config`)
 - **Healthcheck script**: `bash /Users/viktorbarzin/code/infra/scripts/cluster_healthcheck.sh --quiet`
 - **Infra repo**: `/Users/viktorbarzin/code/infra`
 

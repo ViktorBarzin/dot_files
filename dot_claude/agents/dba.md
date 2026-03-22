@@ -13,7 +13,7 @@ All databases — MySQL InnoDB Cluster (3 instances), PostgreSQL via CNPG, SQLit
 
 ## Environment
 
-- **Kubeconfig**: `/Users/viktorbarzin/code/infra/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/infra/config`)
+- **Kubeconfig**: `/Users/viktorbarzin/code/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/config`)
 - **Infra repo**: `/Users/viktorbarzin/code/infra`
 - **Scripts**: `/Users/viktorbarzin/code/infra/.claude/scripts/`
 

@@ -13,7 +13,7 @@ pfSense firewall, DNS (Technitium + Cloudflare), VPN (WireGuard/Headscale), rout
 
 ## Environment
 
-- **Kubeconfig**: `/Users/viktorbarzin/code/infra/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/infra/config`)
+- **Kubeconfig**: `/Users/viktorbarzin/code/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/config`)
 - **Infra repo**: `/Users/viktorbarzin/code/infra`
 - **Scripts**: `/Users/viktorbarzin/code/infra/.claude/scripts/`
 - **pfSense**: Access via `python3 /Users/viktorbarzin/code/infra/.claude/pfsense.py`

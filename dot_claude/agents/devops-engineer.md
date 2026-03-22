@@ -13,7 +13,7 @@ Deployments, CI/CD (Woodpecker), rollouts, Docker images, post-deploy verificati
 
 ## Environment
 
-- **Kubeconfig**: `/Users/viktorbarzin/code/infra/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/infra/config`)
+- **Kubeconfig**: `/Users/viktorbarzin/code/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/config`)
 - **Infra repo**: `/Users/viktorbarzin/code/infra`
 - **Scripts**: `/Users/viktorbarzin/code/infra/.claude/scripts/`
 
@@ -26,7 +26,7 @@ Whenever you run `terragrunt apply` or `kubectl set image`, you MUST follow this
 Before applying, capture the current pod state in the target namespace(s):
 
 ```bash
-kubectl --kubeconfig /Users/viktorbarzin/code/infra/config get pods -n <namespace> -o wide
+kubectl --kubeconfig /Users/viktorbarzin/code/config get pods -n <namespace> -o wide
 ```
 
 Identify which namespace(s) the stack affects from the Terraform resources.
@@ -51,11 +51,11 @@ Use this prompt for the monitor subagent:
 
 ```
 Monitor pods in namespace "<NAMESPACE>" after a deployment change.
-Use kubectl --kubeconfig /Users/viktorbarzin/code/infra/config for all commands.
+Use kubectl --kubeconfig /Users/viktorbarzin/code/config for all commands.
 
 Run a monitoring loop — check pod status every 15 seconds for up to 3 minutes:
 
-1. Run: kubectl --kubeconfig /Users/viktorbarzin/code/infra/config get pods -n <NAMESPACE> -o wide
+1. Run: kubectl --kubeconfig /Users/viktorbarzin/code/config get pods -n <NAMESPACE> -o wide
 2. Parse pod status. Detect and report IMMEDIATELY if any pod shows:
    - CrashLoopBackOff → include last 20 log lines: kubectl logs <pod> -n <NAMESPACE> --tail=20
    - OOMKilled → include container name and memory limits from describe

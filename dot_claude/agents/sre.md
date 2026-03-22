@@ -13,7 +13,7 @@ Incident response, OOM investigation, capacity planning, root cause analysis. Yo
 
 ## Environment
 
-- **Kubeconfig**: `/Users/viktorbarzin/code/infra/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/infra/config`)
+- **Kubeconfig**: `/Users/viktorbarzin/code/config` (always use `kubectl --kubeconfig /Users/viktorbarzin/code/config`)
 - **Infra repo**: `/Users/viktorbarzin/code/infra`
 - **Scripts**: `/Users/viktorbarzin/code/infra/.claude/scripts/`
 - **K8s nodes**: k8s-master (10.0.20.100), k8s-node1-4 (10.0.20.101-104) — SSH user: `wizard`
