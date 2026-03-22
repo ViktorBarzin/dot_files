@@ -6,11 +6,14 @@ description: |
   OOMKilled (exit code 137), (2) a LimitRange or ResourceQuota was recently added
   to the namespace, (3) deployments have `resources: {}` and inherit default limits,
   (4) periodic jobs or background workers fail silently with degraded results before
-  dying. Covers diagnosing the timeline correlation between LimitRange creation and
-  pod failures, and fixing by setting explicit resource requests/limits.
+  dying, (5) explicitly set CPU/memory limits are overridden to lower values by
+  Goldilocks VPA, (6) pod shows different resources than what deployment spec says.
+  Covers diagnosing the timeline correlation between LimitRange creation and
+  pod failures, fixing by setting explicit resource requests/limits, and handling
+  Goldilocks VPA overrides.
 author: Claude Code
-version: 1.0.0
-date: 2026-02-21
+version: 1.1.0
+date: 2026-03-01
 ---
 
 # Kubernetes LimitRange Causing Silent OOM Kills
@@ -138,8 +141,77 @@ a `tier-defaults` LimitRange is added with 1Gi default memory limit.
 - CI/CD pipelines that only patch the image tag (not resources) will preserve
   manually-set resource limits across deploys
 
-See also: kubernetes-latest-tag-image-pull
+See also: kubernetes-latest-tag-image-pull, openclaw-k8s-deployment
+
+## Variant: Goldilocks VPA Overriding Explicit Resources
+
+### Problem
+Even when you set explicit `resources.limits` in a deployment, the pod runs with
+different (usually lower) values. The deployment spec shows `cpu: 2` but the pod
+shows `cpu: 300m`.
+
+### Trigger Conditions
+- `kubectl get pod -o jsonpath='{.spec.containers[0].resources}'` shows different
+  values than `kubectl get deployment -o jsonpath='{.spec.template.spec.containers[0].resources}'`
+- Goldilocks is installed in the cluster
+- Namespace has label `goldilocks.fairwinds.com/vpa-update-mode: initial`
+- VPA objects named `goldilocks-<deployment>` exist in the namespace
+
+### Root Cause
+Goldilocks creates VPA (VerticalPodAutoscaler) objects in `Initial` mode. In this
+mode, the VPA mutating webhook overrides container resources at pod creation time,
+regardless of what the deployment spec says. The VPA recommendations are based on
+historical usage, which may be far lower than what's needed for startup bursts.
+
+### Diagnosis
+```bash
+# Check VPA objects in namespace
+kubectl -n <ns> get vpa
+
+# Check VPA mode
+kubectl -n <ns> get vpa goldilocks-<deployment> -o jsonpath='{.spec.updatePolicy.updateMode}'
+# Output: Initial (this means it overrides on pod creation)
+
+# Check VPA recommendation vs your explicit limits
+kubectl -n <ns> get vpa goldilocks-<deployment> -o jsonpath='{.status.recommendation.containerRecommendations[0].target}'
+
+# Check namespace label
+kubectl get ns <ns> -o jsonpath='{.metadata.labels.goldilocks\.fairwinds\.com/vpa-update-mode}'
+```
+
+### Solution
+**Option 1: Delete VPA before every pod creation** (quick fix, VPA recreates)
+```bash
+kubectl -n <ns> delete vpa goldilocks-<deployment>
+kubectl -n <ns> delete pod -l app=<app>
+```
+
+**Option 2: Set namespace label to disable Goldilocks** (Terraform)
+```hcl
+resource "kubernetes_namespace" "myapp" {
+  metadata {
+    labels = {
+      "goldilocks.fairwinds.com/vpa-update-mode" = "off"
+    }
+  }
+}
+```
+Note: Goldilocks may reset this label if it manages the namespace. You may also
+need to delete the VPA objects manually after changing the label.
+
+**Option 3: Exclude namespace from Goldilocks controller**
+Configure the Goldilocks Helm chart to exclude specific namespaces.
+
+### Key Insight
+The VPA mutating admission webhook (`vpa-webhook-config`) intercepts pod creation
+and modifies resources AFTER Kubernetes applies LimitRange defaults but BEFORE
+the pod is actually created. This means:
+1. Your deployment says `cpu: 2`
+2. The RS template says `cpu: 2`
+3. But the pod gets `cpu: 300m` because VPA overwrites it at admission
 
 ## References
 - [Kubernetes LimitRange](https://kubernetes.io/docs/concepts/policy/limit-range/)
 - [Kubernetes Resource Management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+- [Goldilocks VPA](https://github.com/FairwindsOps/goldilocks)
+- [VPA Modes](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler#quick-start)
