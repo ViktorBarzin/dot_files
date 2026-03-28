@@ -1,7 +1,9 @@
 # Claude Memory
 
 ## Instructions
-- **"remember X"**: Store via `memory_store` MCP tool. For project-specific static info (commands, architecture), update the project's `.claude/CLAUDE.md` instead.
+- **Memory MCP is the ONLY memory system.** All memories (facts, preferences, decisions, project context) MUST be stored and recalled via the `memory_store` / `memory_recall` MCP tools. Do NOT use the file-based auto-memory system (`~/.claude/projects/*/memory/`).
+- **"remember X"**: Store via `memory_store` MCP tool immediately. For project-specific static info (commands, architecture), also update the project's `.claude/CLAUDE.md`.
+- **Recalling**: Always use `memory_recall` MCP tool to search for relevant context before responding to non-trivial requests.
 - **Skills/agents**: Create in `~/.claude/skills/` or `~/.claude/agents/`, sync via chezmoi, commit to dotfiles repo.
 
 ## Preferences
