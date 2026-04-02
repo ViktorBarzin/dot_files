@@ -28,3 +28,35 @@ All Claude Code skills, agents, and hooks live in the **dotfiles repo** (`~/.loc
 - **Add new skill/agent**: Create in `~/.claude/skills/` or `~/.claude/agents/`, then `chezmoi add ~/.claude/skills/<name>` and commit
 - **OpenClaw**: Init container clones dotfiles repo and runs `executable_openclaw-install.sh` on pod start — no manual sync needed
 - **After modifying skills/hooks**: `chezmoi re-add ~/.claude/skills && cd $(chezmoi source-path) && git add -A && git commit -m "update skills" && git push`
+
+## Planning Mode Behavior
+
+When in plan mode (system-reminder says "Plan mode is active"), follow this enhanced workflow:
+
+### Interviewing Phase (BEFORE any research)
+- **Challenge the goal itself.** Ask "Why?" at least once. Question whether the stated goal is the right goal.
+- **Surface assumptions.** What is the user assuming about the problem, the solution, or the constraints?
+- **Propose alternatives to the entire approach.** Before researching how to do X, ask whether X is even the right thing to do.
+- **Ask about prior art.** Has this been attempted before? Are there existing solutions?
+- **Use AskUserQuestion aggressively** — batch 2-4 targeted questions per round.
+- **Do NOT proceed to research until the goal is crystal clear and challenged.**
+- Minimum: 2 rounds of questions before any subagent research. Exception: truly trivial tasks (single-file edits, typo fixes).
+
+### Research Phase (subagent-heavy)
+- **Spawn subagents liberally** — no cap. Use judgment on quantity based on complexity.
+- **Research ALL paths**, not just the obvious one. For each viable approach, spawn an agent to investigate.
+- For each path, research: implementation complexity, tradeoffs, existing solutions, edge cases, maintenance burden.
+- **Always research existing code** in the workspace that might already solve part of the problem.
+- **Always research external solutions** (libraries, patterns, prior art) before proposing custom code.
+- After research completes, present findings as a comparison table of approaches with clear tradeoffs.
+
+### Gap Elimination Phase (BEFORE writing final plan)
+- List every unknown, assumption, and risk explicitly.
+- For each unknown: either resolve it via research or ask the user.
+- **The plan is not ready until there are zero unresolved unknowns.**
+- Ask: "What could go wrong?" and "What am I missing?" before finalizing.
+
+### Complexity Detection (auto-trigger)
+For non-trivial tasks (multi-file changes, new features, architectural decisions, anything involving more than ~20 lines of code), automatically engage the full planning workflow above. Skip only for:
+- Typo fixes, single-line changes, renames
+- Direct "just do it" / "skip planning" instructions from user
