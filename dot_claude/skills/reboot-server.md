@@ -28,11 +28,11 @@ Shorthand used below: `KC="KUBECONFIG=/Users/viktorbarzin/code/config kubectl"`
 | 2 | 9000 | TrueNAS | 60s | 300s | NFS storage — needs network from pfSense |
 | 3 | 220 | docker-registry | 60s | 120s | Pull-through cache (fallback: upstream) |
 | 3 | 102 | devvm | 60s | 120s | Dev VM — needs pfSense for network |
-| 4 | 200 | k8s-master | 45s | 300s | Control plane — must be up before workers |
-| 5 | 201 | k8s-node1 | 45s | 300s | GPU node (Tesla T4) |
-| 5 | 202 | k8s-node2 | 45s | 300s | Worker |
-| 5 | 203 | k8s-node3 | 45s | 300s | Worker |
-| 5 | 204 | k8s-node4 | 45s | 300s | Worker |
+| 4 | 200 | k8s-master | 45s | 420s | Control plane — must be up before workers |
+| 5 | 201 | k8s-node1 | 45s | 420s | GPU node (Tesla T4) |
+| 5 | 202 | k8s-node2 | 45s | 420s | Worker |
+| 5 | 203 | k8s-node3 | 45s | 420s | Worker |
+| 5 | 204 | k8s-node4 | 45s | 420s | Worker |
 | 6 | 103 | home-assistant | 0s | 120s | HA Sofia — no ordering dependency |
 | 6 | 300 | Windows10 | 0s | 120s | Windows VM — no ordering dependency |
 
@@ -85,47 +85,74 @@ qm set 101 --startup order=1,down=120
 qm set 9000 --startup order=2,up=60,down=300
 qm set 102 --startup order=3,up=60,down=120
 qm set 220 --startup order=3,up=60,down=120
-qm set 200 --startup order=4,up=45,down=300
-qm set 201 --startup order=5,up=45,down=300
-qm set 202 --startup order=5,up=45,down=300
-qm set 203 --startup order=5,up=45,down=300
-qm set 204 --startup order=5,up=45,down=300
+qm set 200 --startup order=4,up=45,down=420
+qm set 201 --startup order=5,up=45,down=420
+qm set 202 --startup order=5,up=45,down=420
+qm set 203 --startup order=5,up=45,down=420
+qm set 204 --startup order=5,up=45,down=420
 qm set 103 --startup order=6,down=120
 qm set 300 --startup order=6,down=120
 '
 ```
 
-### PF-4: Check kubelet shutdownGracePeriod on all k8s nodes
+### PF-4: Check kubelet priority-based shutdown on all k8s nodes
+
+Kubelet uses `shutdownGracePeriodByPodPriority` for ordered pod shutdown (lowest priority stopped first):
+
+| Priority | Tier | Grace | Stopped |
+|----------|------|-------|---------|
+| 0 | unclassified | 20s | 1st |
+| 200000 | tier-4-aux | 20s | 2nd |
+| 400000 | tier-3-edge | 30s | 3rd |
+| 600000 | tier-2-gpu | 30s | 4th |
+| 800000 | tier-1-cluster (DBs) | 90s | 5th |
+| 1000000 | tier-0-core | 30s | 6th |
+| 1200000 | gpu-workload | 30s | 7th |
+| 2000000000 | system-cluster-critical | 30s | 8th |
+| 2000001000 | system-node-critical | 30s | 9th (last) |
+
+**Total: 310s kubelet, 420s VM timeout, 480s InhibitDelay**
+
 ```bash
 for VMID in 200 201 202 203 204; do
   echo "=== VMID $VMID ==="
-  ssh root@192.168.1.127 "qm guest exec $VMID -- grep -c shutdownGracePeriod /var/lib/kubelet/config.yaml 2>/dev/null" || echo "NOT SET"
+  ssh root@192.168.1.127 "qm guest exec $VMID -- grep -c shutdownGracePeriodByPodPriority /var/lib/kubelet/config.yaml 2>/dev/null" || echo "NOT SET"
 done
 ```
 
-If not set on any node, patch it:
+If not set on any node, patch it with the python3/yaml approach:
 ```bash
 VMID=<target>
+ssh root@192.168.1.127 "qm guest exec $VMID -- python3 -c \"
+import yaml
+with open('/var/lib/kubelet/config.yaml') as f:
+    cfg = yaml.safe_load(f)
+cfg.pop('shutdownGracePeriod', None)
+cfg.pop('shutdownGracePeriodCriticalPods', None)
+cfg.pop('shutdownGracePeriodByPodPriority', None)
+cfg['shutdownGracePeriodByPodPriority'] = [
+    {'priority': 0,          'shutdownGracePeriodSeconds': 20},
+    {'priority': 200000,     'shutdownGracePeriodSeconds': 20},
+    {'priority': 400000,     'shutdownGracePeriodSeconds': 30},
+    {'priority': 600000,     'shutdownGracePeriodSeconds': 30},
+    {'priority': 800000,     'shutdownGracePeriodSeconds': 90},
+    {'priority': 1000000,    'shutdownGracePeriodSeconds': 30},
+    {'priority': 1200000,    'shutdownGracePeriodSeconds': 30},
+    {'priority': 2000000000, 'shutdownGracePeriodSeconds': 30},
+    {'priority': 2000001000, 'shutdownGracePeriodSeconds': 30},
+]
+with open('/var/lib/kubelet/config.yaml', 'w') as f:
+    yaml.dump(cfg, f, default_flow_style=False)
+print('done')
+\""
+
+# Update systemd timeouts to match
 ssh root@192.168.1.127 "qm guest exec $VMID -- bash -c '
-sed -i \"/shutdownGracePeriod/d; /shutdownGracePeriodCriticalPods/d\" /var/lib/kubelet/config.yaml
-
-cat >> /var/lib/kubelet/config.yaml <<EOF
-shutdownGracePeriod: \"240s\"
-shutdownGracePeriodCriticalPods: \"60s\"
-EOF
-
 mkdir -p /etc/systemd/logind.conf.d
-cat > /etc/systemd/logind.conf.d/kubelet-shutdown.conf <<EOF
-[Login]
-InhibitDelayMaxSec=300
-EOF
+echo -e \"[Login]\nInhibitDelayMaxSec=480\" > /etc/systemd/logind.conf.d/kubelet-shutdown.conf
 systemctl restart systemd-logind
-
 mkdir -p /etc/systemd/system/kubelet.service.d
-cat > /etc/systemd/system/kubelet.service.d/20-shutdown.conf <<EOF
-[Service]
-TimeoutStopSec=300s
-EOF
+echo -e \"[Service]\nTimeoutStopSec=420s\" > /etc/systemd/system/kubelet.service.d/20-shutdown.conf
 systemctl daemon-reload
 systemctl restart kubelet
 '"
