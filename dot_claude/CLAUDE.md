@@ -23,6 +23,12 @@ When installing new Claude plugins or marketplaces, update these files:
 - `~/.local/share/chezmoi/run_once_after_install-claude-plugins.sh` - add to chezmoi run_once script
 Then sync and commit both to chezmoi.
 
+### Cluster Health Checks
+- **Source of truth**: `infra/scripts/cluster_healthcheck.sh` — always run this script for cluster healthchecks
+- The `cluster-triage` agent and `cluster-health` skill both use this script
+- When checking cluster health, prefer spawning the `cluster-triage` agent (which runs the script and investigates FAIL/WARN results) over running the script directly
+- Any new health checks must be added to the script, not done ad-hoc
+
 ### Skills/Agents Sync
 All Claude Code skills, agents, and hooks live in the **dotfiles repo** (`~/.local/share/chezmoi/dot_claude/`), synced via chezmoi.
 - **Add new skill/agent**: Create in `~/.claude/skills/` or `~/.claude/agents/`, then `chezmoi add ~/.claude/skills/<name>` and commit
