@@ -281,6 +281,9 @@ $KC exec -n vault vault-2 -- vault operator raft join http://vault-0.vault-inter
 ```
 
 #### 3.6 Proxmox-LVM PVC Validation
+
+**Note**: VolumeAttachments auto-detach in ~2 min (60s pod eviction + 15s attach-detach reconcile). If pods are stuck in ContainerCreating with Multi-Attach errors, **wait 2-3 min** before intervening. Only escalate if CSI controller pod is not running.
+
 ```bash
 # Check all PVCs — none should be Pending (except newly created)
 $KC get pvc -A --field-selector 'status.phase!=Bound' 2>/dev/null | head -20
@@ -609,7 +612,8 @@ After the master is back and uncordoned, run the full validation suite from [Pha
 | VM won't start | Proxmox host disk full | `ssh root@192.168.1.127 'df -h'` — check thin pool usage with `lvs pve/data` |
 | Node stays NotReady | kubelet/containerd not starting | `qm guest exec <VMID> -- systemctl status kubelet` and `systemctl status containerd` |
 | NFS PVCs stuck Pending | TrueNAS not fully booted | Wait for ZFS pool import: `qm guest exec 9000 -- zpool status` |
-| Proxmox-LVM PVCs stuck | proxmox-csi-plugin not running | `$KC get pods -n proxmox-csi` — check CSI node plugin on affected node. Check LVM thin pool: `qm guest exec <VMID> -- lvs` |
+| Proxmox-LVM PVCs stuck ContainerCreating | VolumeAttachments auto-detaching (60s pod eviction + 15s reconcile) | **Wait ~2 min** — auto-heals. If stuck after 3 min: check `$KC get pods -n proxmox-csi` (CSI controller must be running). Stale VolumeAttachments: `$KC get volumeattachments -o json \| jq '.items[] \| select(.spec.nodeName=="<node>")'` |
+| Stale Error/Unknown pods | Pods from shutdown not GC'd | Force-delete: `$KC get pods -A --field-selector status.phase=Failed --no-headers \| awk '{print "-n",$1,$2}' \| xargs -L1 $KC delete pod --force --grace-period=0` |
 | Vault stays sealed | Auto-unseal sidecar not running | Check sidecar: `$KC logs -n vault vault-0 -c auto-unseal --tail=20`. Check unseal key secret exists: `$KC get secret -n vault vault-unseal-key` |
 | Vault Raft peer missing | Pod restarted on different node | `$KC exec -n vault vault-1 -- vault operator raft join http://vault-0.vault-internal:8200` |
 | MySQL 0 ONLINE members | Complete outage — operator can't recover | See [MySQL InnoDB Cluster Recovery](#37-mysql-innodb-cluster-recovery) — requires user confirmation |
