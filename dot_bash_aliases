@@ -20,7 +20,6 @@ alias vimdiff="vim -d"
 alias g='git'
 alias gs='git status'
 alias ga='git add'
-alias gc='git commit -S'
 alias gp='git push origin $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)'
 alias gpf='git push -u forgejo $(git rev-parse --verify --quiet main >/dev/null 2>&1 && echo main || echo master)'
 # alias gp='for r in $(git remote); do echo "Pushing to $r" && git push $r master; done'
