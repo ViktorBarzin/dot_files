@@ -28,7 +28,7 @@ def get_api_config():
         headers = cm.get("headers", {})
         auth = headers.get("Authorization", "")
         key = auth.replace("Bearer ", "").strip()
-        url = cm.get("url", "").replace("/mcp/sse", "")
+        url = cm.get("url", "").replace("/mcp/sse", "").replace("/mcp/mcp", "")
         return url, key
     except Exception:
         return None, None
