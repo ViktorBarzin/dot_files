@@ -1,4 +1,32 @@
 {
+  "autoMemoryEnabled": true,
+  "enableAllProjectMcpServers": true,
+  "enabledPlugins": {
+    "browser@claude-templates": true,
+    "code-review@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "data@claude-templates": true,
+    "debrief@claude-templates": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-code-plugins": true,
+    "frontend-design@claude-plugins-official": true,
+    "gdrive-mount@claude-templates": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "llm-rules@Meta": true,
+    "meta-statusline-pro@claude-templates": true,
+    "meta@Meta": true,
+    "para-workspace-core@claude-templates": true,
+    "para-workspace-gdrive@claude-templates": true,
+    "para-workspace-integrations@claude-templates": true,
+    "para-workspace-meetings@claude-templates": true,
+    "para-workspace-reporting@claude-templates": true,
+    "para-workspace@claude-templates": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "trajectory@Meta": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "DISABLE_AUTOUPDATER": "1",
@@ -9,6 +37,104 @@
     "STATUSLINE_DISABLE_SESSION_NAME": "1",
     "STATUSLINE_DISABLE_TURNS": "1"
   },
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-allow-memory-tools.py",
+            "timeout": 3,
+            "type": "command"
+          }
+        ],
+        "matcher": "mcp__.*claude_memory__memory_|mcp__.*claude_memory__secret_"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/post-commit-memory.py",
+            "timeout": 5,
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/viktorbarzin/.claude/hooks/pre-compact-backup.sh",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "node \"/Users/viktorbarzin/.claude/hooks/gsd-check-update.js\"",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/memory-sync.py",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-learn.py",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/memory-sync.py",
+            "timeout": 30,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "/Users/viktorbarzin/.claude/hooks/post-compact-recovery.sh",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/user-prompt-recall.py",
+            "timeout": 5,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "claude-opus-4-6[1m]",
   "permissions": {
     "allow": [
       "Bash(ssh:*)",
@@ -29,147 +155,84 @@
       "mcp__plugin_meta_mux__get_phabricator_diff_details",
       "mcp__plugin_meta_mux__knowledge_load",
       "mcp__plugin_meta_mux__knowledge_filtered_search",
-      "mcp__plugin_meta_mux__metamate_knowledge_search"
+      "mcp__plugin_meta_mux__metamate_knowledge_search",
+      "Bash(bash *source-all.sh*)",
+      "Bash(bash *resolve-identity.sh*)",
+      "Bash(bash *resolve-storage.sh*)",
+      "Bash(bash *resolve-org-tree.sh*)",
+      "Bash(bash *resolve-workspace.sh*)",
+      "Bash(bash *merge-sources.sh*)",
+      "Bash(bash *finalize-digest.sh*)",
+      "Bash(bash *finalize-project-digest.sh*)",
+      "Bash(bash *filter-to-project.sh*)",
+      "Bash(bash *merge-contributors.sh*)",
+      "Bash(bash *compute-org-paths.sh*)",
+      "Bash(bash *compute-project-paths.sh*)",
+      "Bash(bash *log_debrief.sh*)",
+      "Bash(bash *log_usage.sh*)",
+      "Bash(bash *write_metrics.sh*)",
+      "Bash(bash *sanitize-leave-types.sh*)",
+      "Bash(bash *verify-checkpoints.sh*)",
+      "Bash(bash *persist-sources.sh*)",
+      "Bash(bash *count-gchat.sh*)",
+      "Bash(bash *chunk-gchat.sh*)",
+      "Bash(bash *merge-annotated-gchat.sh*)",
+      "Bash(bash *merge-annotated.sh*)",
+      "Bash(bash *team-brain-push.sh*)",
+      "Bash(bash *check-team-brain-config.sh*)",
+      "Bash(bash *resolve-gdrive-url.sh*)",
+      "Bash(bash *tag-sensitive.sh*)",
+      "Bash(bash *extract-gsd-projects.sh*)",
+      "Bash(bash *discover-team-brains.sh*)",
+      "Bash(bash *check-reports.sh*)",
+      "Bash(bash *resolve-portfolio.sh*)",
+      "Bash(bash *resolve-project.sh*)",
+      "Bash(bash *source-project.sh*)",
+      "Bash(bash *setup-weekly-cron.sh*)",
+      "Bash(bash *sync-to-persist.sh*)",
+      "Bash(bash *gdrive-write.py*)",
+      "Bash(bash *format-gchat-message.sh*)",
+      "Bash(bash *generate-metrics-table.sh*)",
+      "Bash(bash *check-sources-freshness.sh*)",
+      "Bash(bash *log_feedback.sh*)",
+      "Bash(bash *source-bento.sh*)",
+      "Bash(bash *source-calendar.sh*)",
+      "Bash(bash *source-comments.sh*)",
+      "Bash(bash *source-diffs.sh*)",
+      "Bash(bash *source-flows.sh*)",
+      "Bash(bash *source-gchat.sh*)",
+      "Bash(bash *source-google.sh*)",
+      "Bash(bash *source-meeting-notes.sh*)",
+      "Bash(bash *source-notes.sh*)",
+      "Bash(bash *source-posts.sh*)",
+      "Bash(bash *source-sev-comments.sh*)",
+      "Bash(bash *source-tasks.sh*)",
+      "Bash(bash *source-thanks.sh*)",
+      "Bash(source *resolve-workspace.sh*)",
+      "Bash(mkdir -p *)",
+      "Bash(touch *)",
+      "Bash(date *)",
+      "Bash(cat *)",
+      "Bash(cp *)",
+      "Bash(ls *)",
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(jq *)",
+      "Bash(mclone *)",
+      "Bash(realpath *)",
+      "Bash(meta *)"
     ],
+    "defaultMode": "dontAsk",
     "deny": [
       "mcp__mux_user__headless_analytics_agent",
       "mcp__plugin_demate_demate__headless_analytics_agent"
-    ],
-    "defaultMode": "dontAsk"
-  },
-  "model": "claude-opus-4-6[1m]",
-  "enableAllProjectMcpServers": true,
-  "hooks": {
-    "PermissionRequest": [
-      {
-        "matcher": "mcp__.*claude_memory__memory_|mcp__.*claude_memory__secret_",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-allow-memory-tools.py",
-            "timeout": 3
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/post-commit-memory.py",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/viktorbarzin/.claude/hooks/pre-compact-backup.sh",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"/Users/viktorbarzin/.claude/hooks/gsd-check-update.js\""
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/memory-sync.py",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-learn.py",
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/memory-sync.py",
-            "timeout": 30,
-            "async": true
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/viktorbarzin/.claude/hooks/post-compact-recovery.sh",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 /Users/viktorbarzin/.claude/hooks/user-prompt-recall.py",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
+  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
-    "type": "command",
-    "command": "bash \"$(find $HOME/.claude/plugins/cache -path '*/meta-statusline-pro/*/bin/statusline.sh' 2>/dev/null | sort -V | tail -1)\""
-  },
-  "enabledPlugins": {
-    "browser@claude-templates": true,
-    "code-review@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "code_provenance@Meta": true,
-    "data@claude-templates": true,
-    "debrief@claude-templates": true,
-    "feature-dev@claude-plugins-official": true,
-    "frontend-design@claude-code-plugins": true,
-    "frontend-design@claude-plugins-official": true,
-    "gdrive-mount@claude-templates": true,
-    "gopls-lsp@claude-plugins-official": true,
-    "llm-rules@Meta": true,
-    "meta-statusline-pro@claude-templates": true,
-    "meta@Meta": true,
-    "meta_codesearch@Meta": true,
-    "meta_knowledge@Meta": true,
-    "para-workspace-core@claude-templates": true,
-    "para-workspace-gdrive@claude-templates": true,
-    "para-workspace-integrations@claude-templates": true,
-    "para-workspace-meetings@claude-templates": true,
-    "para-workspace-reporting@claude-templates": true,
-    "para-workspace@claude-templates": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "ralph-loop@claude-plugins-official": true,
-    "sl@Meta": true,
-    "superpowers@claude-plugins-official": true,
-    "trajectory@Meta": true,
-    "typescript-lsp@claude-plugins-official": true
-  },
-  "autoMemoryEnabled": true,
-  "skipDangerousModePermissionPrompt": true
+    "command": "bash \"$(find $HOME/.claude/plugins/cache -path '*/meta-statusline-pro/*/bin/statusline.sh' 2>/dev/null | sort -V | tail -1)\"",
+    "type": "command"
+  }
 }
