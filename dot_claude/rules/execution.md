@@ -115,3 +115,33 @@ have `docs/` directories.
 See also: `infra/.claude/CLAUDE.md` "Update docs with every change"
 for the full list of doc surfaces (includes `.claude/CLAUDE.md`,
 `AGENTS.md`, `.claude/reference/service-catalog.md`).
+
+## 8. Wrapping up a session
+
+Triggered by the user saying anything like "let's wrap up", "wrap up
+the session", "we're done", "end of session", or similar. When you
+hear this, run this checklist end-to-end (no mid-checklist gates):
+
+1. **Close beads tasks you touched this session.**
+    - Completed work → `bd close <id>`, or add `Closes: <id>` / `Fixes:
+      <id>` trailer to the wrap-up commit (the post-commit hook auto-closes).
+    - Partial work → drop back to `open` with
+      `bd note <id> "progress summary — where to pick up"`. Never leave
+      `in_progress` tasks stale across sessions.
+    - Check with `bd list --status in_progress` to confirm nothing of
+      yours is still flagged.
+2. **Update docs** per §7 — any `infra/docs/` surfaces touched by the
+   session's work. Don't land the wrap-up commit with stale docs.
+3. **Commit outstanding work.** Stage specific files by name (§3).
+   Write a commit message that explains the session's goal and result,
+   not a file-by-file changelog.
+4. **Push to remote** per §3 — direct to master for personal repos,
+   PR flow for shared.
+5. **Wait for CI / deployment** to finish before declaring done (§3).
+6. **Persist learnings to memory.** For any non-obvious decisions,
+   patterns, or gotchas discovered during the session, call
+   `mcp__claude_memory__memory_store` with a concise summary. This is
+   what future sessions will recall — skip the obvious, keep the
+   surprising.
+
+Stop only for items on §2's ASK-FIRST list.
