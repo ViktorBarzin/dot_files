@@ -1,0 +1,7 @@
+# The devvm runs a divergent, secret-bearing ~/.claude/settings.json (homelab
+# plugins + MEMORY_API_KEY at mode 0600, added out-of-band — NOT in this repo).
+# chezmoi must not manage or clobber it there (a `chezmoi apply` would revert the
+# 0600 and overwrite the homelab config). Other machines keep it chezmoi-managed.
+{{ if eq .chezmoi.hostname "devvm" }}
+.claude/settings.json
+{{ end }}
