@@ -1,0 +1,5 @@
+interface:
+  display_name: "Wayfinder"
+  short_description: "Map huge work as investigation tickets"
+policy:
+  allow_implicit_invocation: false

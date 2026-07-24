@@ -1,10 +1,14 @@
-# Claude Memory
+# Claude — user-global
 
-## Instructions
-- **Memory MCP is the ONLY memory system.** All memories (facts, preferences, decisions, project context) MUST be stored and recalled via the `memory_store` / `memory_recall` MCP tools. Do NOT use the file-based auto-memory system (`~/.claude/projects/*/memory/`).
-- **"remember X"**: Store via `memory_store` MCP tool immediately. For project-specific static info (commands, architecture), also update the project's `.claude/CLAUDE.md`.
-- **Recalling**: Always use `memory_recall` MCP tool to search for relevant context before responding to non-trivial requests.
-- **Skills/agents**: Create in `~/.claude/skills/` or `~/.claude/agents/`, sync via chezmoi, commit to dotfiles repo.
+## Memory
+- Use whatever memory system THIS machine is configured for; do not assume specific
+  memory MCP tools exist. (On the homelab devvm, memory is the `homelab memory` CLI —
+  the claude-memory MCP was retired 2026-06-21. The file-based auto-memory system
+  under `~/.claude/projects/*/memory/` is the harness default elsewhere.)
+- **"remember X"**: store it in the machine's memory system. For project-specific
+  static info (commands, architecture), also update that project's `.claude/CLAUDE.md`.
+- **Skills/agents**: create in `~/.claude/skills/` or `~/.claude/agents/`, sync via
+  chezmoi, commit to the dotfiles repo.
 
 ## Preferences
 

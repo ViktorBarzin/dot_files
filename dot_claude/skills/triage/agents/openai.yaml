@@ -1,0 +1,5 @@
+interface:
+  display_name: "Triage"
+  short_description: "Move issues/PRs through a triage state machine"
+policy:
+  allow_implicit_invocation: false

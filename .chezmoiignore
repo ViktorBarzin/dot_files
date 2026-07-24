@@ -2,6 +2,11 @@
 # plugins + MEMORY_API_KEY at mode 0600, added out-of-band — NOT in this repo).
 # chezmoi must not manage or clobber it there (a `chezmoi apply` would revert the
 # 0600 and overwrite the homelab config). Other machines keep it chezmoi-managed.
+#
+# ~/.claude/CLAUDE.md is likewise devvm-divergent: the devvm uses a minimal
+# "Claude Code only" scaffold (org policy is injected via managed-settings, rules
+# via ~/.claude/rules/), so it must not be overwritten by the cross-machine source.
 {{ if eq .chezmoi.hostname "devvm" }}
 .claude/settings.json
+.claude/CLAUDE.md
 {{ end }}
