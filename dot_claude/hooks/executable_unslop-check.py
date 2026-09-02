@@ -2,6 +2,10 @@
 """
 Stop hook: enforce the unslop style on the reply Claude just produced.
 
+Installed for every devvm user by t3-provision-users.sh, which also wires it
+into ~/.claude/settings.json through wire-memory-hooks.py. The rules it enforces
+are ~/.claude/rules/40-style.md.
+
 ~/.claude/rules/40-style.md carries the full rule set, but text in context does not
 stop a generation reflex. Measured 2026-09-02 over 7,302 replies from the
 preceding week: 6,068 em dashes, while the em-dash ban was already loaded in
@@ -116,10 +120,28 @@ def prose_words(text):
     return len(text.split())
 
 
+CYRILLIC = re.compile(r"[\u0400-\u04FF]")
+LATIN = re.compile(r"[A-Za-z]")
+
+# In Bulgarian and Russian the dash is standard punctuation, including for the
+# omitted copula ("\u0418\u0432\u0430\u043d \u2014 \u0443\u0447\u0438\u0442\u0435\u043b"), so the em-dash rules would fight correct
+# grammar rather than an AI tell. The Latin-alphabet checks below stay on: they
+# cannot match Cyrillic text anyway.
+DASH_CHECKS = {"em dash", "en dash used as a dash"}
+
+
+def is_cyrillic(text):
+    cyr, lat = len(CYRILLIC.findall(text)), len(LATIN.findall(text))
+    return cyr > 20 and cyr > lat
+
+
 def tells(reply):
     prose = strip_quoted(reply)
+    skip = DASH_CHECKS if is_cyrillic(prose) else frozenset()
     found = []
     for name, pattern in CHECKS:
+        if name in skip:
+            continue
         hits = list(pattern.finditer(prose))
         if hits:
             sample = " ".join(hits[0].group(0).split())[:48]

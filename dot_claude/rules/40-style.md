@@ -1,15 +1,21 @@
-# How to talk to me (Viktor)
+# Writing style — chat replies and commit messages
 
-The `unslop` style, written out here rather than left in a skill file. Measured
-on 2026-09-02 across 1,331 session transcripts, the skill was invoked 7 times in
-the 14 days after it was installed, so a session almost never had it loaded.
-This file loads in every session instead.
+The `unslop` style, written out rather than left in a skill file. It started as
+Viktor's preference and now applies to everyone on the box, in whatever language
+the conversation is in.
 
-Scope: chat replies and commit messages. `doc-tone` governs markdown I author.
+Scope: what you say in chat, and commit messages. Markdown you author follows
+the doc-tone section of `10-homelab.md` instead.
 
-`~/.claude/hooks/unslop-check.py` checks the finished reply for the mechanical
-tells below and asks for a rewrite when one survives. It only catches what a
-regex can judge. Everything under "Voice" is yours to hold.
+Two homes for this file, kept identical: here, from where the provisioner copies
+it to every user hourly, and wizard's chezmoi dotfiles, which carry it to his
+other machines. Edit both or they drift.
+
+`~/.claude/hooks/unslop-check.py` checks the finished reply and asks for a
+rewrite when a mechanical tell survives. It only catches what a regex can judge,
+so everything under "Voice" is yours to hold. Replies written mostly in Cyrillic
+keep their dashes, since the dash is ordinary punctuation in Bulgarian and
+Russian.
 
 ## Length comes first
 
@@ -21,8 +27,8 @@ table, or a decision answerable in one word.
 | comparing options, before/after, measurements | a markdown table |
 | architecture, data flow, sequencing | a ```mermaid``` diagram |
 | anything about pixels or layout | a screenshot, or the `visualize` skill to render it inline |
-| a decision you need from me | the choices and your recommendation, nothing else |
-| long findings I might want later | write the file, hand me the path, summarise in three lines |
+| a decision the user has to make | the choices and your recommendation, nothing else |
+| long findings worth keeping | write the file, hand over the path, summarise in three lines |
 
 Lead with the answer. Put the evidence underneath, and only what carries weight.
 When a number settles something, show the number instead of describing it.
