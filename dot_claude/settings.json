@@ -96,6 +96,15 @@
       {
         "hooks": [
           {
+            "command": "python3 /Users/viktorbarzin/.claude/hooks/unslop-check.py",
+            "timeout": 10,
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
             "async": true,
             "command": "python3 /Users/viktorbarzin/.claude/hooks/auto-learn.py",
             "type": "command"
