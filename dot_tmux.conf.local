@@ -356,11 +356,41 @@ set -g set-clipboard on
 # }
 #
 # # usage: #{mem_cpu}
-# # Shows memory/CPU if tmux-mem-cpu-load plugin is installed
+# # Shows memory/CPU if tmux-mem-cpu-load plugin is installed.
+# #
+# # Why the cache (2026-09-12): tmux-mem-cpu-load sleeps --interval seconds to
+# # take its second /proc/stat sample before printing anything, and tmux keeps
+# # #() output PER CLIENT, so every fresh attach re-ran it from nothing. The
+# # bar drew with the IP already in place (0.01s) and a hole where the load
+# # numbers go for the next 2.00s. --interval 0 is rejected by the binary and
+# # --interval 1 still costs 0.99s, so the sample cannot be made fast; it has
+# # to come off the draw path. Print the last reading now, re-sample detached
+# # for the next redraw. Only a cold or >60s-stale cache waits.
 # _mem_cpu() {
 #   for path in "$HOME/.tmux/plugins/tmux-mem-cpu-load/tmux-mem-cpu-load" "/usr/local/bin/tmux-mem-cpu-load" "/usr/bin/tmux-mem-cpu-load"; do
 #     if [ -x "$path" ]; then
-#       "$path" --colors --powerline-right --interval 2 2>/dev/null
+#       cache="${XDG_RUNTIME_DIR:-/tmp}/tmux-mem-cpu-load.$(id -u)"
+#       mtime=$(stat -c %Y "$cache" 2>/dev/null || stat -f %m "$cache" 2>/dev/null)
+#       [ -n "$mtime" ] || mtime=0
+#       age=$(( $(date +%s) - mtime ))
+#       if [ -s "$cache" ] && [ "$age" -lt 60 ]; then
+#         cat "$cache"
+#         if [ "$age" -ge 5 ]; then
+#           # Detached, and tmux's pipe closed, so tmux reads EOF now instead
+#           # of blocking on the sample. The trap matters: tmux signals a
+#           # format job's process group when its client detaches, which can
+#           # land mid-sample and would otherwise strand the temp file.
+#           ( trap 'rm -f "$cache.$$"' EXIT HUP INT TERM
+#             "$path" --colors --powerline-right --interval 2 2>/dev/null > "$cache.$$"
+#             [ -s "$cache.$$" ] && mv -f "$cache.$$" "$cache"
+#           ) </dev/null >/dev/null 2>&1 &
+#         fi
+#       else
+#         trap 'rm -f "$cache.$$"' EXIT HUP INT TERM
+#         "$path" --colors --powerline-right --interval 2 2>/dev/null > "$cache.$$"
+#         [ -s "$cache.$$" ] && mv -f "$cache.$$" "$cache"
+#         cat "$cache" 2>/dev/null
+#       fi
 #       return
 #     fi
 #   done
