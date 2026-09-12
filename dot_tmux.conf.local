@@ -138,7 +138,7 @@ tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d
 
 # Status right: network info + mem/cpu + battery + time + user@host
 # Battery vars use #{?...} conditionals so they're safe on non-laptop systems
-tmux_conf_theme_status_right=" #(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _local_ip)#(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _gateway) #{prefix}#{mouse}#{pairing}#{synchronized} #(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _mem_cpu)#(awk '/^# EOF$/,0' ~/.tmux.conf.local | cut -c3- | sh -s _battery_fallback) , %R , %d %b | #{username}#{root} | #{hostname} "
+tmux_conf_theme_status_right=" #(awk 'f;/^# EOF$/{f=1}' ~/.tmux.conf.local | cut -c3- | sh -s _local_ip)#(awk 'f;/^# EOF$/{f=1}' ~/.tmux.conf.local | cut -c3- | sh -s _gateway) #{prefix}#{mouse}#{pairing}#{synchronized} #(awk 'f;/^# EOF$/{f=1}' ~/.tmux.conf.local | cut -c3- | sh -s _mem_cpu)#(awk 'f;/^# EOF$/{f=1}' ~/.tmux.conf.local | cut -c3- | sh -s _battery_fallback) , %R , %d %b | #{username}#{root} | #{hostname} "
 
 # Status left colors: yellow, pink, green
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_7,$tmux_conf_theme_colour_8"
@@ -267,8 +267,14 @@ bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "sh -c 'if command 
 # Toggle synchronize-panes
 bind-key s set-window-option synchronize-panes\; display-message "synchronize-panes is now #{?pane_synchronized,on,off}"
 
-# Default shell - use zsh if available, otherwise fall back to default
-if-shell "command -v zsh >/dev/null 2>&1" "set-option -g default-shell /bin/zsh"
+# Default shell.
+# Set DIRECTLY, not via if-shell: if-shell defers its command until after the
+# config is parsed, so at server boot tmux-continuum's restore could run while
+# default-shell was still /bin/bash — restored panes then came up as `bash -l`
+# (no oh-my-zsh, no claude wrapper) while newly created ones got zsh.
+# /bin/zsh is this account's login shell, so the availability test bought
+# nothing here.
+set-option -g default-shell /bin/zsh
 
 # Aggressive resize
 set-window-option -g aggressive-resize
@@ -279,16 +285,28 @@ set-window-option -g aggressive-resize
 # ==============================================================================
 
 # Plugin auto-update on launch/reload
-tmux_conf_update_plugins_on_launch=true
-tmux_conf_update_plugins_on_reload=true
+# Changed 2026-08-16: both were `true`, oh-my-tmux's default. On THIS box that
+# meant a `git fetch` against GitHub for tpm and every plugin on EVERY tmux
+# server launch — and the Go test suites here spawn tmux servers by the dozen
+# (~20 sockets in a single minute under `se-test-*`/`sio-test-*`), so plugin
+# updates were being checked hundreds of times a day. Weekly is enough; the
+# `tmux-plugin-update.timer` user unit does it on Sundays instead.
+tmux_conf_update_plugins_on_launch=false
+tmux_conf_update_plugins_on_reload=false
 tmux_conf_uninstall_plugins_on_reload=true
 
 # Plugins (installed/updated automatically)
 set -g @plugin 'tmux-plugins/tmux-resurrect'
-set -g @resurrect-processes 'vi vim nvim man less more tail top htop'
+# claude is matched as a regex (~claude *) and rewritten to the resume wrapper.
+# The wrapper looks up the pane's previous session UUID from a sidecar JSON
+# produced by claude-session-snap.sh and runs `claude --resume <uuid>`.
+set -g @resurrect-processes '"~claude *->~/bin/claude-resume" vi vim nvim man less more tail top htop'
+set -g @resurrect-hook-post-save-all '~/.tmux/scripts/claude-session-snap.sh'
 
 set -g @plugin 'tmux-plugins/tmux-continuum'
-set -g @continuum-restore 'off'
+set -g @continuum-restore 'on'
+set -g @continuum-save-interval '1'
+set -g @continuum-boot 'on'
 
 set -g @plugin 'thewtex/tmux-mem-cpu-load'
 
@@ -297,6 +315,9 @@ set -g @plugin 'thewtex/tmux-mem-cpu-load'
 # ==============================================================================
 # CUSTOM VARIABLES (cross-platform)
 # ==============================================================================
+
+# OSC 52: tmux emits clipboard on copy so the web terminal lands selections on the OS clipboard
+set -g set-clipboard on
 
 # /!\ do not remove the following line
 # EOF
