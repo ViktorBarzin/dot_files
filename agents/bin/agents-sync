@@ -42,7 +42,7 @@ fi
 mkdir -p "$HOME/.agents"
 tmp="$(mktemp "$HOME/.agents/.AGENTS.md.XXXXXX")"
 {
-  printf '<!-- Joined by agents-sync from core.md and %s.md in %s/agents. Edit those, not this copy. -->\n\n' "$PROFILE" "$SRC"
+  printf '<!-- Built by agents-sync from %s/agents/{core,%s}.md; edit those. -->\n\n' "$SRC" "$PROFILE"
   cat "$SRC/agents/core.md"
   printf '\n'
   cat "$SRC/agents/$PROFILE.md"
