@@ -2,11 +2,23 @@
 # plugins + MEMORY_API_KEY at mode 0600, added out-of-band — NOT in this repo).
 # chezmoi must not manage or clobber it there (a `chezmoi apply` would revert the
 # 0600 and overwrite the homelab config). Other machines keep it chezmoi-managed.
-#
-# ~/.claude/CLAUDE.md is likewise devvm-divergent: the devvm uses a minimal
-# "Claude Code only" scaffold (org policy is injected via managed-settings, rules
-# via ~/.claude/rules/), so it must not be overwritten by the cross-machine source.
 {{ if eq .chezmoi.hostname "devvm" }}
 .claude/settings.json
+{{ end }}
+
+# Agent instructions (2026-09-22). agents/ holds the source files: core.md,
+# personal.md, work.md and Viktor's own skills. agents-sync joins core.md with
+# the machine's profile into ~/.agents/AGENTS.md; chezmoi only places the links
+# to it. Without this line, agents/ would land in ~/agents/.
+agents/**
+
+# macOS is a work machine: its ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md are
+# employer files, and a symlink entry replaces an existing file or directory
+# without asking. Keep every agent entry off it until it joins with the work
+# profile through an import.
+{{ if eq .chezmoi.os "darwin" }}
 .claude/CLAUDE.md
+.codex/AGENTS.md
+.claude/skills/**
+.config/systemd/**
 {{ end }}

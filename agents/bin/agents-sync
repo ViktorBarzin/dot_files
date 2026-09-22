@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# agents-sync: keep this machine's agent instructions current.
+#
+# The source of truth is agents/ in this dotfiles repo: core.md holds the rules
+# for every machine, and personal.md or work.md the rules for one kind of
+# machine. This script pulls the repo, joins core.md with the machine's profile
+# into ~/.agents/AGENTS.md (read-only, since edits belong in the source files),
+# and makes sure ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and the skill links
+# point where chezmoi says. A systemd user timer runs it every 15 minutes; run
+# it by hand after editing agents/ to see the change at once.
+#
+# Written for bash 3.2 and BSD tools as well, for the day a Mac joins.
+set -uo pipefail
+
+SRC="${AGENTS_SRC:-$HOME/.local/share/chezmoi}"
+PROFILE="${AGENTS_PROFILE:-$(cat "$HOME/.config/agents/profile" 2>/dev/null || echo personal)}"
+HUB="$HOME/.agents/AGENTS.md"
+BACKUP="$HOME/.agents/backup/$(date +%Y%m%d-%H%M%S)"
+status=0
+
+log() { echo "agents-sync: $*"; }
+
+# 1. The pre-push hook that keeps internal addresses out of this public repo
+#    lives in the repo; point git at it on every pass, since chezmoi does not
+#    run its once-scripts on a targeted apply.
+git -C "$SRC" config core.hooksPath agents/githooks
+
+# 2. Pull, unless agents/ has edits that are not committed yet: a pull could
+#    conflict with them, and an unfinished edit should not be joined either.
+if [ -n "$(git -C "$SRC" status --porcelain -- agents)" ]; then
+  log "uncommitted changes under $SRC/agents; not pulling (commit them first)"
+elif ! git -C "$SRC" pull --ff-only --quiet 2>/dev/null; then
+  log "WARN: pull failed; using the local copy"
+fi
+
+# 3. Join core.md with the profile into the hub. Rewritten only when the text
+#    changes, and renamed into place so a starting session sees old or new.
+if [ ! -s "$SRC/agents/core.md" ] || [ ! -f "$SRC/agents/$PROFILE.md" ]; then
+  log "ERROR: $SRC/agents/core.md or $PROFILE.md missing; hub left as it is"
+  exit 1
+fi
+mkdir -p "$HOME/.agents"
+tmp="$(mktemp "$HOME/.agents/.AGENTS.md.XXXXXX")"
+{
+  printf '<!-- Joined by agents-sync from core.md and %s.md in %s/agents. Edit those, not this copy. -->\n\n' "$PROFILE" "$SRC"
+  cat "$SRC/agents/core.md"
+  printf '\n'
+  cat "$SRC/agents/$PROFILE.md"
+} > "$tmp"
+if cmp -s "$tmp" "$HUB" 2>/dev/null; then
+  rm -f "$tmp"
+else
+  chmod 0444 "$tmp" && mv -f "$tmp" "$HUB" && log "rebuilt $HUB from core.md + $PROFILE.md"
+fi
+
+# 4. The links chezmoi manages for agents. A symlink entry replaces an existing
+#    file or directory without asking, so anything real in the way is moved to
+#    a dated backup first, outside ~/.claude/skills where it would load as a
+#    duplicate skill.
+links=("$HOME/.claude/CLAUDE.md" "$HOME/.codex/AGENTS.md")
+for entry in "$SRC"/dot_claude/skills/symlink_*.tmpl; do
+  [ -e "$entry" ] || continue
+  name="$(basename "$entry" .tmpl)"; links+=("$HOME/.claude/skills/${name#symlink_}")
+done
+for path in "${links[@]}"; do
+  mkdir -p "$(dirname "$path")"
+  if [ -e "$path" ] && [ ! -L "$path" ]; then
+    mkdir -p "$BACKUP" && mv "$path" "$BACKUP/" && log "moved $path to $BACKUP/"
+  fi
+done
+if ! chezmoi apply --force --keep-going --no-tty "${links[@]}" >/dev/null 2>&1; then
+  log "ERROR: chezmoi apply failed for the agent links"
+  status=1
+fi
+exit "$status"

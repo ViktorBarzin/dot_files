@@ -87,3 +87,28 @@ Here are some of the highlights I tend to use more often:
 | `zshrc`                            | `vim ~/.zshrc`                                                                                                                                                                                                                                 | ^                                                                                                               |
 | `f`                                | `free -h`                                                                                                                                                                                                                                      | Check memory usage                                                                                              |
 | `speedtest`                        | `curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py \|python -`                                                                                                                                                 | speed test without needing the package installed locally                                                        |
+
+## Agent instructions
+
+`agents/` is the source of truth for the instructions Viktor's coding agents
+read, in the AGENTS.md format that Claude Code and Codex both use.
+
+| file | holds |
+|---|---|
+| `agents/core.md` | rules for every machine: how to talk, planning, verification, writing style |
+| `agents/personal.md` | rules for Viktor's own machines: homelab tools and workflow |
+| `agents/work.md` | rules for work machines (empty until one joins) |
+| `agents/skills/` | Viktor's own skills, linked into `~/.claude/skills/` |
+
+`agents/bin/agents-sync` pulls this repo, joins `core.md` with the machine's
+profile (`~/.config/agents/profile`, default `personal`) into a read-only
+`~/.agents/AGENTS.md`, and lets chezmoi place the links to it:
+`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` and the skill links. A systemd
+user timer runs it every 15 minutes. Edit the source files, commit, push, and
+run `agents-sync` to see the change straight away.
+
+This repo is public, so the files say how to work and leave infra facts
+(addresses, hostnames, Vault paths) for agents to look up. The pre-push hook in
+`agents/githooks/` refuses a push that adds any; agents-sync sets
+`core.hooksPath` to it. Upstream skills (mattpocock/skills and others) are not
+copied here: the machine's skills updater installs and refreshes them.

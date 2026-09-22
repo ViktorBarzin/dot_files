@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# pre-push: keep internal homelab details out of this public repo.
+#
+# Scans what a push would publish, the added lines of every pushed commit and
+# their messages, for private IPv4 addresses, .lan hosts, cluster-internal
+# service names and node names, plus Vault paths in markdown. Instructions here
+# are meant to say how to work, not to be a manual of the infra; agents look
+# facts up. Scripts may carry the Vault paths they read, which are already
+# public in the infra repo's mirror. agents-sync points core.hooksPath here.
+#
+# A deliberate exception is `git push --no-verify`.
+set -uo pipefail
+
+addr='\b(10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|192\.168\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3})\b|[a-z0-9-]\.lan\b|svc\.cluster\.local|\bk8s-(node[0-9]+|master)\b|\bproxmox-[0-9]\b'
+vault='\bsecret/[a-z]'
+zero=0000000000000000000000000000000000000000
+hits=""
+
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue          # deleting a remote branch
+  if [ "$remote_sha" = "$zero" ]; then range="$local_sha --not --remotes"
+  else range="$remote_sha..$local_sha"; fi
+  # $range is unquoted on purpose: it holds one or more git revision arguments
+  for c in $(git rev-list $range); do
+    found="$(git log -1 --format=%B "$c" | grep -nE "$addr" | sed "s|^|$c message:|")"
+    found="$found$(git show --format= --unified=0 "$c" | awk '
+      /^\+\+\+ b\// { file = substr($0, 7); next }
+      /^\+/ && !/^\+\+\+/ { print file ":" substr($0, 2) }' | grep -E "$addr" | sed "s|^|$c |")"
+    found="$found$(git show --format= --unified=0 "$c" -- '*.md' | grep -E '^\+' | grep -E "$vault" | sed "s|^|$c md:|")"
+    [ -n "$found" ] && hits="$hits$found"$'\n'
+  done
+done
+
+if [ -n "${hits//$'\n'/}" ]; then
+  echo "pre-push: refusing to publish internal details to a public repo:" >&2
+  printf '%s' "$hits" | sed 's/^/  /' | head -40 >&2
+  echo "Remove them, or push with --no-verify if this one is deliberate." >&2
+  exit 1
+fi
+exit 0
