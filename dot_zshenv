@@ -14,6 +14,7 @@ export CLAUDE_CODE_VERSION_OVERRIDE=latest
 
 # Cargo/Rust
 [[ -f "$HOME/.cargo/env"  ]] && . "$HOME/.cargo/env"
+export VAULT_ADDR=https://vault.viktorbarzin.me
 
 # agent-paste: keep its ssh() wrapper out of Claude Code shells. Claude's
 # shell snapshot drops the _agent_paste_* helper the wrapper calls, so bare
