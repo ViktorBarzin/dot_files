@@ -14,3 +14,10 @@ export CLAUDE_CODE_VERSION_OVERRIDE=latest
 
 # Cargo/Rust
 [[ -f "$HOME/.cargo/env"  ]] && . "$HOME/.cargo/env"
+
+# agent-paste: keep its ssh() wrapper out of Claude Code shells. Claude's
+# shell snapshot drops the _agent_paste_* helper the wrapper calls, so bare
+# `ssh` fails there. The hook skips itself when this is already set.
+if [[ -n "${CLAUDECODE:-}" ]]; then
+  AGENT_PASTE_SHELL_HOOK_LOADED=local-v1
+fi
