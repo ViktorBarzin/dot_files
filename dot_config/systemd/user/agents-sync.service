@@ -1,6 +1,6 @@
 [Unit]
-Description=Pull Viktor's agent instructions and rebuild ~/.agents/AGENTS.md
+Description=Sync ~/.agents, Viktor's agent instructions and skills, with the dotfiles repo
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/share/chezmoi/agents/bin/agents-sync
+ExecStart=%h/.agents/bin/agents-sync

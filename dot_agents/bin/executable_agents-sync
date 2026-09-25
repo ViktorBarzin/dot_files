@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# agents-sync: keep ~/.agents, this machine's agent instructions and skills, in
+# step with the dotfiles repo.
+#
+# ~/.agents is where these files live and where they get edited. chezmoi
+# manages it from dot_agents/ in the dotfiles repo, like any other dotfile:
+#   core.md               rules for every machine
+#   personal.md, work.md  rules for one kind of machine, the profile
+#   skills/<name>/        Viktor's own skills; the upstream ones beside them
+#                         come from the machine's skills updater
+#   bin/agents-sync       this script
+# Each run:
+#   1. saves edits made in ~/.agents to the repo (chezmoi re-add) and commits;
+#   2. pulls, pushes, and applies what other machines pushed;
+#   3. joins core.md with the profile into ~/.agents/AGENTS.md, the one file
+#      both harnesses load, read-only because edits belong in the parts;
+#   4. points ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md at that file, and
+#      ~/.claude/skills/<name> at ~/.agents/skills/<name>.
+# A systemd user timer runs it every 15 minutes; run it by hand after an edit
+# to see the change at once. A NEW skill is never picked up on its own, since
+# the repo is public: add one with `chezmoi add ~/.agents/skills/<name>`.
+#
+# Written for bash 3.2 and BSD tools as well, for the day a Mac joins.
+set -uo pipefail
+# A systemd user unit starts with a minimal PATH, and chezmoi lives in
+# ~/.local/bin on the devvm.
+PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"
+
+AG="$HOME/.agents"
+SRC="${AGENTS_SRC:-$(chezmoi source-path 2>/dev/null)}"
+SRC="${SRC:-$HOME/.local/share/chezmoi}"
+PROFILE="${AGENTS_PROFILE:-$(cat "$HOME/.config/agents/profile" 2>/dev/null || echo personal)}"
+HUB="$AG/AGENTS.md"
+BACKUP="$AG/backup/$(date +%Y%m%d-%H%M%S)"
+HOST="$(hostname -s 2>/dev/null || hostname)"
+status=0
+
+log() { echo "agents-sync: $*"; }
+cz() { chezmoi --source "$SRC" --no-tty "$@"; }
+
+# The pre-push hook that keeps internal addresses out of this public repo lives
+# in the repo. Point git at it on every pass, since chezmoi does not run its
+# once-scripts on a targeted apply.
+git -C "$SRC" config core.hooksPath .githooks
+
+# 1. Save edits made in ~/.agents. re-add copies every managed file whose
+#    content differs from the repo back into dot_agents/. Files chezmoi does
+#    not manage (the joined AGENTS.md, upstream skills, backups) stay out.
+if [ -d "$AG" ] && ! out="$(cz re-add "$AG" 2>&1)"; then
+  log "ERROR: chezmoi re-add failed, so nothing is applied over your edits: $out"
+  exit 1
+fi
+changed="$(git -C "$SRC" status --porcelain -- dot_agents | cut -c4-)"
+if [ -n "$changed" ]; then
+  git -C "$SRC" add -- dot_agents
+  # The pre-push hook refuses internal addresses, and a commit it refuses would
+  # block every push after it. So the same check runs before committing, and a
+  # refused edit stays uncommitted (and saved) until it is fixed in ~/.agents.
+  if ! out="$(cd "$SRC" && .githooks/pre-push --check-staged 2>&1)"; then
+    git -C "$SRC" reset -q -- dot_agents
+    log "ERROR: not committing, fix these in ~/.agents first: $out"
+    status=1
+  elif git -C "$SRC" commit -q -m "agents: save edits made in ~/.agents on $HOST" \
+       -m "$changed" -- dot_agents; then
+    log "committed: $(echo "$changed" | tr '\n' ' ')"
+  else
+    log "ERROR: could not commit the edits under dot_agents/"
+    status=1
+  fi
+fi
+
+# 2. Pull what other machines pushed, then push what this one committed. A
+#    fast-forward when only one side moved, a rebase when both did. Uncommitted
+#    changes elsewhere in the repo block only the rebase.
+before="$(git -C "$SRC" rev-parse HEAD)"
+if ! git -C "$SRC" pull --ff-only --quiet 2>/dev/null; then
+  if ! out="$(git -C "$SRC" pull --rebase --quiet 2>&1)"; then
+    git -C "$SRC" rebase --abort 2>/dev/null
+    log "WARN: could not pull, so this run uses the local copy: $out"
+    status=1
+  fi
+fi
+if [ -n "$(git -C "$SRC" rev-list '@{u}..HEAD' 2>/dev/null)" ]; then
+  if out="$(git -C "$SRC" push --quiet 2>&1)"; then
+    log "pushed"
+  else
+    log "WARN: push refused, the commit stays local until the next run: $out"
+    status=1
+  fi
+fi
+
+# Apply what the pull brought into ~/.agents, and anything the repo has that
+# ~/.agents lacks. Nothing else: after the re-add every managed file matches
+# the repo, so an apply with nothing new could only overwrite an edit saved in
+# the last few seconds.
+if [ "$before" != "$(git -C "$SRC" rev-parse HEAD)" ] \
+   || cz status "$AG" 2>/dev/null | grep -q '^.A'; then
+  if ! out="$(cz apply --force --keep-going "$AG" 2>&1)"; then
+    log "ERROR: chezmoi apply failed for $AG: $out"
+    status=1
+  fi
+fi
+
+# 3. Join core.md with the profile into the hub. Rewritten only when the text
+#    changes, and renamed into place so a starting session sees old or new.
+if [ ! -s "$AG/core.md" ] || [ ! -f "$AG/$PROFILE.md" ]; then
+  log "ERROR: $AG/core.md or $AG/$PROFILE.md missing; hub left as it is"
+  exit 1
+fi
+tmp="$(mktemp "$AG/.AGENTS.md.XXXXXX")"
+{
+  printf '<!-- Built by agents-sync from ~/.agents/{core,%s}.md; edit those. -->\n\n' "$PROFILE"
+  cat "$AG/core.md"
+  printf '\n'
+  cat "$AG/$PROFILE.md"
+} > "$tmp"
+if cmp -s "$tmp" "$HUB" 2>/dev/null; then
+  rm -f "$tmp"
+else
+  chmod 0444 "$tmp" && mv -f "$tmp" "$HUB" && log "rebuilt $HUB from core.md + $PROFILE.md"
+fi
+
+# 4. The links chezmoi manages for agents. A symlink entry replaces an existing
+#    file or directory without asking, so anything real in the way is moved to
+#    a dated backup first, outside the skills directories where it would load
+#    as a duplicate skill.
+links=("$HOME/.claude/CLAUDE.md" "$HOME/.codex/AGENTS.md")
+for entry in "$SRC"/dot_claude/skills/symlink_*; do
+  [ -e "$entry" ] || continue
+  name="$(basename "$entry" .tmpl)"; links+=("$HOME/.claude/skills/${name#symlink_}")
+done
+for entry in "$SRC"/dot_agents/skills/symlink_*; do
+  [ -e "$entry" ] || continue
+  name="$(basename "$entry" .tmpl)"; links+=("$AG/skills/${name#symlink_}")
+done
+for path in "${links[@]}"; do
+  mkdir -p "$(dirname "$path")"
+  if [ -e "$path" ] && [ ! -L "$path" ]; then
+    mkdir -p "$BACKUP" && mv "$path" "$BACKUP/" && log "moved $path to $BACKUP/"
+  fi
+done
+if ! out="$(cz apply --force --keep-going "${links[@]}" 2>&1)"; then
+  log "ERROR: chezmoi apply failed for the agent links: $out"
+  status=1
+fi
+exit "$status"

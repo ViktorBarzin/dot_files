@@ -88,27 +88,37 @@ Here are some of the highlights I tend to use more often:
 | `f`                                | `free -h`                                                                                                                                                                                                                                      | Check memory usage                                                                                              |
 | `speedtest`                        | `curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py \|python -`                                                                                                                                                 | speed test without needing the package installed locally                                                        |
 
-## Agent instructions
+## Agent instructions and skills
 
-`agents/` is the source of truth for the instructions Viktor's coding agents
-read, in the AGENTS.md format that Claude Code and Codex both use.
+`~/.agents` holds everything Viktor's coding agents read, in the formats Claude
+Code and Codex both use, and it is where those files get edited. chezmoi
+manages it from `dot_agents/` like any other dotfile.
 
-| file | holds |
+| in `~/.agents` | holds |
 |---|---|
-| `agents/core.md` | rules for every machine: how to talk, planning, verification, writing style |
-| `agents/personal.md` | rules for Viktor's own machines: homelab tools and workflow |
-| `agents/work.md` | rules for work machines (empty until one joins) |
-| `agents/skills/` | Viktor's own skills, linked into `~/.claude/skills/` |
+| `core.md` | rules for every machine: how to talk, planning, verification, writing style |
+| `personal.md` | rules for Viktor's own machines: homelab tools and workflow |
+| `work.md` | rules for work machines (empty until one joins) |
+| `skills/` | every skill: Viktor's own from this repo, upstream ones from the machine's skills updater |
+| `AGENTS.md` | `core.md` joined with the machine's profile, read-only, built on the machine |
+| `bin/agents-sync` | the sync script below |
 
-`agents/bin/agents-sync` pulls this repo, joins `core.md` with the machine's
-profile (`~/.config/agents/profile`, default `personal`) into a read-only
-`~/.agents/AGENTS.md`, and lets chezmoi place the links to it:
-`~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md` and the skill links. A systemd
-user timer runs it every 15 minutes. Edit the source files, commit, push, and
-run `agents-sync` to see the change straight away.
+Claude Code reads only `~/.claude`, so chezmoi links `~/.claude/CLAUDE.md` to
+`~/.agents/AGENTS.md` and `~/.claude/skills/<name>` to `~/.agents/skills/<name>`.
+Codex reads `~/.agents/skills` directly, and its `~/.codex/AGENTS.md` is a link
+to the same `AGENTS.md`.
+
+`agents-sync` runs every 15 minutes from a systemd user timer. It saves edits
+made in `~/.agents` back into `dot_agents/` (`chezmoi re-add`), commits and
+pushes them, pulls what other machines pushed, rebuilds `AGENTS.md` from
+`core.md` and the profile (`~/.config/agents/profile`, default `personal`), and
+fixes the links. Run it by hand after an edit to see the change at once. A new
+skill is never picked up on its own; add it with
+`chezmoi add ~/.agents/skills/<name>`.
 
 This repo is public, so the files say how to work and leave infra facts
 (addresses, hostnames, Vault paths) for agents to look up. The pre-push hook in
-`agents/githooks/` refuses a push that adds any; agents-sync sets
-`core.hooksPath` to it. Upstream skills (mattpocock/skills and others) are not
-copied here: the machine's skills updater installs and refreshes them.
+`.githooks/` refuses a push that adds any, including one agents-sync makes;
+agents-sync sets `core.hooksPath` to it. Upstream skills (mattpocock/skills and
+others) are not copied here: the machine's skills updater installs and
+refreshes them in `~/.agents/skills`.

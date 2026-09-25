@@ -6,17 +6,22 @@
 .claude/settings.json
 {{ end }}
 
-# Agent instructions (2026-09-22). agents/ holds the source files: core.md,
-# personal.md, work.md and Viktor's own skills. agents-sync joins core.md with
-# the machine's profile into ~/.agents/AGENTS.md; chezmoi only places the links
-# to it. Without this line, agents/ would land in ~/agents/.
-agents/**
+# Agent files (2026-09-22; ~/.agents since 2026-09-25). chezmoi manages
+# ~/.agents from dot_agents/ like any other dotfile, and agents-sync saves edits
+# made there back here. These are made on the machine and never belong in the
+# repo: the joined AGENTS.md, agents-sync's backups, and the lockfile of the
+# upstream skills the skills updater installs beside Viktor's own.
+.agents/AGENTS.md
+.agents/backup
+.agents/backup/**
+.agents/.skill-lock.json
 
 # macOS is a work machine: its ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md are
 # employer files, and a symlink entry replaces an existing file or directory
 # without asking. Keep every agent entry off it until it joins with the work
 # profile through an import.
 {{ if eq .chezmoi.os "darwin" }}
+.agents/**
 .claude/CLAUDE.md
 .codex/AGENTS.md
 .claude/skills/**

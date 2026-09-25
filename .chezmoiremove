@@ -1,6 +1,9 @@
 # Retired copies of the old shared rules (2026-09-22). Each machine's agent
-# instructions now come from agents/ via agents-sync.
+# instructions now come from ~/.agents via agents-sync.
 .claude/rules/execution.md
 .claude/rules/planning.md
 .claude/rules/quality.md
 .claude/rules/40-style.md
+# The link that let Codex read ~/.claude/skills (2026-07-24). Codex reads
+# ~/.agents/skills directly, and every skill lives there since 2026-09-25.
+.codex/skills/claude
