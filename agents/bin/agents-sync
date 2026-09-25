@@ -12,6 +12,10 @@
 # Written for bash 3.2 and BSD tools as well, for the day a Mac joins.
 set -uo pipefail
 
+# A systemd user unit or a launchd agent starts with a minimal PATH, which
+# misses the per-user installs of chezmoi (~/.local/bin) and node (~/bin).
+PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"
+
 SRC="${AGENTS_SRC:-$HOME/.local/share/chezmoi}"
 PROFILE="${AGENTS_PROFILE:-$(cat "$HOME/.config/agents/profile" 2>/dev/null || echo personal)}"
 HUB="$HOME/.agents/AGENTS.md"
