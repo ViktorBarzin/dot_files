@@ -123,3 +123,18 @@ This repo is public, so the files say how to work and leave infra facts
 agents-sync sets `core.hooksPath` to it. Upstream skills (mattpocock/skills and
 others) are not copied here: the machine's skills updater installs and
 refreshes them in `~/.agents/skills`.
+
+## Git hooks for repos under ~/code
+
+Two local git hooks live outside any repo's history, so this repo carries the
+scripts behind them in `dot_claude/hooks/`: `gitleaks-pre-commit.sh` blocks a
+commit that adds a secret, and `beads-auto-close-post-commit.sh` closes the beads
+a commit names and prints the session checkpoint. Each repo gets a two-line shim
+in `.git/hooks/` pointing at them. After cloning repos under `~/code` on a new
+machine, run the installers once; they skip a repo whose hook already differs:
+
+```sh
+~/.claude/hooks/install-gitleaks-pre-commit.sh
+~/.claude/hooks/install-beads-post-commit.sh
+```
+

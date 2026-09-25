@@ -4,6 +4,18 @@
 # 0600 and overwrite the homelab config). Other machines keep it chezmoi-managed.
 {{ if eq .chezmoi.hostname "devvm" }}
 .claude/settings.json
+# The devvm provisioner installs these org hooks from infra's
+# scripts/workstation/claude-hooks and keeps them current; the copies here are
+# older ones kept for other machines' settings.json, and the last four are hooks
+# from the retired memory MCP. A whole-tree apply must not write any of them.
+.claude/hooks/auto-learn.py
+.claude/hooks/post-compact-recovery.sh
+.claude/hooks/pre-compact-backup.sh
+.claude/hooks/unslop-check.py
+.claude/hooks/auto-allow-memory-tools.py
+.claude/hooks/memory-sync.py
+.claude/hooks/post-commit-memory.py
+.claude/hooks/user-prompt-recall.py
 {{ end }}
 
 # Agent files (2026-09-22; ~/.agents since 2026-09-25). chezmoi manages
