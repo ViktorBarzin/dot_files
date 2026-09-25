@@ -40,15 +40,20 @@ mail.py accounts                                   # list the 3 mailboxes
 mail.py folders   --account me                     # list IMAP folders
 mail.py search    --account gmail --unseen --limit 20
 mail.py search    --account me --from x@y.com --since 2026-01-01 --subject invoice
-mail.py read      --account me --folder INBOX --uid 1234        # body + attachment list
+mail.py read      --account me --folder INBOX --uid 1234        # body, attachments, Message-ID
 mail.py scan-pdfs --account all --out /tmp/scan.json            # all msgs with PDF attachments
 mail.py get-attachment --account gmail --folder "[Gmail]/All Mail" --uid 99 --out /tmp/pdfs
 mail.py draft     --account me --to a@b.com --subject "Hi" --body "..."   # saves to Drafts
 mail.py send      --account me --to a@b.com --subject "Hi" --body "..." [--cc] [--bcc] [--attach FILE]
+mail.py send      --account me --to a@b.com --subject "Re: Hi" --body "..." --in-reply-to "<msg-id>"   # threaded reply
 ```
 
 - **Reads never mark messages seen** (uses `BODY.PEEK`) unless you pass
   `--mark-seen` to `read`.
+- **Reply in-thread** by passing the original's Message-ID (printed by `read`)
+  to `--in-reply-to` on `send` or `draft`; `--references` defaults to it.
+  Helpdesk systems such as ServiceNow attach an in-thread reply to the
+  existing case, where a fresh email opens a new one.
 - `scan-pdfs` uses Gmail's `X-GM-RAW filename:pdf` for Gmail and BODYSTRUCTURE
   inspection elsewhere; default folders are INBOX+Archive (me/spam) and All Mail
   (gmail). Output is JSON: `[{account, folder, uid, date, from, subject, pdfs:[{name,size}]}]`.
