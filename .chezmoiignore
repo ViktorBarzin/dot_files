@@ -24,6 +24,7 @@
 .agents/**
 .claude/CLAUDE.md
 .codex/AGENTS.md
+.pi/agent/AGENTS.md
 .claude/skills/**
 .config/systemd/**
 {{ end }}

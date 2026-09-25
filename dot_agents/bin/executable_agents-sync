@@ -13,9 +13,9 @@
 #   1. saves edits made in ~/.agents to the repo (chezmoi re-add) and commits;
 #   2. pulls, pushes, and applies what other machines pushed;
 #   3. joins core.md with the profile into ~/.agents/AGENTS.md, the one file
-#      both harnesses load, read-only because edits belong in the parts;
-#   4. points ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md at that file, and
-#      ~/.claude/skills/<name> at ~/.agents/skills/<name>.
+#      every harness loads, read-only because edits belong in the parts;
+#   4. points ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and ~/.pi/agent/AGENTS.md
+#      at that file, and ~/.claude/skills/<name> at ~/.agents/skills/<name>.
 # A systemd user timer runs it every 15 minutes; run it by hand after an edit
 # to see the change at once. A NEW skill is never picked up on its own, since
 # the repo is public: add one with `chezmoi add ~/.agents/skills/<name>`.
@@ -124,7 +124,7 @@ fi
 #    file or directory without asking, so anything real in the way is moved to
 #    a dated backup first, outside the skills directories where it would load
 #    as a duplicate skill.
-links=("$HOME/.claude/CLAUDE.md" "$HOME/.codex/AGENTS.md")
+links=("$HOME/.claude/CLAUDE.md" "$HOME/.codex/AGENTS.md" "$HOME/.pi/agent/AGENTS.md")
 for entry in "$SRC"/dot_claude/skills/symlink_*; do
   [ -e "$entry" ] || continue
   name="$(basename "$entry" .tmpl)"; links+=("$HOME/.claude/skills/${name#symlink_}")

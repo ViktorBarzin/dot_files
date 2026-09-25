@@ -91,7 +91,7 @@ Here are some of the highlights I tend to use more often:
 ## Agent instructions and skills
 
 `~/.agents` holds everything Viktor's coding agents read, in the formats Claude
-Code and Codex both use, and it is where those files get edited. chezmoi
+Code, Codex and pi all use, and it is where those files get edited. chezmoi
 manages it from `dot_agents/` like any other dotfile.
 
 | in `~/.agents` | holds |
@@ -105,8 +105,9 @@ manages it from `dot_agents/` like any other dotfile.
 
 Claude Code reads only `~/.claude`, so chezmoi links `~/.claude/CLAUDE.md` to
 `~/.agents/AGENTS.md` and `~/.claude/skills/<name>` to `~/.agents/skills/<name>`.
-Codex reads `~/.agents/skills` directly, and its `~/.codex/AGENTS.md` is a link
-to the same `AGENTS.md`.
+Codex and pi read `~/.agents/skills` directly, and their instruction files,
+`~/.codex/AGENTS.md` and `~/.pi/agent/AGENTS.md`, are links to the same
+`AGENTS.md`.
 
 `agents-sync` runs every 15 minutes from a systemd user timer. It saves edits
 made in `~/.agents` back into `dot_agents/` (`chezmoi re-add`), commits and
