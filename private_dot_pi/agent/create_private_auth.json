@@ -1,0 +1,6 @@
+{
+  "anthropic": {
+    "type": "api_key",
+    "key": "!sed -n 's/^CLAUDE_CODE_OAUTH_TOKEN=//p' /home/wizard/.config/claude-auth-sync/claude-oauth.env"
+  }
+}

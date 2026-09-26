@@ -1,0 +1,9 @@
+{
+  "capture": {
+    "keepVisible": [
+      "fabric_exec",
+      "ask_user_question"
+    ]
+  },
+  "configVersion": 4
+}

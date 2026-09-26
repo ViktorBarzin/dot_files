@@ -1,0 +1,6 @@
+{
+  "packages": [
+    "npm:pi-fabric",
+    "npm:@juicesharp/rpiv-ask-user-question"
+  ]
+}
