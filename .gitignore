@@ -1,3 +1,4 @@
 *tmp*
 !*.tmpl
 .ropeproject
+.worktrees/
