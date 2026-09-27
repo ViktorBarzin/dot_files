@@ -148,17 +148,32 @@ def default_gateway() -> str:
     return ""
 
 
+def current_wifi(system_profiler_text: str) -> str:
+    """The "Current Network Information" block: channel, signal/noise, rate."""
+    lines = system_profiler_text.splitlines()
+    for i, line in enumerate(lines):
+        if line.strip() == "Current Network Information:":
+            block = []
+            for rest in lines[i:]:
+                if rest.strip() == "Other Local Wi-Fi Networks:":
+                    break
+                block.append(rest)
+            return "\n".join(block)
+    return "(no current network)"
+
+
 def snapshot() -> str:
     parts = []
     for title, cmd in (
         ("route get default", ["/sbin/route", "-n", "get", "default"]),
         ("ipconfig getsummary en0", ["/usr/sbin/ipconfig", "getsummary", "en0"]),
-        ("wifi", ["/usr/sbin/system_profiler", "SPAirPortDataType", "-detailLevel", "basic"]),
         ("utun interfaces", ["/bin/sh", "-c", "/sbin/ifconfig | grep -E '^utun|inet ' "]),
         ("scutil --dns", ["/usr/sbin/scutil", "--dns"]),
     ):
         r = run(cmd, timeout=10)
         parts.append(f"== {title}\n{(r.stdout or r.stderr)[:3000]}")
+    r = run(["/usr/sbin/system_profiler", "SPAirPortDataType"], timeout=15)
+    parts.append(f"== wifi\n{current_wifi(r.stdout)}")
     return "\n".join(parts)
 
 

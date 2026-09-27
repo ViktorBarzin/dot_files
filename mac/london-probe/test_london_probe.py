@@ -1,7 +1,7 @@
 """Tests for the drop detector in london_probe.py (run: python3 -m unittest)."""
 import unittest
 
-from london_probe import Detector, Sample
+from london_probe import Detector, Sample, current_wifi
 
 
 def s(t, flint=True, public=True, dns=None):
@@ -68,6 +68,30 @@ class DetectorTest(unittest.TestCase):
     def test_active_reports_drop_in_progress(self):
         d, _ = self.feed([s(t, public=False) for t in range(0, 6)])
         self.assertTrue(d.active)
+
+
+class CurrentWifiTest(unittest.TestCase):
+    def test_keeps_only_the_current_network_block(self):
+        text = """Wi-Fi:
+      Supported Channels: 1 (2GHz), 2 (2GHz), 36 (5GHz)
+      Current Network Information:
+        <redacted>:
+          PHY Mode: 802.11ax
+          Channel: 44 (5GHz, 80MHz)
+          Signal / Noise: -38 dBm / -92 dBm
+          Transmit Rate: 1201
+      Other Local Wi-Fi Networks:
+        Neighbour:
+          Channel: 1 (2GHz, 20MHz)
+"""
+        out = current_wifi(text)
+        self.assertIn("Channel: 44 (5GHz, 80MHz)", out)
+        self.assertIn("Signal / Noise: -38 dBm / -92 dBm", out)
+        self.assertNotIn("Supported Channels", out)
+        self.assertNotIn("Neighbour", out)
+
+    def test_not_associated_returns_marker(self):
+        self.assertEqual(current_wifi("Wi-Fi:\n  Status: Off\n"), "(no current network)")
 
 
 if __name__ == "__main__":
