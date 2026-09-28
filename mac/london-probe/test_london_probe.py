@@ -1,7 +1,9 @@
 """Tests for the drop detector in london_probe.py (run: python3 -m unittest)."""
 import unittest
 
-from london_probe import Detector, Sample, current_wifi
+import socket
+
+from london_probe import Detector, Sample, current_wifi, tcp_reachable
 
 
 def s(t, flint=True, public=True, dns=None):
@@ -92,6 +94,27 @@ class CurrentWifiTest(unittest.TestCase):
 
     def test_not_associated_returns_marker(self):
         self.assertEqual(current_wifi("Wi-Fi:\n  Status: Off\n"), "(no current network)")
+
+
+class TcpReachableTest(unittest.TestCase):
+    def test_listening_port_is_reachable(self):
+        srv = socket.socket()
+        srv.bind(("127.0.0.1", 0))
+        srv.listen(1)
+        try:
+            self.assertTrue(tcp_reachable("127.0.0.1", srv.getsockname()[1]))
+        finally:
+            srv.close()
+
+    def test_refused_port_still_proves_the_path(self):
+        s = socket.socket()
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+        s.close()
+        self.assertTrue(tcp_reachable("127.0.0.1", port))
+
+    def test_silent_address_is_not_reachable(self):
+        self.assertFalse(tcp_reachable("192.0.2.1", 80, timeout=0.3))
 
 
 if __name__ == "__main__":

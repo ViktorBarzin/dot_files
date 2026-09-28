@@ -2,15 +2,17 @@
 """London internet-drop probe for the Mac (launchd agent).
 
 Runs only while the Mac is on the London Flint's networks (default gateway
-192.168.8.1 or 192.168.9.1). Once a second it pings the Flint and two public
-IPs; every 5 seconds it asks the Flint's DNS for a name. A drop is 5+ seconds
-of failed public pings, or 2+ failed DNS lookups while pings work. Each drop is
+192.168.8.1 or 192.168.9.1). Once a second it opens a TCP connection to the Flint and to two
+public IPs from different providers; every 5 seconds it asks the Flint's DNS
+for a name. TCP, not ping: behind the Hyperoptic router a fresh one-shot ping
+out of the WAN failed about half the time while TCP never did (2026-09-28). A drop is 5+ seconds
+of failed public connections, or 2+ failed DNS lookups while they work. Each drop is
 classified by layer:
 
   wifi        the Flint itself stopped answering (the Mac's own link)
   internet    the Flint answers, the internet does not (upstream; the Flint's
               own probe reports these, so they are recorded but not alerted)
-  client-dns  pings work, the Flint's DNS does not answer the Mac
+  client-dns  connections work, the Flint's DNS does not answer the Mac
 
 When the drop ends, one event is queued and pushed to Loki
 ({job="london-drops", source="mac"}), retried until Loki accepts it, stamped
@@ -22,6 +24,7 @@ import collections
 import concurrent.futures
 import json
 import os
+import socket
 import subprocess
 import time
 from dataclasses import dataclass, field
@@ -29,7 +32,8 @@ from pathlib import Path
 from typing import Deque, List, Optional
 
 FLINT_GATEWAYS = ("192.168.8.1", "192.168.9.1")
-PUBLIC = ("1.1.1.1", "9.9.9.9")
+FLINT_PORT = 80  # GL admin UI; the guest network answers with a reject, which still proves the path
+PUBLIC = (("1.1.1.1", 80), ("8.8.8.8", 443))
 DNS_NAME = "example.com"
 LOKI_HOST = "loki.viktorbarzin.lan"
 LOKI_IP = "10.0.20.203"  # Traefik; the cert does not cover .lan, the path is the tunnel
@@ -130,8 +134,15 @@ def run(cmd: List[str], timeout: float = 3) -> subprocess.CompletedProcess:
         return subprocess.CompletedProcess(cmd, 124, "", "timeout")
 
 
-def ping(host: str) -> bool:
-    return run(["/sbin/ping", "-c", "1", "-t", "1", "-q", host]).returncode == 0
+def tcp_reachable(host: str, port: int, timeout: float = 1.0) -> bool:
+    """True if the host answered at all: a completed connection or a refusal."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except ConnectionRefusedError:
+        return True
+    except OSError:
+        return False
 
 
 def dns_ok(server: str) -> bool:
@@ -245,8 +256,8 @@ def main() -> None:
             time.sleep(5)
             continue
 
-        f_flint = pool.submit(ping, gw)
-        f_pub = [pool.submit(ping, h) for h in PUBLIC]
+        f_flint = pool.submit(tcp_reachable, gw, FLINT_PORT)
+        f_pub = [pool.submit(tcp_reachable, h, p) for h, p in PUBLIC]
         flint = f_flint.result()
         public = any(f.result() for f in f_pub)
         dns: Optional[bool] = None
