@@ -11,8 +11,10 @@ def s(t, flint=True, public=True, dns=None):
 
 
 class DetectorTest(unittest.TestCase):
+    """Thresholds are in seconds; samples arrive every 10 s, every 2 s after a failure."""
+
     def feed(self, samples):
-        d = Detector(drop_after=5, dns_drop_after=2)
+        d = Detector(drop_after=30, dns_drop_after=30)
         events = []
         for x in samples:
             ev = d.observe(x)
@@ -20,56 +22,67 @@ class DetectorTest(unittest.TestCase):
                 events.append(ev)
         return d, events
 
-    def test_short_public_blip_is_not_a_drop(self):
-        _, events = self.feed([s(0), s(1, public=False), s(2, public=False), s(3, public=False), s(4)])
+    def test_blip_under_30s_is_not_a_drop(self):
+        samples = [s(0)] + [s(t, public=False) for t in range(10, 40, 2)] + [s(40)]
+        _, events = self.feed(samples)
         self.assertEqual(events, [])
 
-    def test_public_loss_with_flint_up_is_internet_drop(self):
-        samples = [s(t, public=False) for t in range(10, 17)] + [s(17)]
+    def test_public_loss_of_30s_with_flint_up_is_internet_drop(self):
+        samples = [s(0)] + [s(t, public=False) for t in range(10, 44, 2)] + [s(44)]
         _, events = self.feed(samples)
         self.assertEqual(len(events), 1)
         ev = events[0]
         self.assertEqual(ev.layer, "internet")
         self.assertEqual(ev.start, 10)
-        self.assertEqual(ev.end, 17)
-        self.assertEqual(ev.duration_s, 7)
+        self.assertEqual(ev.end, 44)
+        self.assertEqual(ev.duration_s, 34)
 
     def test_flint_unreachable_is_wifi_drop(self):
-        samples = [s(t, flint=False, public=False) for t in range(0, 6)] + [s(6)]
+        samples = [s(t, flint=False, public=False) for t in range(0, 32, 2)] + [s(32)]
         _, events = self.feed(samples)
         self.assertEqual([e.layer for e in events], ["wifi"])
 
     def test_wifi_wins_if_flint_drops_at_any_point_of_the_drop(self):
-        samples = [s(0, public=False), s(1, public=False), s(2, flint=False, public=False),
-                   s(3, public=False), s(4, public=False), s(5)]
-        _, events = self.feed(samples)
+        samples = [s(t, public=False) for t in range(0, 32, 2)]
+        samples[3] = s(6, flint=False, public=False)
+        _, events = self.feed(samples + [s(32)])
         self.assertEqual([e.layer for e in events], ["wifi"])
 
-    def test_dns_failures_with_ping_ok_are_client_dns_drop(self):
-        samples = [s(0, dns=False), s(5, dns=False), s(10, dns=True)]
+    def test_dns_failing_for_30s_with_connections_ok_is_client_dns_drop(self):
+        samples = [s(t, dns=False) for t in range(0, 32, 2)] + [s(32, dns=True)]
         _, events = self.feed(samples)
         self.assertEqual(len(events), 1)
         self.assertEqual(events[0].layer, "client-dns")
         self.assertEqual(events[0].start, 0)
-        self.assertEqual(events[0].end, 10)
+        self.assertEqual(events[0].end, 32)
 
-    def test_single_dns_failure_is_not_a_drop(self):
-        _, events = self.feed([s(0, dns=False), s(5, dns=True)])
+    def test_short_dns_failure_is_not_a_drop(self):
+        _, events = self.feed([s(0, dns=False), s(2, dns=False), s(4, dns=True)])
         self.assertEqual(events, [])
 
     def test_dns_is_not_judged_while_public_is_down(self):
-        samples = [s(t, public=False, dns=False) for t in range(0, 6)] + [s(6, dns=True)]
+        samples = [s(t, public=False, dns=False) for t in range(0, 32, 2)] + [s(32, dns=True)]
         _, events = self.feed(samples)
         self.assertEqual([e.layer for e in events], ["internet"])
 
     def test_drop_id_is_stable_and_prefixed(self):
-        samples = [s(t, public=False) for t in range(100, 106)] + [s(106)]
+        samples = [s(t, public=False) for t in range(100, 132, 2)] + [s(132)]
         _, events = self.feed(samples)
         self.assertEqual(events[0].drop_id, "mac-100")
 
     def test_active_reports_drop_in_progress(self):
-        d, _ = self.feed([s(t, public=False) for t in range(0, 6)])
+        d, _ = self.feed([s(t, public=False) for t in range(0, 32, 2)])
         self.assertTrue(d.active)
+
+    def test_pending_after_any_failure_and_clear_after_recovery(self):
+        d, _ = self.feed([s(0), s(10, public=False)])
+        self.assertTrue(d.pending)
+        d.observe(s(12))
+        self.assertFalse(d.pending)
+        d.observe(s(20, dns=False))
+        self.assertTrue(d.pending)
+        d.observe(s(22, dns=True))
+        self.assertFalse(d.pending)
 
 
 class CurrentWifiTest(unittest.TestCase):

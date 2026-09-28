@@ -2,11 +2,13 @@
 """London internet-drop probe for the Mac (launchd agent).
 
 Runs only while the Mac is on the London Flint's networks (default gateway
-192.168.8.1 or 192.168.9.1). Once a second it opens a TCP connection to the Flint and to two
-public IPs from different providers; every 5 seconds it asks the Flint's DNS
-for a name. TCP, not ping: behind the Hyperoptic router a fresh one-shot ping
-out of the WAN failed about half the time while TCP never did (2026-09-28). A drop is 5+ seconds
-of failed public connections, or 2+ failed DNS lookups while they work. Each drop is
+192.168.8.1 or 192.168.9.1). Every 10 seconds it opens TCP connections to the
+Flint and to two public IPs from different providers, and every 30 seconds it
+asks the Flint's DNS for a name; after a failure it rechecks every 2 seconds.
+A drop is 30+ seconds of failed public connections, or 30+ seconds of failed
+DNS while connections work; shorter blips are not reported (Viktor,
+2026-09-28). TCP, not ping: behind the Hyperoptic router a fresh one-shot ping
+out of the WAN failed about half the time while TCP never did. Each drop is
 classified by layer:
 
   wifi        the Flint itself stopped answering (the Mac's own link)
@@ -32,6 +34,9 @@ from pathlib import Path
 from typing import Deque, List, Optional
 
 FLINT_GATEWAYS = ("192.168.8.1", "192.168.9.1")
+CHECK_EVERY = 10  # seconds between checks while healthy
+RECHECK_EVERY = 2  # seconds between checks after a failure, to time the drop
+DNS_EVERY = 30
 FLINT_PORT = 80  # GL admin UI; the guest network answers with a reject, which still proves the path
 PUBLIC = (("1.1.1.1", 80), ("8.8.8.8", 443))
 DNS_NAME = "example.com"
@@ -69,12 +74,11 @@ class Drop:
 class Detector:
     """Turns per-second samples into finished drops."""
 
-    def __init__(self, drop_after: int = 5, dns_drop_after: int = 2) -> None:
+    def __init__(self, drop_after: int = 30, dns_drop_after: int = 30) -> None:
         self.drop_after = drop_after
         self.dns_drop_after = dns_drop_after
         self.first_fail: Optional[int] = None
         self.flint_failed = False
-        self.dns_fails = 0
         self.dns_first_fail: Optional[int] = None
         self.current: Optional[Drop] = None
         self.recent: Deque[Sample] = collections.deque(maxlen=30)
@@ -83,6 +87,11 @@ class Detector:
     def active(self) -> bool:
         return self.current is not None
 
+    @property
+    def pending(self) -> bool:
+        """A check has failed and not yet recovered: time to recheck fast."""
+        return self.first_fail is not None or self.dns_first_fail is not None
+
     def observe(self, x: Sample) -> Optional[Drop]:
         self.recent.append(x)
         if not x.public:
@@ -90,7 +99,7 @@ class Detector:
                 self.first_fail = x.t
             if not x.flint:
                 self.flint_failed = True
-            if self.current is None and x.t - self.first_fail + 1 >= self.drop_after:
+            if self.current is None and x.t - self.first_fail >= self.drop_after:
                 self.current = Drop(start=self.first_fail, end=x.t, layer="")
             if self.current is not None and self.current.layer != "client-dns":
                 self.current.layer = "wifi" if self.flint_failed else "internet"
@@ -105,13 +114,11 @@ class Detector:
         if x.dns is True:
             if self.current is not None and self.current.layer == "client-dns":
                 finished = self._finish(x.t)
-            self.dns_fails = 0
             self.dns_first_fail = None
         elif x.dns is False:
             if self.dns_first_fail is None:
                 self.dns_first_fail = x.t
-            self.dns_fails += 1
-            if self.current is None and self.dns_fails >= self.dns_drop_after:
+            if self.current is None and x.t - self.dns_first_fail >= self.dns_drop_after:
                 self.current = Drop(start=self.dns_first_fail, end=x.t, layer="client-dns")
         return finished
 
@@ -253,7 +260,7 @@ def main() -> None:
             # A drop in progress on the Flint's network cannot be judged here.
             if detector.active:
                 detector = Detector()
-            time.sleep(5)
+            time.sleep(CHECK_EVERY)
             continue
 
         f_flint = pool.submit(tcp_reachable, gw, FLINT_PORT)
@@ -261,7 +268,8 @@ def main() -> None:
         flint = f_flint.result()
         public = any(f.result() for f in f_pub)
         dns: Optional[bool] = None
-        if public and now - last_dns >= 5:
+        dns_every = RECHECK_EVERY if detector.dns_first_fail is not None else DNS_EVERY
+        if public and now - last_dns >= dns_every:
             last_dns = now
             dns = dns_ok(gw)
 
@@ -283,7 +291,8 @@ def main() -> None:
             except OSError as e:
                 log(f"flush failed: {e}")
 
-        time.sleep(max(0.0, 1.0 - (time.time() - tick)))
+        every = RECHECK_EVERY if detector.pending else CHECK_EVERY
+        time.sleep(max(0.0, every - (time.time() - tick)))
 
 
 if __name__ == "__main__":
