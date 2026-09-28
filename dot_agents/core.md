@@ -99,9 +99,7 @@ the conversation is in.
 Scope: what you say in chat, and commit messages. Markdown you author follows
 the doc-tone section (see "Writing style — every markdown I author (Viktor, 2026-08-08)" above) instead.
 
-`~/.claude/hooks/unslop-check.py` checks the finished reply and asks for a
-rewrite when a mechanical tell survives. It only catches what a regex can judge,
-so everything under "Voice" is yours to hold. Replies written mostly in Cyrillic
+Replies written mostly in Cyrillic
 keep their dashes, since the dash is ordinary punctuation in Bulgarian and
 Russian.
 

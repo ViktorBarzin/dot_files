@@ -7,3 +7,6 @@
 # The link that let Codex read ~/.claude/skills (2026-07-24). Codex reads
 # ~/.agents/skills directly, and every skill lives there since 2026-09-25.
 .codex/skills/claude
+# The unslop-check style hook (removed 2026-09-28, infra ae249f01): each block
+# showed the reply twice.
+.claude/hooks/unslop-check.py
