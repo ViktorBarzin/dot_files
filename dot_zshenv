@@ -16,9 +16,7 @@ export CLAUDE_CODE_VERSION_OVERRIDE=latest
 [[ -f "$HOME/.cargo/env"  ]] && . "$HOME/.cargo/env"
 export VAULT_ADDR=https://vault.viktorbarzin.me
 
-# agent-paste: keep its ssh() wrapper out of Claude Code shells. Claude's
-# shell snapshot drops the _agent_paste_* helper the wrapper calls, so bare
-# `ssh` fails there. The hook skips itself when this is already set.
-if [[ -n "${CLAUDECODE:-}" ]]; then
-  AGENT_PASTE_SHELL_HOOK_LOADED=local-v1
-fi
+# agent-paste is off on this box. The Mac side re-appends its hook line to
+# ~/.zshrc and ~/.bashrc whenever it is missing, so removing the line is not
+# enough. The hook returns early when this is already set, so no client starts.
+AGENT_PASTE_SHELL_HOOK_LOADED=local-v1
