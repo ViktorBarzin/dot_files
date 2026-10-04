@@ -246,5 +246,6 @@ stored.
   `homelab memory` CLI (the claude-memory MCP is retired).
 - **Stopping before memory extraction** — finish through the memory step
   (Phase 3 step 8); the memory sweep is part of every wrap-up.
-- **Forgetting a handoff** — this skill does NOT write a continuation doc; if
-  the next session needs context, also run the `handoff` skill.
+- **Forgetting the next session** — this skill does NOT write a continuation
+  doc; if the next session needs context, store it with `homelab memory` or
+  in the task's plan doc.
