@@ -1,24 +1,31 @@
 #!/usr/bin/env bash
-# agents-sync: keep ~/.agents, this machine's agent instructions and skills, in
-# step with the dotfiles repo.
+# agents-sync: back up ~/.agents, this machine's agent instructions and skills,
+# to the dotfiles repo, and keep what is built from it current.
 #
-# ~/.agents is where these files live and where they get edited. chezmoi
-# manages it from dot_agents/ in the dotfiles repo, like any other dotfile:
+# ~/.agents is the source of truth. Edit, add or delete files there, and the
+# next run carries the change into dot_agents/ in the dotfiles repo, commits it
+# and pushes it. chezmoi maps one to the other:
 #   core.md               rules for every machine
 #   personal.md, work.md  rules for one kind of machine, the profile
 #   skills/<name>/        Viktor's own skills; the upstream ones beside them
-#                         come from the machine's skills updater
+#                         come from the machine's skills updater and stay out
 #   bin/agents-sync       this script
 # Each run:
-#   1. saves edits made in ~/.agents to the repo (chezmoi re-add) and commits;
-#   2. pulls, pushes, and applies what other machines pushed;
-#   3. joins core.md with the profile into ~/.agents/AGENTS.md, the one file
+#   1. saves ~/.agents: edits (chezmoi re-add), deletions (chezmoi forget), and
+#      new files once they are two minutes old (chezmoi add); a new skill also
+#      gets its ~/.claude/skills link, and a deleted one loses it;
+#   2. checks the change for internal details and secrets, holds back each file
+#      that fails, and commits the rest;
+#   3. pulls, pushes, and applies what the pull changed;
+#   4. joins core.md with the profile into ~/.agents/AGENTS.md, the one file
 #      every harness loads, read-only because edits belong in the parts;
-#   4. points ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and ~/.pi/agent/AGENTS.md
+#   5. points ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and ~/.pi/agent/AGENTS.md
 #      at that file, and ~/.claude/skills/<name> at ~/.agents/skills/<name>.
 # A systemd user timer runs it every 15 minutes; run it by hand after an edit
-# to see the change at once. A NEW skill is never picked up on its own, since
-# the repo is public: add one with `chezmoi add ~/.agents/skills/<name>`.
+# to see the change at once. It reports to the journal:
+#   journalctl --user -u agents-sync
+# .chezmoiignore lists what never goes in: the built hub, backups, the skills
+# lockfile, the upstream skills it names, and caches.
 #
 # Written for bash 3.2 and BSD tools as well, for the day a Mac joins.
 set -uo pipefail
@@ -33,43 +40,145 @@ PROFILE="${AGENTS_PROFILE:-$(cat "$HOME/.config/agents/profile" 2>/dev/null || e
 HUB="$AG/AGENTS.md"
 BACKUP="$AG/backup/$(date +%Y%m%d-%H%M%S)"
 HOST="$(hostname -s 2>/dev/null || hostname)"
+# Where in the repo the files this script saves live.
+SAVED=(dot_agents dot_claude/skills)
 status=0
+checklog="$(mktemp)"
+trap 'rm -f "$checklog"' EXIT
 
 log() { echo "agents-sync: $*"; }
 cz() { chezmoi --source "$SRC" --no-tty "$@"; }
+# The names of the entries chezmoi manages directly under a folder.
+names_under() { cz managed --include="$2" "$1" 2>/dev/null | sed -n "s|^${1#"$HOME"/}/\([^/]*\)\$|\1|p"; }
 
 # The pre-push hook that keeps internal addresses out of this public repo lives
 # in the repo. Point git at it on every pass, since chezmoi does not run its
 # once-scripts on a targeted apply.
 git -C "$SRC" config core.hooksPath .githooks
 
-# 1. Save edits made in ~/.agents. re-add copies every managed file whose
-#    content differs from the repo back into dot_agents/. Files chezmoi does
-#    not manage (the joined AGENTS.md, upstream skills, backups) stay out.
-if [ -d "$AG" ] && ! out="$(cz re-add "$AG" 2>&1)"; then
-  log "ERROR: chezmoi re-add failed, so nothing is applied over your edits: $out"
-  exit 1
+# 1. Save ~/.agents.
+if [ -d "$AG" ]; then
+  # Edits to files the repo already has.
+  if ! out="$(cz re-add "$AG" 2>&1)"; then
+    log "ERROR: chezmoi re-add failed, so nothing is applied over your edits: $out"
+    exit 1
+  fi
+
+  # Deletions. chezmoi marks a file it wrote that is now gone with D, and one it
+  # would create with A, so DA is a file deleted here. One it never wrote
+  # (" A", as on a fresh machine) is applied in step 3 instead. A folder counts
+  # once. More than ten in one run look like an accident rather than a cleanup,
+  # so they wait for AGENTS_SYNC_DELETE_MANY=1.
+  gone=()
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    if [ "${#gone[@]}" -gt 0 ]; then
+      case "$rel" in "${gone[${#gone[@]}-1]}"/*) continue ;; esac
+    fi
+    gone+=("$rel")
+  done < <(cz status "$AG" 2>/dev/null | sed -n 's/^DA //p' | sort)
+  if [ "${#gone[@]}" -gt 10 ] && [ "${AGENTS_SYNC_DELETE_MANY:-}" != 1 ]; then
+    log "ERROR: ${#gone[@]} files or folders are gone from $AG. If you meant it, run AGENTS_SYNC_DELETE_MANY=1 agents-sync; to undo it, run chezmoi apply $AG"
+    status=1
+  elif [ "${#gone[@]}" -gt 0 ]; then
+    for rel in "${gone[@]}"; do
+      if out="$(cz forget --force "$HOME/$rel" 2>&1)"; then
+        log "removed $rel"
+      else
+        log "ERROR: could not remove $rel from the repo: $out"
+        status=1
+      fi
+    done
+  fi
+
+  # New files, once two minutes old, so a file still being written waits.
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    [ -z "$(find "$HOME/$rel" -mmin -2 2>/dev/null | head -n 1)" ] || continue
+    if out="$(cz add "$HOME/$rel" 2>&1)"; then
+      log "added $rel"
+    else
+      log "ERROR: could not add $rel: $out"
+      status=1
+    fi
+  done < <(cz unmanaged "$AG" 2>/dev/null)
+
+  # Claude Code reads skills only from ~/.claude/skills, so each of Viktor's
+  # skills has a link there, declared in the repo. Declare one for a new skill,
+  # and drop the one of a skill that is gone.
+  own="$(names_under "$AG/skills" dirs,symlinks)"
+  linked="$(names_under "$HOME/.claude/skills" symlinks)"
+  for name in $own; do
+    printf '%s\n' "$linked" | grep -Fqx -- "$name" && continue
+    link="$HOME/.claude/skills/$name"
+    if [ ! -e "$link" ] && [ ! -L "$link" ]; then
+      mkdir -p "$HOME/.claude/skills" && ln -s "../../.agents/skills/$name" "$link"
+    fi
+    if [ "$(readlink "$link" 2>/dev/null)" = "../../.agents/skills/$name" ] \
+       && out="$(cz add "$link" 2>&1)"; then
+      log "linked the new skill $name for Claude Code"
+    else
+      log "WARN: $link is in the way of the skill $name; move it and the next run links it"
+      status=1
+    fi
+  done
+  for name in $linked; do
+    printf '%s\n' "$own" | grep -Fqx -- "$name" && continue
+    if out="$(cz forget --force "$HOME/.claude/skills/$name" 2>&1)"; then
+      rm -f "$HOME/.claude/skills/$name"
+      log "removed the link to the deleted skill $name"
+    else
+      log "ERROR: could not remove the link to the deleted skill $name: $out"
+      status=1
+    fi
+  done
 fi
-changed="$(git -C "$SRC" status --porcelain -- dot_agents | cut -c4-)"
-if [ -n "$changed" ]; then
-  git -C "$SRC" add -- dot_agents
-  # The pre-push hook refuses internal addresses, and a commit it refuses would
-  # block every push after it. So the same check runs before committing, and a
-  # refused edit stays uncommitted (and saved) until it is fixed in ~/.agents.
-  if ! out="$(cd "$SRC" && .githooks/pre-push --check-staged 2>&1)"; then
-    git -C "$SRC" reset -q -- dot_agents
-    log "ERROR: not committing, fix these in ~/.agents first: $out"
-    status=1
-  elif git -C "$SRC" commit -q -m "agents: save edits made in ~/.agents on $HOST" \
-       -m "$changed" -- dot_agents; then
-    log "committed: $(echo "$changed" | tr '\n' ' ')"
-  else
-    log "ERROR: could not commit the edits under dot_agents/"
-    status=1
+
+# 2. Check what step 1 saved, then commit it. The repo is public, so a file
+#    that names internal hosts or carries a secret is held back: its copy in
+#    the repo is undone, the file stays as it is in ~/.agents, and the next
+#    run checks it again. The rest goes in.
+passes() {
+  (cd "$SRC" && .githooks/pre-push --check-staged) >"$checklog" 2>&1 || return 1
+  if ! command -v gitleaks >/dev/null; then
+    echo "gitleaks is not installed, so nothing new can be checked for secrets" >"$checklog"
+    return 1
+  fi
+  gitleaks protect --staged --redact --no-banner --source "$SRC" >"$checklog" 2>&1
+}
+if [ -n "$(git -C "$SRC" status --porcelain -- "${SAVED[@]}")" ]; then
+  git -C "$SRC" add -A -- "${SAVED[@]}"
+  if ! passes; then
+    git -C "$SRC" reset -q -- "${SAVED[@]}"
+    while IFS= read -r -d '' entry; do
+      f="${entry:3}"
+      git -C "$SRC" add -A -- "$f"
+      if ! passes; then
+        log "ERROR: holding back $f until it is fixed in ~/.agents: $(tr '\n' ' ' < "$checklog")"
+        status=1
+        git -C "$SRC" reset -q -- "$f"
+        if git -C "$SRC" cat-file -e "HEAD:$f" 2>/dev/null; then
+          git -C "$SRC" checkout -q HEAD -- "$f"
+        else
+          rm -f "$SRC/$f"
+        fi
+      fi
+      git -C "$SRC" reset -q -- "$f"
+    done < <(git -C "$SRC" status --porcelain -z --no-renames --untracked-files=all -- "${SAVED[@]}")
+    git -C "$SRC" add -A -- "${SAVED[@]}"
+  fi
+  changes="$(git -C "$SRC" diff --cached --name-status -- "${SAVED[@]}")"
+  if [ -n "$changes" ]; then
+    if git -C "$SRC" commit -q -m "agents: save edits made in ~/.agents on $HOST" -m "$changes" -- "${SAVED[@]}"; then
+      log "committed: $(printf '%s' "$changes" | tr '\t\n' '  ')"
+    else
+      log "ERROR: could not commit the changes"
+      status=1
+    fi
   fi
 fi
 
-# 2. Pull what other machines pushed, then push what this one committed. A
+# 3. Pull what other machines pushed, then push what this one committed. A
 #    fast-forward when only one side moved, a rebase when both did. Uncommitted
 #    changes elsewhere in the repo block only the rebase.
 before="$(git -C "$SRC" rev-parse HEAD)"
@@ -89,19 +198,24 @@ if [ -n "$(git -C "$SRC" rev-list '@{u}..HEAD' 2>/dev/null)" ]; then
   fi
 fi
 
-# Apply what the pull brought into ~/.agents, and anything the repo has that
-# ~/.agents lacks. Nothing else: after the re-add every managed file matches
-# the repo, so an apply with nothing new could only overwrite an edit saved in
-# the last few seconds.
-if [ "$before" != "$(git -C "$SRC" rev-parse HEAD)" ] \
-   || cz status "$AG" 2>/dev/null | grep -q '^.A'; then
-  if ! out="$(cz apply --force --keep-going "$AG" 2>&1)"; then
-    log "ERROR: chezmoi apply failed for $AG: $out"
-    status=1
-  fi
+# Apply the files the pull changed, and the ones the repo has that this
+# machine never got (a fresh machine). Nothing else, so an edit held back above
+# is never overwritten.
+targets=()
+if [ "$before" != "$(git -C "$SRC" rev-parse HEAD)" ]; then
+  while IFS= read -r p; do
+    t="$(cz target-path "$SRC/$p" 2>/dev/null)" && targets+=("$t")
+  done < <(git -C "$SRC" diff --name-only "$before" HEAD -- dot_agents)
+fi
+while IFS= read -r rel; do
+  [ -n "$rel" ] && targets+=("$HOME/$rel")
+done < <(cz status "$AG" 2>/dev/null | sed -n 's/^ A //p')
+if [ "${#targets[@]}" -gt 0 ] && ! out="$(cz apply --force --keep-going "${targets[@]}" 2>&1)"; then
+  log "ERROR: chezmoi apply failed in $AG: $out"
+  status=1
 fi
 
-# 3. Join core.md with the profile into the hub. Rewritten only when the text
+# 4. Join core.md with the profile into the hub. Rewritten only when the text
 #    changes, and renamed into place so a starting session sees old or new.
 if [ ! -s "$AG/core.md" ] || [ ! -f "$AG/$PROFILE.md" ]; then
   log "ERROR: $AG/core.md or $AG/$PROFILE.md missing; hub left as it is"
@@ -120,18 +234,16 @@ else
   chmod 0444 "$tmp" && mv -f "$tmp" "$HUB" && log "rebuilt $HUB from core.md + $PROFILE.md"
 fi
 
-# 4. The links chezmoi manages for agents. A symlink entry replaces an existing
+# 5. The links chezmoi manages for agents. A symlink entry replaces an existing
 #    file or directory without asking, so anything real in the way is moved to
 #    a dated backup first, outside the skills directories where it would load
 #    as a duplicate skill.
 links=("$HOME/.claude/CLAUDE.md" "$HOME/.codex/AGENTS.md" "$HOME/.pi/agent/AGENTS.md")
-for entry in "$SRC"/dot_claude/skills/symlink_*; do
-  [ -e "$entry" ] || continue
-  name="$(basename "$entry" .tmpl)"; links+=("$HOME/.claude/skills/${name#symlink_}")
+for name in $(names_under "$HOME/.claude/skills" symlinks); do
+  links+=("$HOME/.claude/skills/$name")
 done
-for entry in "$SRC"/dot_agents/skills/symlink_*; do
-  [ -e "$entry" ] || continue
-  name="$(basename "$entry" .tmpl)"; links+=("$AG/skills/${name#symlink_}")
+for name in $(names_under "$AG/skills" symlinks); do
+  links+=("$AG/skills/$name")
 done
 for path in "${links[@]}"; do
   mkdir -p "$(dirname "$path")"

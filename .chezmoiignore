@@ -18,14 +18,32 @@
 {{ end }}
 
 # Agent files (2026-09-22; ~/.agents since 2026-09-25). chezmoi manages
-# ~/.agents from dot_agents/ like any other dotfile, and agents-sync saves edits
-# made there back here. These are made on the machine and never belong in the
-# repo: the joined AGENTS.md, agents-sync's backups, and the lockfile of the
-# upstream skills the skills updater installs beside Viktor's own.
+# ~/.agents from dot_agents/ like any other dotfile, and agents-sync saves what
+# changes there back here: edits, new files and deletions (2026-10-04). These
+# are made on the machine and never belong in the repo: the joined AGENTS.md,
+# agents-sync's backups, and the lockfile of the upstream skills the skills
+# updater installs beside Viktor's own.
 .agents/AGENTS.md
+.agents/.AGENTS.md.*
 .agents/backup
 .agents/backup/**
 .agents/.skill-lock.json
+# The upstream skills themselves, named in that lockfile: they are referenced
+# and kept current by the updater, never copied here. Caches and editor
+# leftovers stay out too.
+{{ $lock := joinPath .chezmoi.homeDir ".agents/.skill-lock.json" -}}
+{{ if stat $lock -}}
+{{   range $name, $_ := (include $lock | fromJson).skills -}}
+.agents/skills/{{ $name }}
+.agents/skills/{{ $name }}/**
+{{   end -}}
+{{ end -}}
+.agents/**/__pycache__
+.agents/**/__pycache__/**
+.agents/**/*.pyc
+.agents/**/.DS_Store
+.agents/**/*.swp
+.agents/**/*~
 
 # macOS is a work machine: its ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md are
 # employer files, and a symlink entry replaces an existing file or directory

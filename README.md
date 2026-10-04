@@ -109,20 +109,24 @@ Codex and pi read `~/.agents/skills` directly, and their instruction files,
 `~/.codex/AGENTS.md` and `~/.pi/agent/AGENTS.md`, are links to the same
 `AGENTS.md`.
 
-`agents-sync` runs every 15 minutes from a systemd user timer. It saves edits
-made in `~/.agents` back into `dot_agents/` (`chezmoi re-add`), commits and
-pushes them, pulls what other machines pushed, rebuilds `AGENTS.md` from
-`core.md` and the profile (`~/.config/agents/profile`, default `personal`), and
-fixes the links. Run it by hand after an edit to see the change at once. A new
-skill is never picked up on its own; add it with
-`chezmoi add ~/.agents/skills/<name>`.
+`agents-sync` runs every 15 minutes from a systemd user timer, so `~/.agents` is
+the place to edit: change, add or delete a file there, and the next run carries
+it into `dot_agents/`, commits it and pushes it. A new file waits until it is
+two minutes old, a new skill also gets its `~/.claude/skills` link, and more
+than ten deletions in one run wait for `AGENTS_SYNC_DELETE_MANY=1`. Each run then
+pulls what other machines pushed, rebuilds `AGENTS.md` from `core.md` and the
+profile (`~/.config/agents/profile`, default `personal`), and fixes the links.
+Run it by hand after an edit to see the change at once; it reports to
+`journalctl --user -u agents-sync`. Its tests are in `.tests/agents-sync-test.sh`.
 
 This repo is public, so the files say how to work and leave infra facts
 (addresses, hostnames, Vault paths) for agents to look up. The pre-push hook in
-`.githooks/` refuses a push that adds any, including one agents-sync makes;
-agents-sync sets `core.hooksPath` to it. Upstream skills (mattpocock/skills and
-others) are not copied here: the machine's skills updater installs and
-refreshes them in `~/.agents/skills`.
+`.githooks/` refuses a push that adds any; agents-sync sets `core.hooksPath` to
+it and runs the same check, plus a gitleaks secret scan, before it commits. A
+file that fails is held back, unchanged in `~/.agents`, until it is fixed there.
+Upstream skills (mattpocock/skills and others) are not copied here: the
+machine's skills updater installs and refreshes them in `~/.agents/skills`, and
+`.chezmoiignore` keeps out the ones its lockfile names.
 
 ## Git hooks for repos under ~/code
 
