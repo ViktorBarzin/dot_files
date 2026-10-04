@@ -23,7 +23,7 @@
 #      at that file, and ~/.claude/skills/<name> at ~/.agents/skills/<name>.
 # A systemd user timer runs it every 15 minutes; run it by hand after an edit
 # to see the change at once. It reports to the journal:
-#   journalctl --user -u agents-sync
+#   journalctl --user-unit agents-sync
 # .chezmoiignore lists what never goes in: the built hub, backups, the skills
 # lockfile, the upstream skills it names, and caches.
 #

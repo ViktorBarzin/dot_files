@@ -117,7 +117,7 @@ than ten deletions in one run wait for `AGENTS_SYNC_DELETE_MANY=1`. Each run the
 pulls what other machines pushed, rebuilds `AGENTS.md` from `core.md` and the
 profile (`~/.config/agents/profile`, default `personal`), and fixes the links.
 Run it by hand after an edit to see the change at once; it reports to
-`journalctl --user -u agents-sync`. Its tests are in `.tests/agents-sync-test.sh`.
+`journalctl --user-unit agents-sync`. Its tests are in `.tests/agents-sync-test.sh`.
 
 This repo is public, so the files say how to work and leave infra facts
 (addresses, hostnames, Vault paths) for agents to look up. The pre-push hook in
