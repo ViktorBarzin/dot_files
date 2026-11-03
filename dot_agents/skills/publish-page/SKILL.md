@@ -6,17 +6,18 @@ argument-hint: "<path/to/doc.md> [draft|approved|executing|done]"
 
 # Publish a page
 
-The markdown stays canonical wherever it lives (any repo — monorepo docs, infra
-docs/plans, a project repo). Publishing renders a snapshot into the monorepo's
-`pages/` tree and pushes; the site serves the monorepo at git HEAD, so **the
-push is the publish**.
+The markdown stays canonical wherever it lives (any repo — infra docs/plans, a
+project repo). Publishing renders a snapshot into `~/code/pages`, a clone of the
+private Forgejo repo `viktor/pages` (the pages/ subdir of the monorepo until
+2026-11-03), and pushes; the site serves that repo at git HEAD, so **the push
+is the publish**.
 
 **Per-user layout (2026-07-26):** the site serves per-user private spaces.
-Viktor's pages live in `pages/wizard/` (served at the `pages.viktorbarzin.me`
-root for him); a `pages/shared/` area is visible to everyone with access. Other
-devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
-(served via a `/assets/*` carve-out) — pages reference them as absolute
-`/assets/...`.
+Viktor's pages live in `~/code/pages/wizard/` (served at the
+`pages.viktorbarzin.me` root for him); a `shared/` area is visible to everyone
+with access. Other devvm users get their own `<user>/`. Assets are shared at
+`assets/` (served via a `/assets/*` carve-out) — pages reference them as
+absolute `/assets/...`.
 
 1. **Diagram check, before rendering:** a doc with architecture, data flow,
    sequencing, or timeline content is EXPECTED to carry at least one
@@ -75,15 +76,15 @@ devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
    half. Grep the output for `<p>` or `</p>` between `<svg` and `</svg>` — none
    should be there.
 
-5. **Commit + push the monorepo** (stage by name — never `add -A`):
+5. **Commit + push the pages repo** (stage by name — never `add -A`):
 
    ```sh
-   git -C ~/code add pages/wizard/<date>-<slug>.html pages/wizard/index.html
-   git -C ~/code commit -m "pages: publish <title> (<status>)"   # body: why
-   git -C ~/code push origin master
+   git -C ~/code/pages add wizard/<date>-<slug>.html wizard/index.html
+   git -C ~/code/pages commit -m "pages: publish <title> (<status>)"   # body: why
+   git -C ~/code/pages push origin master
    ```
 
-   - Non-fast-forward → `git -C ~/code pull --rebase origin master`, push again.
+   - Non-fast-forward → `git -C ~/code/pages pull --rebase origin master`, push again.
    - Docs-only single commit, allowed straight to master from a clean checkout.
 
 6. **Hand over the URL** — part of the deliverable:
