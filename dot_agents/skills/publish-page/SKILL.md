@@ -35,16 +35,7 @@ devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
      state (state machines) · ER (data models). Tables render inline to ~8
      columns; wider ones scroll.
 
-3. **doc-tone (required):** run the `/doc-tone` skill on the canonical markdown
-   before rendering — a tone pass that strips defensive/overconfident/adversarial
-   phrasing while preserving every fact, number, decision, boundary, and ask.
-   The changelog comes first (changed lines + the tone-tell each fixes), so the
-   author can confirm nothing substantive moved. A doc already authored in the
-   house style (global rules → "Writing style") usually needs few or no changes;
-   run the pass anyway and report "no tone changes needed" when that's the
-   result.
-
-4. **Render:**
+3. **Render:**
 
    ```sh
    python3 ~/code/pages/tools/render.py <source.md> --pages-dir ~/code/pages/wizard --status <status>
@@ -57,7 +48,7 @@ devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
    - `--status`: `draft` | `approved` | `executing` | `done`. Pick what's true
      *now*.
 
-5. **Look at it before you commit** (execution.md §4 — a rendered page is not
+4. **Look at it before you commit** (execution.md §4 — a rendered page is not
    verified by having been rendered). `pages.viktorbarzin.me` is owner-gated and
    403s every automated client, in-cluster included, so serve the tree locally:
 
@@ -84,7 +75,7 @@ devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
    half. Grep the output for `<p>` or `</p>` between `<svg` and `</svg>` — none
    should be there.
 
-6. **Commit + push the monorepo** (stage by name — never `add -A`):
+5. **Commit + push the monorepo** (stage by name — never `add -A`):
 
    ```sh
    git -C ~/code add pages/wizard/<date>-<slug>.html pages/wizard/index.html
@@ -95,13 +86,13 @@ devvm users get their own `pages/<user>/`. Assets are shared at `pages/assets/`
    - Non-fast-forward → `git -C ~/code pull --rebase origin master`, push again.
    - Docs-only single commit, allowed straight to master from a clean checkout.
 
-7. **Hand over the URL** — part of the deliverable:
+6. **Hand over the URL** — part of the deliverable:
    `https://pages.viktorbarzin.me/<date>-<slug>.html` (index:
    `https://pages.viktorbarzin.me/`). ~60s to appear (git-sync serves on push).
    Owner-gated behind Authentik (per-user private). Old `plans.viktorbarzin.me/…`
    URLs 301-redirect here, so previously-shared links still resolve.
 
-8. **Re-publish on material change:** same command + updated status; same source
+7. **Re-publish on material change:** same command + updated status; same source
    → same filename, so the page + index entry update in place.
 
 The URL is the DELIVERABLE — never hand over a screenshot or a rasterised page
