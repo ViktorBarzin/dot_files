@@ -18,7 +18,7 @@ Remove defensive, adversarial, or overconfident phrasing while keeping every fac
 6. **Use bold sparingly** — genuine key terms only, never to insist.
 7. **Frame the whole thing as a shared problem to solve with the reader**, not a case being prosecuted.
 
-Preserve exact numbers, their units, and their hedges. **Revising an existing doc → run `/doc-tone`**, which lists the changed lines and the tone-tell each one fixes BEFORE the rewrite, so the author can confirm no fact, number, decision, or boundary moved; authoring fresh needs no changelog. The pass is a required step before publishing to pages (`publish-page` step 3). If a change would alter meaning, flag it instead of making it.
+Preserve exact numbers, their units, and their hedges. If a change would alter meaning, flag it instead of making it.
 
 # Execution (applies to ALL agents)
 
@@ -97,7 +97,7 @@ Viktor's preference and now applies to everyone on the box, in whatever language
 the conversation is in.
 
 Scope: what you say in chat, and commit messages. Markdown you author follows
-the doc-tone section (see "Writing style — every markdown I author (Viktor, 2026-08-08)" above) instead.
+the markdown writing-style section (see "Writing style — every markdown I author (Viktor, 2026-08-08)" above) instead.
 
 Replies written mostly in Cyrillic
 keep their dashes, since the dash is ordinary punctuation in Bulgarian and
