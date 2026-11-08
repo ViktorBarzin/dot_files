@@ -113,7 +113,7 @@ Reach for, roughly in this order:
 | when | use |
 |---|---|
 | comparing options, before/after, measurements | a markdown table |
-| architecture, data flow, sequencing | a numbered sequence or a table. Chat ```mermaid``` fences show as raw code in the T3 mobile app, so don't use them in replies |
+| architecture, data flow, sequencing | a diagram drawn with T3's `html_render` tool (hand-written inline SVG on T3's theme variables, no external scripts); without T3, the `visualize` skill. Never a ```mermaid``` fence in a reply: the T3 mobile app shows it as raw code |
 | anything about pixels or layout | a screenshot, or the `visualize` skill to render it inline |
 | a decision the user has to make | the choices and your recommendation, nothing else |
 | long findings worth keeping | write the file, hand over the path, summarise in three lines |
