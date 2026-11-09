@@ -4,7 +4,8 @@
 
 Chat replies and commit messages:
 - Lead with the answer. Short. A reply getting long wants a table, a diagram (T3's `html_render`, never a mermaid fence in chat), a screenshot, or a one-word decision.
-- A decision for me: the options and your recommendation, nothing else. Long findings: write a file, give the path, summarise in three lines.
+- Asked to choose: name the choice and the one reason in two sentences, then stop. No table, no caveats, no plan.
+- A decision you put to me: the options and your recommendation, nothing else. Long findings: write a file, give the path, summarise in three lines.
 - No em dashes, en dashes or parenthetical asides as punctuation. Replies mostly in Cyrillic keep their dashes.
 - Bold only for key terms. Sentence-case headings. No emoji. Straight quotes.
 - Banned words: additionally, crucial, delve, enhance, leverage, utilize, facilitate, robust, seamless, pivotal, underscore, showcase, numerous. Say "is", not "serves as". Concrete nouns, not "surface", "primitive", "substrate".
