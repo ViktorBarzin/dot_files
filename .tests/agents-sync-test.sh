@@ -24,8 +24,8 @@ fails=0
 T=""
 rc=0
 
-# A home where ~/.agents was applied from a source holding core.md, the
-# personal profile and one skill of Viktor's, plus an upstream skill that the
+# A home where ~/.agents was applied from a source holding AGENTS.md, a notes
+# file and one skill of Viktor's, plus an upstream skill that the
 # skills lockfile names.
 setup() {
   T="$(mktemp -d)"
@@ -34,12 +34,12 @@ setup() {
   mkdir -p "$HOME" && : > "$GIT_CONFIG_GLOBAL"
   local seed="$T/seed" link
   mkdir -p "$seed/dot_agents/skills/own" "$seed/dot_agents/bin" "$seed/dot_claude/skills" "$seed/.githooks"
-  printf '# Core\n\nBe brief.\n' > "$seed/dot_agents/core.md"
-  printf '# Personal\n\nUse the homelab tools.\n' > "$seed/dot_agents/personal.md"
+  printf '# Rules\n\nBe brief.\n' > "$seed/dot_agents/AGENTS.md"
+  printf '# Notes\n\nUse the homelab tools.\n' > "$seed/dot_agents/notes.md"
   printf -- '---\nname: own\ndescription: Mine.\n---\nDo it.\n' > "$seed/dot_agents/skills/own/SKILL.md"
   cp "$SCRIPT" "$seed/dot_agents/bin/executable_agents-sync"
   printf '../../.agents/skills/own' > "$seed/dot_claude/skills/symlink_own"
-  # The links every harness reads the hub through, as the repo declares them.
+  # The links every harness reads AGENTS.md through, as the repo declares them.
   for link in dot_claude/symlink_CLAUDE.md.tmpl dot_codex/symlink_AGENTS.md.tmpl private_dot_pi/agent/symlink_AGENTS.md.tmpl; do
     mkdir -p "$seed/$(dirname "$link")" && cp "$REPO/$link" "$seed/$link"
   done
@@ -93,17 +93,18 @@ expect "and succeeds" [ "$rc" -eq 0 ]
 done_case
 
 setup
-printf '\nNew rule.\n' >> "$HOME/.agents/core.md"
+printf '\nNew rule.\n' >> "$HOME/.agents/AGENTS.md"
 sync
-expect "an edit to a tracked file reaches the repo" remote_says dot_agents/core.md "New rule."
-expect "the hub carries the edit" file_says "$HOME/.agents/AGENTS.md" "New rule."
+expect "an edit to AGENTS.md reaches the repo" remote_says dot_agents/AGENTS.md "New rule."
+expect "AGENTS.md stays editable" [ -w "$HOME/.agents/AGENTS.md" ]
+expect "and is what Claude Code reads" file_says "$HOME/.claude/CLAUDE.md" "New rule."
 done_case
 
 setup
-printf '# Notes\n' > "$HOME/.agents/notes.md"
-old "$HOME/.agents/notes.md"
+printf '# Ideas\n' > "$HOME/.agents/ideas.md"
+old "$HOME/.agents/ideas.md"
 sync
-expect "a new file reaches the repo" remote_has dot_agents/notes.md
+expect "a new file reaches the repo" remote_has dot_agents/ideas.md
 done_case
 
 setup
@@ -133,7 +134,6 @@ old "$HOME/.agents/skills"
 sync
 expect "an upstream skill stays out" not remote_lists upstream1
 expect "a cache stays out" not remote_lists __pycache__
-expect "the hub stays out" not remote_lists '^dot_agents/AGENTS.md$'
 expect "the lockfile stays out" not remote_lists skill-lock
 done_case
 
@@ -161,7 +161,7 @@ setup
 rm -rf "$HOME/.agents"
 "$HOME/.local/share/chezmoi/dot_agents/bin/executable_agents-sync" >"$T/run.log" 2>&1
 expect "a missing ~/.agents is never copied into the repo as a deletion" \
-  remote_has dot_agents/core.md dot_agents/skills/own/SKILL.md
+  remote_has dot_agents/AGENTS.md dot_agents/skills/own/SKILL.md
 done_case
 
 setup
@@ -200,12 +200,12 @@ done_case
 setup
 host=nas
 domain=lan
-printf '\nThe box is %s.%s.\n' "$host" "$domain" >> "$HOME/.agents/personal.md"
-printf '\nAnother rule.\n' >> "$HOME/.agents/core.md"
+printf '\nThe box is %s.%s.\n' "$host" "$domain" >> "$HOME/.agents/notes.md"
+printf '\nAnother rule.\n' >> "$HOME/.agents/AGENTS.md"
 sync
-expect "an edit naming an internal host is held back" not remote_says dot_agents/personal.md "The box is"
-expect "the edit stays in ~/.agents" file_says "$HOME/.agents/personal.md" "The box is"
-expect "the other edit still goes in" remote_says dot_agents/core.md "Another rule."
+expect "an edit naming an internal host is held back" not remote_says dot_agents/notes.md "The box is"
+expect "the edit stays in ~/.agents" file_says "$HOME/.agents/notes.md" "The box is"
+expect "the other edit still goes in" remote_says dot_agents/AGENTS.md "Another rule."
 done_case
 
 if [ "$fails" -eq 0 ]; then echo "agents-sync-test: all passed"; else echo "agents-sync-test: $fails failed"; fi

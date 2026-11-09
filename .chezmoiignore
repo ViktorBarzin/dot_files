@@ -20,11 +20,10 @@
 # Agent files (2026-09-22; ~/.agents since 2026-09-25). chezmoi manages
 # ~/.agents from dot_agents/ like any other dotfile, and agents-sync saves what
 # changes there back here: edits, new files and deletions (2026-10-04). These
-# are made on the machine and never belong in the repo: the joined AGENTS.md,
-# agents-sync's backups, and the lockfile of the upstream skills the skills
-# updater installs beside Viktor's own.
-.agents/AGENTS.md
-.agents/.AGENTS.md.*
+# are made on the machine and never belong in the repo: agents-sync's backups
+# and the lockfile of the upstream skills the skills updater installs beside
+# Viktor's own. AGENTS.md itself is edited in ~/.agents and saved like any other
+# file since 2026-11-09 (it was built from core.md + personal.md before).
 .agents/backup
 .agents/backup/**
 .agents/.skill-lock.json

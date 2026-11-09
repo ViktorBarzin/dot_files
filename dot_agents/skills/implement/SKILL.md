@@ -134,3 +134,10 @@ means a pipeline *containing* your commit went green, so check ancestry: a busy
 repo cancels your pipeline when the next push lands.
 
 Close with three lines: what changed, the evidence, the CI result.
+
+## Versioning
+
+First-party apps and services use semver: `vX.Y.Z` git tags, `v0.1.0` at the
+first milestone, `v1.0.0` at the first stable release. Tag however the project
+already tags (by hand or automated). Third-party clones, other users' repos and
+continuously deployed GitOps repos such as infra are not tagged.

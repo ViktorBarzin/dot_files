@@ -96,11 +96,8 @@ manages it from `dot_agents/` like any other dotfile.
 
 | in `~/.agents` | holds |
 |---|---|
-| `core.md` | rules for every machine: how to talk, planning, verification, writing style |
-| `personal.md` | rules for Viktor's own machines: homelab tools and workflow |
-| `work.md` | rules for work machines (empty until one joins) |
+| `AGENTS.md` | Viktor's instructions: how to talk and write, when to plan, how to verify |
 | `skills/` | every skill: Viktor's own from this repo, upstream ones from the machine's skills updater |
-| `AGENTS.md` | `core.md` joined with the machine's profile, read-only, built on the machine |
 | `bin/agents-sync` | the sync script below |
 
 Claude Code reads only `~/.claude`, so chezmoi links `~/.claude/CLAUDE.md` to
@@ -114,8 +111,7 @@ the place to edit: change, add or delete a file there, and the next run carries
 it into `dot_agents/`, commits it and pushes it. A new file waits until it is
 two minutes old, a new skill also gets its `~/.claude/skills` link, and more
 than ten deletions in one run wait for `AGENTS_SYNC_DELETE_MANY=1`. Each run then
-pulls what other machines pushed, rebuilds `AGENTS.md` from `core.md` and the
-profile (`~/.config/agents/profile`, default `personal`), and fixes the links.
+pulls what other machines pushed and fixes the links.
 Run it by hand after an edit to see the change at once; it reports to
 `journalctl --user-unit agents-sync`. Its tests are in `.tests/agents-sync-test.sh`.
 

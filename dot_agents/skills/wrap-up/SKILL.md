@@ -96,8 +96,7 @@ Then:
 - **Docs sweep — UNCONDITIONAL, not gated on `infra/docs/`.** For each area
   this session changed, check whether any doc still describes the OLD state:
   `CONTEXT.md`, `docs/adr/`, `README`, `CLAUDE.md`, skill docs, and
-  `infra/docs/` for infra work (in the monorepo, `CONTEXT-MAP.md` locates the
-  domain docs). List each stale doc and what must change. Docs that wrap-up
+  `infra/docs/` for infra work. List each stale doc and what must change. Docs that wrap-up
   itself edits to restore truth ARE this session's work — stage them with the
   commit; the "not mine" rule is about pre-existing dirty files, not about
   refusing to touch clean tracked docs the session made stale. Accepted ADRs
@@ -168,7 +167,7 @@ leftovers you can't attribute. Then run Phase 3 to the end.
    subagent with the prompt below, substituting `<TRANSCRIPT>` with the path
    resolved in Phase 0.
 
-### Memory-extraction subagent prompt (this is execution.md §M.3, adapted)
+### Memory-extraction subagent prompt
 
 ```
 Mine durable, cross-session learnings from the conversation. Read the

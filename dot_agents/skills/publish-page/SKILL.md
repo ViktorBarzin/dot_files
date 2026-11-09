@@ -1,10 +1,18 @@
 ---
 name: publish-page
-description: Publish a substantive design doc (plan/spec/design) as a styled HTML page at pages.viktorbarzin.me so Viktor can review it from a browser on the go. Use for FINALIZED SUBSTANTIVE design docs — whether from a grilling session (grilling / grill-with-docs / grill-me) or authored directly — and when Viktor explicitly asks to publish a specific doc. NOT for research outputs, raw brainstorming/writing-plans, execution/progress snapshots, or trivial throwaway notes (those stay canonical in their owning repo); the raw plan-mode approval text is not a deliverable, but a finalized substantive plan is; sensitive personal/financial analyses stay inline, never published. Once published, re-publish whenever it materially changes (revision, status change, execution progress worth seeing). grill-with-docs ends with this as its final deliverable step. (Broadened 2026-07-26 from grilling-only to substantive-design-docs for all users; renamed from publish-plan when the site became pages.viktorbarzin.me.)
+description: Publish a finalized plan, spec or design doc as a page at pages.viktorbarzin.me, or re-publish one that changed. Use when a substantive design doc is final, a grilling session ends in one, or Viktor asks to publish a doc.
 argument-hint: "<path/to/doc.md> [draft|approved|executing|done]"
 ---
 
 # Publish a page
+
+What to publish: finalized, substantive plans, specs and designs, from a
+grilling session or written directly, and any doc Viktor asks for. Not research
+output, brainstorming, progress snapshots or throwaway notes, and never a
+sensitive personal or financial analysis (those stay in chat). Re-publish when
+the doc materially changes: a revision, a status change, progress worth seeing.
+Hand Viktor the URL; it is part of the deliverable. Publish here only, never to
+claude.ai Artifacts or another vendor-hosted page.
 
 The markdown stays canonical wherever it lives (any repo — infra docs/plans, a
 project repo). Publishing renders a snapshot into `~/code/pages`, a clone of the

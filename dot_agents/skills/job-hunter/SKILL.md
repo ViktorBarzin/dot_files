@@ -1,5 +1,6 @@
 ---
 name: job-hunter
+disable-model-invocation: true
 description: |
   Query and refresh the passive job-market scraper. Use when:
   (1) User asks about salary data, job-market bands, or comp percentiles

@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 # agents-sync: back up ~/.agents, this machine's agent instructions and skills,
-# to the dotfiles repo, and keep what is built from it current.
+# to the dotfiles repo, and keep the links to it current.
 #
 # ~/.agents is the source of truth. Edit, add or delete files there, and the
 # next run carries the change into dot_agents/ in the dotfiles repo, commits it
 # and pushes it. chezmoi maps one to the other:
-#   core.md               rules for every machine
-#   personal.md, work.md  rules for one kind of machine, the profile
+#   AGENTS.md             Viktor's instructions, the one file every harness loads
 #   skills/<name>/        Viktor's own skills; the upstream ones beside them
 #                         come from the machine's skills updater and stay out
 #   bin/agents-sync       this script
@@ -17,15 +16,12 @@
 #   2. checks the change for internal details and secrets, holds back each file
 #      that fails, and commits the rest;
 #   3. pulls, pushes, and applies what the pull changed;
-#   4. joins core.md with the profile into ~/.agents/AGENTS.md, the one file
-#      every harness loads, read-only because edits belong in the parts;
-#   5. points ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and ~/.pi/agent/AGENTS.md
-#      at that file, and ~/.claude/skills/<name> at ~/.agents/skills/<name>.
+#   4. points ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md and ~/.pi/agent/AGENTS.md
+#      at ~/.agents/AGENTS.md, and ~/.claude/skills/<name> at ~/.agents/skills/<name>.
 # A systemd user timer runs it every 15 minutes; run it by hand after an edit
 # to see the change at once. It reports to the journal:
 #   journalctl --user-unit agents-sync
-# .chezmoiignore lists what never goes in: the built hub, backups, the skills
-# lockfile, the upstream skills it names, and caches.
+# .chezmoiignore lists what never goes in: backups, the skills lockfile, the upstream skills it names, and caches.
 #
 # Written for bash 3.2 and BSD tools as well, for the day a Mac joins.
 set -uo pipefail
@@ -36,8 +32,6 @@ PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"
 AG="$HOME/.agents"
 SRC="${AGENTS_SRC:-$(chezmoi source-path 2>/dev/null)}"
 SRC="${SRC:-$HOME/.local/share/chezmoi}"
-PROFILE="${AGENTS_PROFILE:-$(cat "$HOME/.config/agents/profile" 2>/dev/null || echo personal)}"
-HUB="$AG/AGENTS.md"
 BACKUP="$AG/backup/$(date +%Y%m%d-%H%M%S)"
 HOST="$(hostname -s 2>/dev/null || hostname)"
 # Where in the repo the files this script saves live.
@@ -215,26 +209,7 @@ if [ "${#targets[@]}" -gt 0 ] && ! out="$(cz apply --force --keep-going "${targe
   status=1
 fi
 
-# 4. Join core.md with the profile into the hub. Rewritten only when the text
-#    changes, and renamed into place so a starting session sees old or new.
-if [ ! -s "$AG/core.md" ] || [ ! -f "$AG/$PROFILE.md" ]; then
-  log "ERROR: $AG/core.md or $AG/$PROFILE.md missing; hub left as it is"
-  exit 1
-fi
-tmp="$(mktemp "$AG/.AGENTS.md.XXXXXX")"
-{
-  printf '<!-- Built by agents-sync from ~/.agents/{core,%s}.md; edit those. -->\n\n' "$PROFILE"
-  cat "$AG/core.md"
-  printf '\n'
-  cat "$AG/$PROFILE.md"
-} > "$tmp"
-if cmp -s "$tmp" "$HUB" 2>/dev/null; then
-  rm -f "$tmp"
-else
-  chmod 0444 "$tmp" && mv -f "$tmp" "$HUB" && log "rebuilt $HUB from core.md + $PROFILE.md"
-fi
-
-# 5. The links chezmoi manages for agents. A symlink entry replaces an existing
+# 4. The links chezmoi manages for agents. A symlink entry replaces an existing
 #    file or directory without asking, so anything real in the way is moved to
 #    a dated backup first, outside the skills directories where it would load
 #    as a duplicate skill.
