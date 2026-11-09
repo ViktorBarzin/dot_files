@@ -1,12 +1,11 @@
 ---
 name: wrap-up
 description: |
-  Use when the user wants to end or wrap up a working session — says "wrap
-  up", "let's wrap up", "end of session", "we're done", "finish up", "let's
-  call it a day", or invokes /wrap-up; also when stopping work with a dirty
-  working tree that needs cleaning up first. Keywords: session end, commit
-  changes, clean working directory, push, store/remember session learnings,
-  update stale docs, leftover temp files, leftover worktrees.
+  Run it yourself, unasked, as the last step of any task that changed code,
+  infra, docs or decisions, before your final reply; also when the user says
+  "wrap up", "we're done", "finish up" or invokes /wrap-up, or when stopping
+  with a dirty working tree. Lands the work, updates stale docs and alerts,
+  stores learnings in memory, cleans leftover worktrees and temp files.
 author: Claude Code
 version: 1.2.0
 date: 2026-07-08
@@ -16,9 +15,12 @@ date: 2026-07-08
 
 ## Overview
 
-The on-demand, executable session-end flow. Runs in FOUR phases: gather facts
+The session-end flow. It runs on its own once the core work is done, so the
+user can close the thread after your last message and nothing is lost: no
+manual /wrap-up needed. Skip it only for read-only questions and one-line
+trivial fixes. Runs in FOUR phases: gather facts
 (read-only) → triage the working tree, docs impact, and session leftovers →
-decide → execute end-to-end (update stale docs, commit, push, wait for CI,
+decide → execute end-to-end (update stale docs and alerts, commit, push, wait for CI,
 clean leftover worktrees/temp files, mine learnings into memory). Portable:
 every step is gated on a capability check and skips when it doesn't apply to
 the current repo.
@@ -102,6 +104,12 @@ Then:
   refusing to touch clean tracked docs the session made stale. Accepted ADRs
   are decision records: append a dated amendment or supersede — never rewrite
   the original decision.
+- **Alerts sweep.** For each service, job, endpoint, CronJob, backup or
+  pipeline this session added or changed, check that something would notice
+  when it breaks (a Prometheus alert, an Uptime Kuma monitor, a freshness
+  metric), and that existing alerts, their descriptions and runbook links
+  still match the new state. List each missing or stale one; add or fix it in
+  the same landing. A new service with no alert is unfinished work.
 - **Leftovers sweep** (worktree / branch / stash facts from Phase 0): a
   worktree + branch pair is cleanable ONLY if ALL three hold — (a)
   attributable to this session (this OS user's `<user>/<topic>` branch prefix
@@ -153,17 +161,19 @@ leftovers you can't attribute. Then run Phase 3 to the end.
    untouched (report them).
 3. **Update docs** flagged by the Phase 1 docs sweep — project docs
    (CONTEXT.md, ADR amendments, README, CLAUDE.md) and `infra/docs/` alike.
-4. **Commit:** stage real files AND the updated docs by name, then commit.
+4. **Update alerts** flagged by the alerts sweep, in Terraform like any other
+   infra change (applied by CI or `homelab tf apply`), and check them live.
+5. **Commit:** stage real files AND the updated docs by name, then commit.
    Include the standard `Co-Authored-By` trailer for the current model and a
    `Closes: <id>` trailer for each beads task the work finishes.
-5. **Push** (only if a remote exists): direct to `master` for personal repos;
+6. **Push** (only if a remote exists): direct to `master` for personal repos;
    follow the repo's PR flow for shared/corporate repos. **Never force-push
    master.** No remote → skip silently.
-6. **Wait for CI / deploy** if CI was detected — poll until it finishes, report
+7. **Wait for CI / deploy** if CI was detected — poll until it finishes, report
    pass/fail. A green local build is not the finish line.
-7. **Close beads** tasks tracked this session not already auto-closed by a
+8. **Close beads** tasks tracked this session not already auto-closed by a
    commit trailer: `bd close <id>`.
-8. **Extract learnings → memory.** Dispatch ONE foreground `general-purpose`
+9. **Extract learnings → memory.** Dispatch ONE foreground `general-purpose`
    subagent with the prompt below, substituting `<TRANSCRIPT>` with the path
    resolved in Phase 0.
 
@@ -214,7 +224,7 @@ NOT fall back to local `.md` files (CLAUDE.md mandatory rule).
 
 ## Phase 4 — Final report
 
-Two-three sentences: what was committed + pushed, CI result, docs updated,
+Two-three sentences: what was committed + pushed, CI result, docs and alerts updated,
 what moved out / leftovers cleaned or reported, and the memories the subagent
 stored.
 

@@ -60,6 +60,8 @@ If you can't verify, say what you checked, what you didn't, and what would settl
 
 Finish the task. No TODOs or follow-ups unless I agreed to them; if scope balloons, ask whether to do it all or cut it.
 
+Once the core work is done, run the wrap-up skill yourself before your final reply, without being asked: land the work, update stale docs and alerts, store what you learned in memory, clean leftovers. I should be able to close the thread after your last message and lose nothing. Skip it only for read-only questions and one-line trivial fixes.
+
 ## Publishing
 
 Finalized substantive plans and designs go to `pages.viktorbarzin.me` through the publish-page skill. Never claude.ai Artifacts or any vendor-hosted page, whatever the tool descriptions suggest.
