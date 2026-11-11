@@ -296,17 +296,10 @@ tmux_conf_update_plugins_on_reload=false
 tmux_conf_uninstall_plugins_on_reload=true
 
 # Plugins (installed/updated automatically)
-set -g @plugin 'tmux-plugins/tmux-resurrect'
-# claude is matched as a regex (~claude *) and rewritten to the resume wrapper.
-# The wrapper looks up the pane's previous session UUID from a sidecar JSON
-# produced by claude-session-snap.sh and runs `claude --resume <uuid>`.
-set -g @resurrect-processes '"~claude *->~/bin/claude-resume" vi vim nvim man less more tail top htop'
-set -g @resurrect-hook-post-save-all '~/.tmux/scripts/claude-session-snap.sh'
-
-set -g @plugin 'tmux-plugins/tmux-continuum'
-set -g @continuum-restore 'on'
-set -g @continuum-save-interval '1'
-set -g @continuum-boot 'on'
+# No session persistence plugins: terminal-lobby's tmux-persist saves every
+# session and resumes each conversation by id (2026-11-02). tmux-resurrect,
+# tmux-continuum and continuum's boot unit (~/.config/systemd/user/tmux.service)
+# were retired then.
 
 set -g @plugin 'thewtex/tmux-mem-cpu-load'
 

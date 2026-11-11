@@ -1,20 +1,22 @@
-# The devvm and its rebuild drill, devvm-drill, run a divergent, secret-bearing ~/.claude/settings.json (homelab
-# plugins + MEMORY_API_KEY at mode 0600, added out-of-band — NOT in this repo).
-# chezmoi must not manage or clobber it there (a `chezmoi apply` would revert the
-# 0600 and overwrite the homelab config). Other machines keep it chezmoi-managed.
+# The devvm and its rebuild drills (hosts named devvm*) keep every file under
+# ~/.claude in the claude-sessions store, which restores them on a rebuild, and
+# the infra provisioner installs the org hooks and fills the secrets in
+# settings.json. The copies here are other machines' (settings.json with Mac
+# paths, the memory MCP the devvm retired on 2026-06-20 and its hooks, old
+# plugin lists and caches). chezmoi writing them first made the store's
+# restore keep the stale copy, which the ingest then stored as the newest
+# (rebuild drill, 2026-11-11). So on the devvm chezmoi keeps only the links:
+# CLAUDE.md and the skill links. ~/.codex holds links alone already.
+# The memory MCP's other two pieces stay off it too, and so does the old
+# vault-token-renew.sh: the provisioner installs ~/.local/bin/vault-token-renew.
 {{ if hasPrefix "devvm" .chezmoi.hostname }}
-.claude/settings.json
-# The devvm provisioner installs these org hooks from infra's
-# scripts/workstation/claude-hooks and keeps them current; the copies here are
-# older ones kept for other machines' settings.json, and the last four are hooks
-# from the retired memory MCP. A whole-tree apply must not write any of them.
-.claude/hooks/auto-learn.py
-.claude/hooks/post-compact-recovery.sh
-.claude/hooks/pre-compact-backup.sh
-.claude/hooks/auto-allow-memory-tools.py
-.claude/hooks/memory-sync.py
-.claude/hooks/post-commit-memory.py
-.claude/hooks/user-prompt-recall.py
+.claude/**
+!.claude/CLAUDE.md
+!.claude/skills
+!.claude/skills/**
+.mcp.json
+.local/bin/claude-memory-mcp-wrapper
+.local/bin/vault-token-renew.sh
 {{ end }}
 
 # Agent files (2026-09-22; ~/.agents since 2026-09-25). chezmoi manages
@@ -67,4 +69,12 @@
 {{ else }}
 .config/systemd/user/lobby-local.service
 .config/systemd/user/default.target.wants/lobby-local.service
+{{ end }}
+
+# The Mac's LaunchAgents and its london-probe sources belong to the Mac alone.
+{{ if ne .chezmoi.os "darwin" }}
+Library
+Library/**
+mac
+mac/**
 {{ end }}

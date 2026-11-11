@@ -1,3 +1,15 @@
+# ============================================================================
+# Completions are initialised ONCE, by oh-my-zsh, further down.
+# ============================================================================
+# There used to be a compinit here as well. It cost ~79ms and bought nothing:
+# oh-my-zsh runs its own compinit against its own dump ($ZSH_COMPDUMP,
+# ~/.zcompdump-<host>-<zshver>), so this one only ever populated a second file
+# that nothing read. ZSH_DISABLE_COMPFIX below is what makes oh-my-zsh's call
+# take the cheap branch; nothing suppresses the call itself.
+#
+# The guard was also inverted: (#qN.mh+24) matches a dump OLDER than 24h, so
+# "regenerate once daily" actually took the slow full compinit every time.
+
 # ~/.zshrc - Zsh configuration for interactive shells
 # Customizations are in ~/.oh-my-zsh/custom/*.zsh (auto-loaded)
 
@@ -42,7 +54,12 @@ plugins=(
     z
 )
 
-# Skip compinit in oh-my-zsh (we handle it above)
+# Neither of these skips oh-my-zsh's compinit — nothing does; it is the one
+# that initialises completions. They make it CHEAP and stop a third one:
+#   ZSH_DISABLE_COMPFIX  -> oh-my-zsh takes `compinit -u` instead of `-i`,
+#                           skipping compaudit's insecure-directory scan (the
+#                           expensive half: ~41ms over 4 calls when it runs).
+#   skip_global_compinit  -> Debian's /etc/zsh/zshrc does not add one of its own.
 export ZSH_DISABLE_COMPFIX=true
 skip_global_compinit=1
 
@@ -87,9 +104,22 @@ czpush() {
   cd - > /dev/null
 }
 
-# Claude Code auto memory
-export CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-# PARA workspace configuration
-export PARA_MODE="local"
-export PARA_ROOT="/Users/viktorbarzin/Nextcloud/Viktor Nextcloud/para"
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
+
+# The Mac's own settings (2026-02-28). The devvm never had them; the guard
+# keeps each machine as it was when the two copies were merged (2026-11-11).
+if [[ "$OSTYPE" == darwin* ]]; then
+  # Claude Code auto memory
+  export CLAUDE_CODE_DISABLE_AUTO_MEMORY=0
+
+  # PARA workspace configuration
+  export PARA_MODE="local"
+  export PARA_ROOT="/Users/viktorbarzin/Nextcloud/Viktor Nextcloud/para"
+fi
+

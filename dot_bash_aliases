@@ -99,8 +99,7 @@ osInfo[/etc/gentoo-release]=emerge
 osInfo[/etc/SuSE-release]=zypp
 osInfo[/etc/debian_version]=apt-get
 
-# for f in "${!osInfo[@]}" # bash version
-for f in "${(@k)osInfo}" # zsh version
+for f in "${!osInfo[@]}" # bash version
 do
     if [[ -f $f ]];then
         pm=${osInfo[$f]}
@@ -439,11 +438,15 @@ alias wa="watch sensors"
 alias gtop="sudo intel_gpu_top"
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-bindkey '^[0' autosuggest-accept;
-# bindkey '^[9' forward-word;
-bindkey '^[9' autosuggest-fetch;
-# bindkey '^[9' autosuggest-clear;
-#bindkey '^ ' autosuggest-fetch
+# zsh-only: this file is sourced by ~/.bashrc, and `bindkey` is a zsh builtin.
+# The live copies of these bindings are in ~/.oh-my-zsh/custom/keybindings.zsh.
+if [ -n "$ZSH_VERSION" ]; then
+    bindkey '^[0' autosuggest-accept
+    # bindkey '^[9' forward-word;
+    bindkey '^[9' autosuggest-fetch
+    # bindkey '^[9' autosuggest-clear;
+    #bindkey '^ ' autosuggest-fetch
+fi
 alias sp="snapper -c home"
 
 function snp(){
