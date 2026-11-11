@@ -1,0 +1,12 @@
+[Unit]
+Description=Update tmux plugins once a week
+
+[Timer]
+# Sunday 04:00, jittered. Persistent so a powered-off week still gets one run
+# on next boot rather than silently skipping.
+OnCalendar=Sun *-*-* 04:00:00
+RandomizedDelaySec=30m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

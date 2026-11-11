@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Weekly tpm + plugin update for tmux.
+#
+# Replaces oh-my-tmux's tmux_conf_update_plugins_on_{launch,reload}, which were
+# both `true` and therefore fetched tpm and every plugin from GitHub on EVERY
+# tmux server start. That is fine on a laptop; on this box the Go test suites
+# spawn tmux servers in bulk (~20 in one minute), so it ran hundreds of times a
+# day for no benefit. Those flags are now false and this runs weekly instead.
+set -uo pipefail
+export TMUX_PLUGIN_MANAGER_PATH="${TMUX_PLUGIN_MANAGER_PATH:-$HOME/.tmux/plugins}"
+TPM="$TMUX_PLUGIN_MANAGER_PATH/tpm"
+[ -d "$TPM" ] || { echo "tpm not installed at $TPM — nothing to update"; exit 0; }
+
+echo "=== $(date -Is) updating tpm ==="
+git -C "$TPM" fetch -q -p && git -C "$TPM" reset -q --hard origin/HEAD || \
+  echo "warning: tpm self-update failed, continuing to plugins"
+
+# tpm's bin/ scripts need a tmux server to talk to; they no-op without one.
+# Use a throwaway server on its own socket so this never disturbs real sessions.
+SOCK="tpm-update-$$"
+tmux -L "$SOCK" new-session -d -s updater 'sleep 300' 2>/dev/null || {
+  echo "could not start a scratch tmux server"; exit 1; }
+trap 'tmux -L "$SOCK" kill-server 2>/dev/null || true' EXIT
+
+echo "=== updating plugins ==="
+TMUX="$(tmux -L "$SOCK" display -p '#{socket_path},,')" \
+  "$TPM/bin/update_plugins" all
+rc=$?
+echo "=== done (exit $rc) ==="
+exit $rc

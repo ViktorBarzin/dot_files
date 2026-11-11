@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly tmux plugin (tpm) update
+Documentation=man:tmux(1)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/tmux-plugin-update
+Nice=10
+IOSchedulingClass=idle

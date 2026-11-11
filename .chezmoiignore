@@ -56,3 +56,15 @@
 .claude/skills/**
 .config/systemd/**
 {{ end }}
+
+# The devvm is rebuilt from code (2026-11-11). Its two GPG-encrypted files, the
+# admin kubeconfig and the zsh secrets, come from its credential restore there,
+# so chezmoi neither asks for the passphrase nor overwrites them. The local
+# terminal-lobby UI exists only on that box.
+{{ if hasPrefix "devvm" .chezmoi.hostname }}
+.kube/config
+.oh-my-zsh/custom/secrets.zsh
+{{ else }}
+.config/systemd/user/lobby-local.service
+.config/systemd/user/default.target.wants/lobby-local.service
+{{ end }}

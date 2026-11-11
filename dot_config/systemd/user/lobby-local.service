@@ -1,0 +1,26 @@
+[Unit]
+# Local, no-auth terminal-lobby UI for wizard.
+#
+# frontend-v2's vite dev server is a same-origin proxy onto the LIVE lobby
+# backends (ttyd 7681, clipboard-upload 7683, tmux-api 7684, session-events
+# 7685, file-api 7686, skills-api 7688), so this is the real lobby against real
+# tmux sessions, not a mock. It injects the identity that Authentik would
+# normally supply, which is what makes it usable while forward-auth is down.
+#
+# Bound to 127.0.0.1 ON PURPOSE. The identity header is the only authentication
+# these backends have, so a wider bind would hand a shell to anything that can
+# route here. Reach it over an SSH tunnel:
+#     ssh -N -L 5899:127.0.0.1:5899 <devvm>
+Description=terminal-lobby local UI (no auth, loopback only)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/code/terminal-lobby/frontend-v2
+EnvironmentFile=%h/.config/terminal-lobby-dev.env
+ExecStart=/usr/bin/npx vite --port 5899 --strictPort --host 127.0.0.1
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target
