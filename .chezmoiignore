@@ -6,14 +6,15 @@
 # plugin lists and caches). chezmoi writing them first made the store's
 # restore keep the stale copy, which the ingest then stored as the newest
 # (rebuild drill, 2026-11-11). So on the devvm chezmoi keeps only the links:
-# CLAUDE.md and the skill links. ~/.codex holds links alone already.
+# CLAUDE.md and the skill links. ~/.codex holds links alone already. (Not
+# .claude/**: that pattern also matches .claude itself, and the excludes below
+# cannot bring its children back.)
 # The memory MCP's other two pieces stay off it too, and so does the old
 # vault-token-renew.sh: the provisioner installs ~/.local/bin/vault-token-renew.
 {{ if hasPrefix "devvm" .chezmoi.hostname }}
-.claude/**
+.claude/*
 !.claude/CLAUDE.md
 !.claude/skills
-!.claude/skills/**
 .mcp.json
 .local/bin/claude-memory-mcp-wrapper
 .local/bin/vault-token-renew.sh
