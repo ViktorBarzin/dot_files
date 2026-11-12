@@ -135,6 +135,34 @@ keeps its public link. Check a Bundle or HTML page by opening the file locally
 before publishing; `homelab pages preview` covers markdown only. `?raw` on a
 page URL shows it outside the frame (for printing).
 
+## Plans: blocks, not prose (since 2026-11-12)
+
+A plan, spec or design starts from the plan template,
+`curl -s https://pages.viktorbarzin.me/assets/plan-template.md` (also
+`~/code/pages/assets/plan-template.md`). Each kind of change gets one fenced YAML block and one caption
+line; the renderer draws it and refuses a block that does not validate, naming
+it. Keep as text only: the two-sentence why, open questions, the one-line why
+on each decision, and exact commands. Budget: about 600 words of prose outside
+the blocks; above that the publish prints a warning (it still publishes).
+
+| Block | For | Shape |
+|---|---|---|
+| ```` ```topology ```` | the system with the change on it | `nodes` (id, label, note, group, `state: new\|changed\|removed\|same`, `risk: high\|medium\|low`, `scope: out`), `edges` (from, to, label, state), `checks` (`node`, text, `status: passed\|failed\|open`), `left_out`; at most 12 nodes |
+| ```` ```decision ```` | a choice | question, options (name, note, one `chosen: true`), why; a list for several |
+| ```` ```config ```` | settings that change | rows of key, where, old, new |
+| ```` ```numbers ```` | figures before and after | rows of label, before, after, `better: false` when it got worse |
+| ```` ```timeline ```` | order of work | steps of when, what, `rollback`, and one `ponr: true` |
+
+Write `node:` for a check, never `on:`: YAML reads a bare `on` as true.
+
+## Lifetimes
+
+Pages, Bundles and public links published or shared from 2026-11-12 on are
+deleted 90 days after their last publish or share (git keeps a copy). Pass
+`--expires never` for a page that must stay (a reference doc, a runbook-like
+design), `--expires 30d` for something short-lived. `homelab pages unpublish
+<page>` deletes one now.
+
 The URL is the DELIVERABLE — never hand over a screenshot or a rasterised page
 in its place. Looking at the page yourself is VERIFICATION, which is required
 (execution.md §4) and is a different thing. Secrets never belong in pages.
