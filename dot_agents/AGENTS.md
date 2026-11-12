@@ -14,7 +14,7 @@ Chat replies and commit messages:
 
 Markdown I author (docs, plans, READMEs, skills, issues): readers include the people who built the systems discussed. Calibrate confidence to the evidence and add an open-questions note when needed. No loaded or dismissive words. State boundaries as scope and routing, not refusals. Credit what exists and name the specific gap. Keep every number and hedge.
 
-Plans, specs and designs are short and visual: write them from the plan template (`curl -s https://pages.viktorbarzin.me/assets/plan-template.md`) from the first draft, with the change in its YAML blocks and about 600 words of prose. The publish-page skill lists the block fields.
+Plans, specs and designs are short and visual: write them from the plan template (`curl -s https://pages.viktorbarzin.me/assets/plan-template.md`) from the first draft, with the change in its YAML blocks and about 600 words of prose. Write that prose in ASD-STE100 Simplified Technical English: at most 25 words a sentence (20 for an instruction), active voice, one word for one thing; the template lists the rules. The publish-page skill lists the block fields.
 
 ## Before you start
 

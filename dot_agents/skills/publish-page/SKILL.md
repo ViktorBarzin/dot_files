@@ -155,6 +155,17 @@ the blocks; above that the publish prints a warning (it still publishes).
 
 Write `node:` for a check, never `on:`: YAML reads a bare `on` as true.
 
+Write the prose in ASD-STE100 Simplified Technical English (Issue 9, 2025),
+the standard for aircraft maintenance manuals: one topic per paragraph, at
+most 25 words in a description and 20 in an instruction, imperative
+instructions, active voice, simple tenses, one word for one thing, lists
+instead of long sentences. The template lists all the rules. The publish
+warns on each sentence over 25 words; fix them before you hand over the URL.
+
+In a topology, mark only real changes. The renderer draws unchanged parts
+as a grey background and each change as a solid block, so a picture where
+every part is "changed" says nothing.
+
 ## Lifetimes
 
 Pages, Bundles and public links published or shared from 2026-11-12 on are
