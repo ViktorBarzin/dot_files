@@ -12,7 +12,8 @@ output, brainstorming, progress snapshots or throwaway notes, and never a
 sensitive personal or financial analysis (those stay in chat). Re-publish when
 the doc materially changes: a revision, a status change, progress worth seeing.
 Hand Viktor the URL; it is part of the deliverable. Publish here only, never to
-claude.ai Artifacts or another vendor-hosted page.
+claude.ai Artifacts or another vendor-hosted page: 3D viewers, decks, charts and
+other interactive work belong here too (see "Visual and interactive work").
 
 The markdown stays canonical wherever it lives (any repo — infra docs/plans, a
 project repo). Publishing renders a snapshot into `~/code/pages`, a clone of the
@@ -103,6 +104,36 @@ absolute `/assets/...`.
 
 7. **Re-publish on material change:** same command + updated status; same source
    → same filename, so the page + index entry update in place.
+
+## Visual and interactive work (since 2026-11-12)
+
+Everything an Artifact used to carry goes here instead, through
+`homelab pages publish` (any user, own Space; `--shared` for the team):
+
+| What | Publish | Notes |
+|---|---|---|
+| A doc | `homelab pages publish doc.md` | as above |
+| A slide deck | `doc.md` with front matter `deck: true` | one slide per `---` line; reveal.js; "PDF" link prints it |
+| A chart in a doc | a ```` ```chart ```` fence holding a Chart.js config (JSON with `type` and `data`) | a bad block fails the publish with a 400 |
+| One HTML page (a 3D viewer, an HTML deck, a free-form chart) | `homelab pages publish page.html` | scripts and CDNs work; vendored libs at `/assets/` (below) |
+| A page with its own images, models, data, clips | `homelab pages publish dir/` | a **Bundle**: `index.html` or `index.md` at the top, relative paths for the rest; 10 MiB per file, 25 MiB per publish |
+| A link that opens without login | add `--public`, or `homelab pages share <page URL>` | prints `https://pages.viktorbarzin.me/p/<random>/`; `homelab pages unshare <page>` revokes it |
+
+Pages run in a sandboxed frame (infra ADR-0042): page scripts get no cookies,
+no `localStorage`/`sessionStorage`/`IndexedDB` and no service worker, and a
+single page cannot load relative files (put them in a Bundle). Vendored copies,
+listed in `~/code/pages/assets/VERSIONS.md`:
+
+```html
+<script type="importmap">{"imports":{"three":"/assets/three-0.187.0/three.module.js","three/addons/":"/assets/three-0.187.0/addons/"}}</script>
+<script src="/assets/chart-4.6.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/assets/reveal-6.0.2/reveal.css"><script src="/assets/reveal-6.0.2/reveal.js"></script>
+```
+
+The same file or directory name updates the same page on any later day, and
+keeps its public link. Check a Bundle or HTML page by opening the file locally
+before publishing; `homelab pages preview` covers markdown only. `?raw` on a
+page URL shows it outside the frame (for printing).
 
 The URL is the DELIVERABLE — never hand over a screenshot or a rasterised page
 in its place. Looking at the page yourself is VERIFICATION, which is required
