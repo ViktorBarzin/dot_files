@@ -141,7 +141,10 @@ A plan, spec or design starts from the plan template,
 `curl -s https://pages.viktorbarzin.me/assets/plan-template.md` (also
 `~/code/pages/assets/plan-template.md`). Each kind of change gets one fenced YAML block and one caption
 line; the renderer draws it and refuses a block that does not validate, naming
-it. Keep as text only: the two-sentence why, open questions, the one-line why
+it. A plan has no open questions: settle each one first, by investigation
+for a fact or by the grilling skill for a decision, and record the answer in
+a decision block; the renderer refuses a plan with an "Open questions"
+section. Keep as text only: the two-sentence why, the one-line why
 on each decision, and exact commands. Budget: about 600 words of prose outside
 the blocks; above that the publish prints a warning (it still publishes).
 
