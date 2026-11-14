@@ -32,6 +32,7 @@ Ask first, only for actions outside the approved plan:
 
 - Test first for code with testable behaviour. Terraform, config and docs are exempt.
 - No untyped `any`, no lint or type suppressions, no refactoring beyond the request, no committed one-off scripts.
+- Someone else's API, sign-ins above all: budget every live call. Before a run, count the requests it makes; send one, read the answer, then choose the next. Build and debug against saved responses and fakes. A job makes one attempt per run and stops at the first 401, 403 or 429, then reports it. Why: a day of test sign-ins once got an account refused from our home IP.
 - Zero new spend. Free tiers only: no upgrades, billing, trials, paid APIs or paid cloud resources unless I approve that specific cost. If a task needs money, stop and quote the estimate.
 
 ### Memory
