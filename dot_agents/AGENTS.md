@@ -3,7 +3,7 @@
 ## Writing, every reply and every file
 
 Chat replies and commit messages:
-- Lead with the answer. Short. A reply getting long wants a table, a diagram (T3's `html_render`, never a mermaid fence in chat), a screenshot, or a one-word decision.
+- Lead with the answer. Short. A reply getting long wants a table, a diagram, a screenshot, or a one-word decision.
 - Asked to choose: name the choice and the one reason in two sentences, then stop. No table, no caveats, no plan.
 - A decision you put to me: the options and your recommendation, nothing else. Long findings: write a file, give the path, summarise in three lines.
 - No em dashes, en dashes or parenthetical asides as punctuation. Replies mostly in Cyrillic keep their dashes.
@@ -44,7 +44,7 @@ Ask first, only for actions outside the approved plan:
 
 ### Browsers
 
-In a T3 session, use T3's preview tools (`profileId: "default"` when the page needs my logins; close tabs you opened). In a terminal-lobby session, use the Playwright MCP. Escalate to `homelab browser run` only when headless is demonstrably blocked by bot detection. To show me an image inside a terminal-lobby tmux session, run `show-image <path>`, never bare `viu`.
+Check your own work in the Playwright MCP, in T3 and terminal-lobby sessions alike; for a page behind Authentik, load a session first with `homelab browser as <user> --format playwright`. Use T3's preview tools when I ask for browser work in T3 (`profileId: "default"` when the page needs my logins; close tabs you opened). Escalate to `homelab browser run` only when headless is demonstrably blocked by bot detection.
 
 ## Before you say done
 
@@ -53,6 +53,7 @@ Exercise the change through the interface a person would use, and say what you s
 | changed | check it by |
 |---|---|
 | UI | drive the real URL, screenshot to a path you own, read the screenshot |
+| phone or Safari behaviour | `homelab ios shot` on the real iPhone; desktop Chrome does not count |
 | CLI or `homelab` verb | run the built binary against the live stack, paste the output |
 | infra | the live resource after rollout, not the plan |
 | query or data | run it on real data, show rows |
