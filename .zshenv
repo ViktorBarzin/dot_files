@@ -7,11 +7,11 @@
 #eval "$(pyenv virtualenv-init -)"
 
 
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-export VIRTUALENV_PYTHON=python3
-export WORKON_HOME=$HOME/.virtualenvs
+#export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+#export VIRTUALENV_PYTHON=python3
+#export WORKON_HOME=$HOME/.virtualenvs
 # export VIRTUALENV_PYTHON=python
 
-if [ -f $HOME/.virtualenvwrapper.sh ]; then
-    source $HOME/.virtualenvwrapper.sh
-fi
+#if [ -f $HOME/.virtualenvwrapper.sh ]; then
+    #source $HOME/.virtualenvwrapper.sh
+#fi
