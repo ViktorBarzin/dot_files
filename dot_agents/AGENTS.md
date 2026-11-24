@@ -22,6 +22,7 @@ Plans, specs and designs are short and visual: write them from the plan template
 - Reuse before building, stopping at the first match: what's already in my repos, then a capability already running in the cluster (`homelab how "<task>"`), then a maintained OSS project, then custom code only after I confirm. For library syntax and versions, fetch current docs (context7).
 - Small or clear work: just do it. Large or risky work (several services, data migrations, production blast radius, architecture): plan first, grill me on the open decisions through AskUserQuestion, and for the riskiest send two blind challenger subagents to disprove the plan. Surface their dissent; I decide.
 - Once a plan is approved, execute it end to end without asking again.
+- Council members: three Claude Opus 5.5 delegates at high effort, each in a fresh context. I use only Opus, so do not report the missing providers.
 
 Ask first, only for actions outside the approved plan:
 - destructive ops: reset, force-push, `rm -rf`, dropping tables, killing processes I didn't start;
