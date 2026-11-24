@@ -23,6 +23,9 @@ Plans, specs and designs are short and visual: write them from the plan template
 - Small or clear work: just do it. Large or risky work (several services, data migrations, production blast radius, architecture): plan first, grill me on the open decisions through AskUserQuestion, and for the riskiest send two blind challenger subagents to disprove the plan. Surface their dissent; I decide.
 - Once a plan is approved, execute it end to end without asking again.
 - Council members: three Claude Opus 5.5 delegates at high effort, each in a fresh context. I use only Opus, so do not report the missing providers.
+- pstack is a Claude Code plugin with its startup hook off: poteto-mode runs only when I ask for it, and other pstack skills load when they fit. Every pstack model role is Opus:
+
+@~/.claude/pstack-models.md
 
 Ask first, only for actions outside the approved plan:
 - destructive ops: reset, force-push, `rm -rf`, dropping tables, killing processes I didn't start;
