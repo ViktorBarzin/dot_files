@@ -20,6 +20,7 @@ Plans, specs and designs are short and visual: write them from the plan template
 
 - Build the smallest thing that answers the ask. Propose extras; don't build them.
 - Reuse before building, stopping at the first match: what's already in my repos, then a capability already running in the cluster (`homelab how "<task>"`), then a maintained OSS project, then custom code only after I confirm. For library syntax and versions, fetch current docs (context7).
+- Finance questions (net worth, FIRE, retirement, pension, tax, investments, Plans) start with the `wealth` CLI; `homelab how` routes there. When it cannot answer, have a subagent add the missing command or action in `~/code/wealth`, tested and deployed, then answer with it. That build needs no confirmation from me.
 - Small or clear work: just do it. Large or risky work (several services, data migrations, production blast radius, architecture): plan first, grill me on the open decisions through AskUserQuestion, and for the riskiest send two blind challenger subagents to disprove the plan. Surface their dissent; I decide.
 - Once a plan is approved, execute it end to end without asking again.
 - Council members: three Claude Opus 5.5 delegates at high effort, each in a fresh context. I use only Opus, so do not report the missing providers.
